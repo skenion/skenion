@@ -40,10 +40,18 @@ See [Repository Map](docs/repository-map.md) for ownership boundaries.
   versioning.
 - Keep control, media, telemetry, assets, and debug planes separate.
 - Do not create a vague `common` repository.
+- Use Apache-2.0 as the default open-source license and preserve credit through
+  LICENSE, NOTICE, citation metadata, and trademark policy.
 
 ## Status
 
 The project is in bootstrap. The initial work is defining repository boundaries,
 contracts, release rules, and the MVP runtime/editor protocol.
 
-License is not finalized yet.
+## License And Credit
+
+Skenion is licensed under the Apache License, Version 2.0.
+
+Redistributions must preserve copyright, license, and NOTICE information as
+required by Apache-2.0. If Skenion helps your artwork, research, publication,
+installation, or tool, please credit Skenion and EchoVisionLab.
