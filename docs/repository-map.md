@@ -17,6 +17,7 @@ Owns:
 - release policy
 - repository boundaries
 - compatibility policy
+- compatibility matrix
 - roadmap
 - contributor-facing project rules
 

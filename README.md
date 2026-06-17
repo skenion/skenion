@@ -30,6 +30,8 @@ Skenion starts as a multi-repository project:
 | `skenion-ci` | Reusable GitHub Actions workflows and composite actions |
 
 See [Repository Map](docs/repository-map.md) for ownership boundaries.
+See [Compatibility Matrix](docs/compatibility-matrix.md) for graph/node/runtime
+source-of-truth rules.
 See [Roadmap](docs/roadmap.md) for the initial implementation order.
 
 ## Key Decisions
