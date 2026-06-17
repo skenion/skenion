@@ -58,10 +58,10 @@ an editable graph and generates a default view state for that copy.
 
 | Repository | Release / branch | Compatibility note |
 | --- | --- | --- |
-| `skenion-contracts` | `skenion-contracts-v0.17.0` | Publishes typed send/receive and panel-control builtins with help metadata and help graphs. |
-| `skenion-runtime` | `skenion-runtime-v0.19.0` | Adds typed control channels in runtime session state. |
-| `skenion-examples` | `main` after send/receive panel fixtures merge | Contains compatibility fixtures, tutorial graphs, and runtime smoke coverage for typed channels. |
-| `skenion-studio` | `skenion-studio-v0.19.0` | Uses contracts builtins/help and exposes runtime panel controls without graph patching. |
+| `skenion-contracts` | `skenion-contracts-v0.19.0` | Publishes ProjectDocument/ViewState schemas alongside typed send/receive and panel-control builtins with help metadata and help graphs. |
+| `skenion-runtime` | `skenion-runtime-v0.20.0` | Adds live preview control updates on top of typed control channels in runtime session state. |
+| `skenion-examples` | `main` after project view state examples merge | Contains compatibility fixtures, project documents, tutorial graphs, and runtime smoke coverage for typed channels. |
+| `skenion-studio` | `skenion-studio-v0.21.0` | Saves/opens project view state while keeping graph-only export/import and runtime control interactions separate from graph patching. |
 
 ## Canonical Data Kinds
 
