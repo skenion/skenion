@@ -19,10 +19,10 @@ runtime compatibility. It exists to keep `skenion-contracts`, `skenion-examples`
 
 | Repository | Release / branch | Compatibility note |
 | --- | --- | --- |
-| `skenion-contracts` | `skenion-contracts-v0.15.0` plus current branch | Publishes structured shader diagnostics and canonical builtin help metadata/help graphs. |
+| `skenion-contracts` | `skenion-contracts-v0.16.0` | Publishes canonical builtin help metadata and bundled help graphs. |
 | `skenion-runtime` | `skenion-runtime-v0.18.0` | Exposes shader diagnostics and generated WGSL from the runtime session. |
-| `skenion-examples` | current branch | Contains compatibility fixtures plus learning tutorial graph manifest. |
-| `skenion-studio` | `skenion-studio-v0.17.0` plus current branch | Uses contracts builtins/help, displays read-only help graphs, and can open help graphs as editable copies. |
+| `skenion-examples` | `main` after node help tutorials merge | Contains compatibility fixtures plus learning tutorial graph manifest. |
+| `skenion-studio` | `skenion-studio-v0.18.0` | Uses contracts builtins/help, displays read-only help graphs, and can open help graphs as editable copies. |
 
 ## Canonical Data Kinds
 

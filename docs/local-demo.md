@@ -41,5 +41,7 @@ Suggested manual flow:
 6. Send runtime control events through the inspector.
 7. Open Help for `render.fullscreen-shader`.
 8. Compare local annotation analysis, synced input ports, runtime diagnostics, and generated WGSL.
+9. Open the Dynamic Shader Inputs tutorial graph from `skenion-examples/tutorials/v0.1`.
+10. Inspect the Shader Diagnostics tutorial and confirm the expected diagnostic appears before syncing inputs.
 
 Do not use tutorial graphs as compatibility fixtures. Compatibility fixtures stay under `skenion-examples/compatibility`.
