@@ -12,16 +12,17 @@ runtime compatibility. It exists to keep `skenion-contracts`, `skenion-examples`
 | Node definition schema | `skenion.node.definition` `0.1.0` | `skenion-contracts/json-schema/node/v0.1/node-definition.schema.json` |
 | Graph patch schema | `skenion.graph.patch` `0.1.0` | `skenion-contracts/json-schema/graph/v0.1/patch.schema.json` |
 | Built-in node definitions | `builtins/v0.1` | `skenion-contracts/builtins/v0.1/builtins.manifest.json` and `skenion-contracts/builtins/v0.1/nodes/*.node.json` |
+| Built-in node help | `skenion.node.help` `0.1.0` plus help graphs | `skenion-contracts/builtins/v0.1/help/*.help.json` and `skenion-contracts/help/v0.1/nodes/*.help.graph.json` |
 | Runtime HTTP API | `runtime-http.v0` | `skenion-contracts/openapi/runtime-http.v0.yaml` |
 
 ## Verified Releases
 
 | Repository | Release / branch | Compatibility note |
 | --- | --- | --- |
-| `skenion-contracts` | `skenion-contracts-v0.12.0` | Publishes `core.color-rgba` and fullscreen shader `u_value`, `u_value2`, `u_color` builtins. |
-| `skenion-runtime` | `skenion-runtime-v0.15.0` plus current `main` CI | Extracts `u_value`, `u_value2`, and `u_color` for fullscreen shader preview. |
-| `skenion-examples` | current `main` | Contains canonical multi-uniform shader project and patch smoke fixtures. |
-| `skenion-studio` | `skenion-studio-v0.14.0` | Uses contracts builtins, exposes RGBA color node controls, and includes a multi-uniform visual gate sample. |
+| `skenion-contracts` | `skenion-contracts-v0.15.0` plus current branch | Publishes structured shader diagnostics and canonical builtin help metadata/help graphs. |
+| `skenion-runtime` | `skenion-runtime-v0.18.0` | Exposes shader diagnostics and generated WGSL from the runtime session. |
+| `skenion-examples` | current branch | Contains compatibility fixtures plus learning tutorial graph manifest. |
+| `skenion-studio` | `skenion-studio-v0.17.0` plus current branch | Uses contracts builtins/help, displays read-only help graphs, and can open help graphs as editable copies. |
 
 ## Canonical Data Kinds
 
@@ -53,6 +54,25 @@ must use `number.f32`.
 - Product-facing render cables may display as `render.frame`; the low-level
   v0.1 stored resource type remains `resource<gpu.texture2d>` until a later
   persisted schema changes that contract.
+- Every new builtin node must include node definition, compact help metadata,
+  and a valid help graph in the same PR.
+- Studio must consume `builtinNodeHelpV01` and `builtinNodeHelpGraphsV01` from
+  `@skenion/contracts`; it must not keep a separate hand-written help registry.
+
+## Learning Surfaces
+
+Learning surfaces are intentionally separate from compatibility fixtures.
+
+| Surface | Owner | Purpose |
+| --- | --- | --- |
+| Builtin help metadata | `skenion-contracts` | Inspector/palette help text and node behavior summary |
+| Builtin help graphs | `skenion-contracts` | Small read-only example patches for each builtin node |
+| Tutorial manifest and graphs | `skenion-examples` | User-facing learning paths across multiple nodes |
+| Help graph viewer | `skenion-studio` | Read-only graph display and "Open as New Graph" copy flow |
+
+Help graphs must be valid `skenion.graph` `0.1.0` documents. Tutorial graphs
+may intentionally include shader analysis errors only when their manifest lists
+the expected diagnostics.
 
 ## Compatibility Checks
 

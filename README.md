@@ -32,6 +32,8 @@ Skenion starts as a multi-repository project:
 See [Repository Map](docs/repository-map.md) for ownership boundaries.
 See [Compatibility Matrix](docs/compatibility-matrix.md) for graph/node/runtime
 source-of-truth rules.
+See [Local Demo](docs/local-demo.md) for the current Runtime + Studio learning
+flow.
 See [Roadmap](docs/roadmap.md) for the initial implementation order.
 
 ## Key Decisions
