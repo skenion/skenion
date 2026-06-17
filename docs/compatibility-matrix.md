@@ -9,6 +9,8 @@ runtime compatibility. It exists to keep `skenion-contracts`, `skenion-examples`
 | Surface | Current baseline | Owner |
 | --- | --- | --- |
 | Graph document schema | `skenion.graph` `0.1.0` | `skenion-contracts/json-schema/graph/v0.1/graph.schema.json` |
+| View state schema | `skenion.view-state` `0.1.0` | `skenion-contracts/json-schema/view/v0.1/view-state.schema.json` |
+| Project document schema | `skenion.project` `0.1.0` | `skenion-contracts/json-schema/project/v0.1/project.schema.json` |
 | Node definition schema | `skenion.node.definition` `0.1.0` | `skenion-contracts/json-schema/node/v0.1/node-definition.schema.json` |
 | Graph patch schema | `skenion.graph.patch` `0.1.0` | `skenion-contracts/json-schema/graph/v0.1/patch.schema.json` |
 | Built-in node definitions | `builtins/v0.1` | `skenion-contracts/builtins/v0.1/builtins.manifest.json` and `skenion-contracts/builtins/v0.1/nodes/*.node.json` |
@@ -16,6 +18,41 @@ runtime compatibility. It exists to keep `skenion-contracts`, `skenion-examples`
 | Typed control routing | `core.send-*`, `core.receive-*`, `ui.*` panel controls | `skenion-contracts/builtins/v0.1` plus `skenion-contracts/docs/control-routing.md` |
 | Live preview control updates | `skenion.preview.control-state` `0.1.0` runtime-internal snapshot plus telemetry revision fields | `skenion-contracts/docs/live-preview-control-updates.md` and `skenion-contracts/openapi/runtime-http.v0.yaml` |
 | Runtime HTTP API | `runtime-http.v0` | `skenion-contracts/openapi/runtime-http.v0.yaml` |
+
+## Project Documents and View State
+
+`GraphDocument` remains the runtime/execution graph. It stores nodes, ports,
+params, edges, and graph revision. It must not store Studio layout, viewport,
+panel layout, selection, or collapsed UI state.
+
+`ViewState` is Studio-owned layout state. v0.1 stores canvas node positions and
+viewport. Node drag and viewport pan/zoom update `viewState` only:
+
+```text
+node drag or viewport pan
+  -> viewState change
+  -> no graph patch
+  -> graph revision unchanged
+  -> runtime session sync state unchanged
+```
+
+`ProjectDocument` stores `metadata`, `graph`, and `viewState` together and is
+the user-facing file format for `.skenion.json`. Opening a project replaces the
+local graph/view state and clears pending runtime patch/session UI state, but it
+does not automatically load Runtime. The user must explicitly use Load Current
+Graph after connecting Runtime.
+
+Graph-only import/export stays separate:
+
+```text
+Save Project  -> graph + viewState + metadata
+Open Project  -> graph + viewState
+Export Graph  -> graph only
+Import Graph  -> graph only, generated default viewState
+```
+
+Help graph viewer remains read-only. Open as New Graph copies a help graph into
+an editable graph and generates a default view state for that copy.
 
 ## Verified Releases
 

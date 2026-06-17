@@ -49,6 +49,24 @@ Suggested manual flow:
 14. Start preview, move the slider again, and confirm telemetry reports `controlLive: true` with matching `controlRevision` and `previewControlRevision`.
 15. Apply a graph edit and confirm preview graph staleness is separate from runtime control live state.
 
+## Save And Reopen Projects
+
+Project documents use the `.skenion.json` extension and contain the execution
+graph plus Studio view state. Graph JSON export remains graph-only.
+
+Manual persistence smoke:
+
+1. Load the Send / Receive Panel Controls sample.
+2. Move several nodes and pan or zoom the canvas.
+3. Save Project.
+4. Refresh Studio or start a new Studio session.
+5. Open Project and confirm node positions and viewport are restored.
+6. Confirm Runtime did not auto-load the opened project.
+7. Connect Runtime and explicitly Load Current Graph.
+8. Start preview and confirm slider/toggle live control still updates the running preview.
+9. Export Graph and confirm the exported JSON has no `viewState` field.
+10. Import Graph and confirm Studio generates a default view state.
+
 Do not use tutorial graphs as compatibility fixtures. Compatibility fixtures stay under `skenion-examples/compatibility`.
 
 The direct runtime smoke for the panel-control path lives in
