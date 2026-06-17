@@ -84,26 +84,38 @@ Required cross-repository checks:
   and graph patches against contracts builtins.
 - studio tests prove its registry IDs and render ports match contracts builtins,
   and that newly created sample graphs store `number.f32`.
-- runtime tests and CI smoke validate the canonical shader uniform projects:
+- contracts own `ShaderInterfaceV01`, `ShaderDiagnosticV01`, and
+  `replaceNodeInterface`. Shader input parsing is part of the contract surface,
+  not a Studio-only convention.
+- `render.fullscreen-shader` builtins provide the stable `out` port. Individual
+  graph node instances own annotation-generated input ports after Studio syncs
+  the analyzed interface.
+- studio analyzes WGSL `@skenion.uniform` annotations and queues
+  `replaceNodeInterface` graph patches through Sync Inputs.
+- runtime generates the WGSL support header and dynamic uniform layout from the
+  analyzed shader interface.
+- runtime tests and CI smoke validate canonical dynamic shader uniform projects:
 
 ```text
 core.value-f32.value
-  -> render.fullscreen-shader.u_value
-  -> render.output.in
+  -> render.fullscreen-shader.speed
 
-core.value-f32.value
-  -> render.fullscreen-shader.u_value
-core.value-f32.value
-  -> render.fullscreen-shader.u_value2
+core.value-bool.value or core.toggle.value
+  -> render.fullscreen-shader.enabled
+
+core.value-i32.value
+  -> render.fullscreen-shader.iterations
+
 core.color-rgba.value
-  -> render.fullscreen-shader.u_color
+  -> render.fullscreen-shader.tint
+
 render.fullscreen-shader.out
   -> render.output.in
 ```
 
-Do not add dynamic shader port parsing, texture inputs, asset loading, script
-nodes, or new render nodes until this matrix remains green across the affected
-repositories.
+Dynamic shader input parsing is supported through WGSL `@skenion.uniform`
+annotations. GLSL, texture inputs, asset loading, script nodes, and multi-pass
+rendering remain out of scope.
 
 Run the hub-level smoke script before merging compatibility-affecting changes:
 
