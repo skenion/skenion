@@ -20,10 +20,10 @@ runtime compatibility. It exists to keep `skenion-contracts`, `skenion-examples`
 
 | Repository | Release / branch | Compatibility note |
 | --- | --- | --- |
-| `skenion-contracts` | `skenion-contracts-v0.16.0` | Publishes canonical builtin help metadata and bundled help graphs. |
-| `skenion-runtime` | branch after send/receive panel controls | Adds typed control channels in runtime session state. |
-| `skenion-examples` | `main` after node help tutorials merge | Contains compatibility fixtures plus learning tutorial graph manifest. |
-| `skenion-studio` | branch after send/receive panel controls | Uses contracts builtins/help and exposes runtime panel controls without graph patching. |
+| `skenion-contracts` | `skenion-contracts-v0.17.0` | Publishes typed send/receive and panel-control builtins with help metadata and help graphs. |
+| `skenion-runtime` | `skenion-runtime-v0.19.0` | Adds typed control channels in runtime session state. |
+| `skenion-examples` | `main` after send/receive panel fixtures merge | Contains compatibility fixtures, tutorial graphs, and runtime smoke coverage for typed channels. |
+| `skenion-studio` | `skenion-studio-v0.19.0` | Uses contracts builtins/help and exposes runtime panel controls without graph patching. |
 
 ## Canonical Data Kinds
 
