@@ -50,6 +50,9 @@ run "examples: validate runtime project payloads" bash -lc \
 run "runtime: Rust tests" bash -lc \
   "cd '${RUNTIME_DIR}' && cargo test --all-targets --all-features"
 
+run "runtime: validate examples fixtures" bash -lc \
+  "cd '${EXAMPLES_DIR}' && bash scripts/validate-with-runtime.sh '${RUNTIME_DIR}'"
+
 run "studio: app build smoke" bash -lc \
   "cd '${STUDIO_DIR}' && pnpm install --frozen-lockfile && pnpm run build"
 

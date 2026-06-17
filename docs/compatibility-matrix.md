@@ -14,6 +14,15 @@ runtime compatibility. It exists to keep `skenion-contracts`, `skenion-examples`
 | Built-in node definitions | `builtins/v0.1` | `skenion-contracts/builtins/v0.1/builtins.manifest.json` and `skenion-contracts/builtins/v0.1/nodes/*.node.json` |
 | Runtime HTTP API | `runtime-http.v0` | `skenion-contracts/openapi/runtime-http.v0.yaml` |
 
+## Verified Releases
+
+| Repository | Release / branch | Compatibility note |
+| --- | --- | --- |
+| `skenion-contracts` | `skenion-contracts-v0.12.0` | Publishes `core.color-rgba` and fullscreen shader `u_value`, `u_value2`, `u_color` builtins. |
+| `skenion-runtime` | `skenion-runtime-v0.15.0` plus current `main` CI | Extracts `u_value`, `u_value2`, and `u_color` for fullscreen shader preview. |
+| `skenion-examples` | current `main` | Contains canonical multi-uniform shader project and patch smoke fixtures. |
+| `skenion-studio` | `skenion-studio-v0.14.0` | Uses contracts builtins, exposes RGBA color node controls, and includes a multi-uniform visual gate sample. |
+
 ## Canonical Data Kinds
 
 Use namespaced data kinds in persisted graph node snapshots and node
@@ -55,15 +64,24 @@ Required cross-repository checks:
   and graph patches against contracts builtins.
 - studio tests prove its registry IDs and render ports match contracts builtins,
   and that newly created sample graphs store `number.f32`.
-- runtime tests and CI smoke validate the canonical shader uniform project:
+- runtime tests and CI smoke validate the canonical shader uniform projects:
 
 ```text
 core.value-f32.value
   -> render.fullscreen-shader.u_value
   -> render.output.in
+
+core.value-f32.value
+  -> render.fullscreen-shader.u_value
+core.value-f32.value
+  -> render.fullscreen-shader.u_value2
+core.color-rgba.value
+  -> render.fullscreen-shader.u_color
+render.fullscreen-shader.out
+  -> render.output.in
 ```
 
-Do not add additional shader uniforms, texture inputs, asset loading, script
+Do not add dynamic shader port parsing, texture inputs, asset loading, script
 nodes, or new render nodes until this matrix remains green across the affected
 repositories.
 
