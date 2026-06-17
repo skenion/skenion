@@ -43,5 +43,11 @@ Suggested manual flow:
 8. Compare local annotation analysis, synced input ports, runtime diagnostics, and generated WGSL.
 9. Open the Dynamic Shader Inputs tutorial graph from `skenion-examples/tutorials/v0.1`.
 10. Inspect the Shader Diagnostics tutorial and confirm the expected diagnostic appears before syncing inputs.
+11. Load the Send / Receive Panel Controls sample in Studio.
+12. Connect Runtime, Load Current Graph, move the `ui.slider-f32` runtime control, and click the `ui.toggle`.
+13. Confirm Runtime control state exposes `number.f32:speed` and `boolean:enabled` channels, then start preview.
 
 Do not use tutorial graphs as compatibility fixtures. Compatibility fixtures stay under `skenion-examples/compatibility`.
+
+The direct runtime smoke for the panel-control path lives in
+`skenion-examples/scripts/smoke-runtime-send-receive-panel.sh`.
