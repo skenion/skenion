@@ -15,7 +15,7 @@ runtime compatibility. It exists to keep `skenion-contracts`, `skenion-examples`
 | Graph patch schema | `skenion.graph.patch` `0.1.0` | `skenion-contracts/json-schema/graph/v0.1/patch.schema.json` |
 | Built-in node definitions | `builtins/v0.1` | `skenion-contracts/builtins/v0.1/builtins.manifest.json` and `skenion-contracts/builtins/v0.1/nodes/*.node.json` |
 | Built-in node help | `skenion.node.help` `0.1.0` plus help graphs | `skenion-contracts/builtins/v0.1/help/*.help.json` and `skenion-contracts/help/v0.1/nodes/*.help.graph.json` |
-| Typed control routing | `core.send-*`, `core.receive-*`, `ui.*` panel controls | `skenion-contracts/builtins/v0.1` plus `skenion-contracts/docs/control-routing.md` |
+| Typed control routing | Object-owned `sendName` / `receiveName` on value and UI control nodes | `skenion-contracts/builtins/v0.1` plus `skenion-contracts/docs/control-routing.md` |
 | Live preview control updates | `skenion.preview.control-state` `0.1.0` runtime-internal snapshot plus telemetry revision fields | `skenion-contracts/docs/live-preview-control-updates.md` and `skenion-contracts/openapi/runtime-http.v0.yaml` |
 | Runtime HTTP API | `runtime-http.v0` | `skenion-contracts/openapi/runtime-http.v0.yaml` |
 
@@ -58,10 +58,10 @@ an editable graph and generates a default view state for that copy.
 
 | Repository | Release / branch | Compatibility note |
 | --- | --- | --- |
-| `skenion-contracts` | `skenion-contracts-v0.19.0` | Publishes ProjectDocument/ViewState schemas alongside typed send/receive and panel-control builtins with help metadata and help graphs. |
-| `skenion-runtime` | `skenion-runtime-v0.20.0` | Adds live preview control updates on top of typed control channels in runtime session state. |
-| `skenion-examples` | `main` after project view state examples merge | Contains compatibility fixtures, project documents, tutorial graphs, and runtime smoke coverage for typed channels. |
-| `skenion-studio` | `skenion-studio-v0.21.0` | Saves/opens project view state while keeping graph-only export/import and runtime control interactions separate from graph patching. |
+| `skenion-contracts` | `skenion-contracts-v0.21.0` | Removes legacy routing objects and publishes object-owned control routing builtins/help. |
+| `skenion-runtime` | `skenion-runtime-v0.21.0` | Routes typed channels through object-owned `sendName` / `receiveName` and keeps live preview control updates separate from graph staleness. |
+| `skenion-examples` | `main` after object routing panel merge | Contains compatibility fixtures, project documents, tutorial graphs, and runtime smoke coverage for object-owned typed channels. |
+| `skenion-studio` | `skenion-studio-v0.22.0` | Renders Max-style object controls and keeps runtime control interactions separate from graph patching. |
 
 ## Canonical Data Kinds
 
@@ -79,24 +79,37 @@ definition manifests.
 
 ## Typed Control Channels
 
-Typed send/receive routing is explicit graph structure, not a hidden runtime
-read. v0.1 supports these channel families:
+Typed named routing belongs to the object that emits or receives the value.
+Dedicated `core.send-*` and `core.receive-*` routing nodes are not part of the
+current builtin contract.
+
+Objects publish channels when they emit and have a non-empty `sendName`.
+Compatible objects with matching `receiveName` can update their runtime control
+state from that channel:
 
 ```text
-core.send-f32.in      -> channel number.f32:<name>
-core.receive-f32      -> value<number.f32>
-core.send-i32.in      -> channel number.i32:<name>
-core.receive-i32      -> value<number.i32>
-core.send-bool.in     -> channel boolean:<name>
-core.receive-bool     -> value<boolean>
-core.send-rgba.in     -> channel color.rgba:<name>
-core.receive-rgba     -> value<color.rgba>
+ui.slider-f32(sendName: speed)
+  -> channel number.f32:speed
+  -> ui.slider-f32(receiveName: speed)
+  -> render.fullscreen-shader.speed
+
+ui.toggle(sendName: enabled)
+  -> channel boolean:enabled
+  -> ui.toggle(receiveName: enabled)
+  -> render.fullscreen-shader.enabled
+
+ui.button(sendName: reset)
+  -> channel event.bang:reset
+  -> core.message(receiveName: reset)
 ```
 
-`ui.button`, `ui.slider-f32`, and `ui.toggle` are panel controls. Runtime
-interaction with those nodes sends `/v0/session/control/event` requests and
-updates runtime control state; it must not create graph patches. Editing labels,
-ranges, names, or defaults remains graph editing.
+`core.value-f32`, `core.value-i32`, `core.value-bool`, `core.color-rgba`,
+`core.string`, `core.message`, `core.toggle`, `core.comment`, `core.panel`,
+`ui.button`, `ui.slider-f32`, and `ui.toggle` own their routing params where
+applicable. Runtime interaction with these nodes sends
+`/v0/session/control/event` requests and updates runtime control state; it must
+not create graph patches. Editing labels, ranges, names, or defaults remains
+graph editing.
 
 When local preview is running, runtime control events can update the preview
 control-state snapshot and telemetry `controlRevision` /
@@ -179,19 +192,19 @@ render.fullscreen-shader.out
   -> render.output.in
 ```
 
-The send/receive panel demo validates this additional path:
+The object routing panel demo validates this additional path:
 
 ```text
-ui.slider-f32.value
-  -> core.send-f32.in
+ui.slider-f32(sendName: speed)
+  -> channel number.f32:speed
 
-core.receive-f32.value
+ui.slider-f32(receiveName: speed).value
   -> render.fullscreen-shader.speed
 
-ui.toggle.value
-  -> core.send-bool.in
+ui.toggle(sendName: enabled)
+  -> channel boolean:enabled
 
-core.receive-bool.value
+ui.toggle(receiveName: enabled).value
   -> render.fullscreen-shader.enabled
 ```
 

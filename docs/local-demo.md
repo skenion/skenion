@@ -5,7 +5,7 @@ This demo path is the current quickest way to learn Skenion locally.
 ## Start Runtime
 
 ```bash
-cd /Users/state303/Documents/Skenion-runtime
+cd /Volumes/dev/Skenion/Skenion-runtime
 cargo run -- serve --host 127.0.0.1 --port 3761
 ```
 
@@ -14,7 +14,7 @@ Use `SKENION_PREVIEW_DRY_RUN=1` when validating control-plane behavior without a
 ## Start Studio
 
 ```bash
-cd /Users/state303/Documents/Skenion-studio
+cd /Volumes/dev/Skenion/Skenion-studio
 pnpm dev
 ```
 
@@ -43,7 +43,7 @@ Suggested manual flow:
 8. Compare local annotation analysis, synced input ports, runtime diagnostics, and generated WGSL.
 9. Open the Dynamic Shader Inputs tutorial graph from `skenion-examples/tutorials/v0.1`.
 10. Inspect the Shader Diagnostics tutorial and confirm the expected diagnostic appears before syncing inputs.
-11. Load the Send / Receive Panel Controls sample in Studio.
+11. Load the Object Routing Panel Controls sample in Studio.
 12. Connect Runtime, Load Current Graph, move the `ui.slider-f32` runtime control, and click the `ui.toggle`.
 13. Confirm Runtime control state exposes `number.f32:speed` and `boolean:enabled` channels.
 14. Start preview, move the slider again, and confirm telemetry reports `controlLive: true` with matching `controlRevision` and `previewControlRevision`.
@@ -56,7 +56,7 @@ graph plus Studio view state. Graph JSON export remains graph-only.
 
 Manual persistence smoke:
 
-1. Load the Send / Receive Panel Controls sample.
+1. Load the Object Routing Panel Controls sample.
 2. Move several nodes and pan or zoom the canvas.
 3. Save Project.
 4. Refresh Studio or start a new Studio session.
@@ -70,6 +70,6 @@ Manual persistence smoke:
 Do not use tutorial graphs as compatibility fixtures. Compatibility fixtures stay under `skenion-examples/compatibility`.
 
 The direct runtime smoke for the panel-control path lives in
-`skenion-examples/scripts/smoke-runtime-send-receive-panel.sh`.
+`skenion-examples/scripts/smoke-runtime-object-routing-panel.sh`.
 The live preview control path is covered by
 `skenion-examples/scripts/smoke-runtime-live-control-preview.sh`.
