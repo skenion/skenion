@@ -22,6 +22,7 @@ Skenion starts as a multi-repository project:
 | Repository | Role |
 | --- | --- |
 | `skenion` | Project hub, architecture, RFCs, ADRs, roadmap, governance |
+| `skenion-docs` | Human-readable model docs for data delivery, processing, and object semantics |
 | `skenion-contracts` | Protobuf, JSON Schema, OpenAPI, generated packages, conformance tests |
 | `skenion-runtime` | Rust native runtime and CLI |
 | `skenion-studio` | Mantine-based browser editor, controller, and viewer |
@@ -32,6 +33,9 @@ Skenion starts as a multi-repository project:
 See [Repository Map](docs/repository-map.md) for ownership boundaries.
 See [Compatibility Matrix](docs/compatibility-matrix.md) for graph/node/runtime
 source-of-truth rules.
+Human-readable delivery and processing model docs live in
+[`skenion-docs`](https://github.com/echovisionlab/skenion-docs); machine
+contracts remain in `skenion-contracts`.
 See [Local Demo](docs/local-demo.md) for the current Runtime + Studio learning
 flow.
 See [Roadmap](docs/roadmap.md) for the initial implementation order.

@@ -41,6 +41,22 @@ Owns:
 This repository is the shared contract between TypeScript and Rust. It is not a
 general-purpose utility package.
 
+### `skenion-docs`
+
+Human-readable design documentation.
+
+Owns:
+
+- data delivery and processing model docs
+- control/message model explanations
+- semantic value, audio, video, render, and GPU domain review guides
+- Pd-style object, message, and expression layer notes
+- references that help reviewers understand design intent
+
+Does not own JSON Schema, OpenAPI, generated packages, builtin manifests, or
+runtime behavior. Those remain in `skenion-contracts`, `skenion-runtime`, and
+the implementation repositories.
+
 ### `skenion-runtime`
 
 Rust native runtime.
