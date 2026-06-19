@@ -18,7 +18,7 @@ cd /Volumes/dev/Skenion/Skenion-studio
 pnpm dev
 ```
 
-Open `http://127.0.0.1:5173`.
+Open `http://localhost:5173`.
 
 ## Learn Nodes
 
@@ -33,19 +33,19 @@ Tutorial graphs live in `skenion-examples/tutorials/v0.1` and are indexed by
 
 Suggested manual flow:
 
-1. Open Help for `core.value-f32`.
+1. Open Help for `core.float`.
 2. Inspect the help graph.
 3. Open it as a new graph.
 4. Connect Runtime.
-5. Load Current Graph.
+5. Confirm Studio shows the Runtime-owned session graph.
 6. Send runtime control events through the inspector.
 7. Open Help for `render.fullscreen-shader`.
 8. Compare local annotation analysis, synced input ports, runtime diagnostics, and generated WGSL.
 9. Open the Dynamic Shader Inputs tutorial graph from `skenion-examples/tutorials/v0.1`.
 10. Inspect the Shader Diagnostics tutorial and confirm the expected diagnostic appears before syncing inputs.
 11. Load the Object Routing Panel Controls sample in Studio.
-12. Connect Runtime, Load Current Graph, move the `ui.slider-f32` runtime control, and click the `ui.toggle`.
-13. Confirm Runtime control state exposes `number.f32:speed` and `boolean:enabled` channels.
+12. Connect Runtime, move the `core.float` object with `widget=slider`, and click the `core.bool` object with `widget=toggle`.
+13. Confirm Runtime control state exposes `number.float:speed` and `boolean:enabled` channels.
 14. Start preview, move the slider again, and confirm telemetry reports `controlLive: true` with matching `controlRevision` and `previewControlRevision`.
 15. Apply a graph edit and confirm preview graph staleness is separate from runtime control live state.
 
@@ -61,11 +61,11 @@ Manual persistence smoke:
 3. Save Project.
 4. Refresh Studio or start a new Studio session.
 5. Open Project and confirm node positions and viewport are restored.
-6. Confirm Runtime did not auto-load the opened project.
-7. Connect Runtime and explicitly Load Current Graph.
-8. Start preview and confirm slider/toggle live control still updates the running preview.
+6. Confirm the opened project loads into the Runtime-owned session when Runtime is connected.
+7. Disconnect Runtime and confirm Studio hides the graph instead of editing a local-only graph.
+8. Reconnect Runtime, start preview, and confirm slider/toggle live control still updates the running preview.
 9. Export Graph and confirm the exported JSON has no `viewState` field.
-10. Import Graph and confirm Studio generates a default view state.
+10. Import Graph with Runtime connected and confirm Studio generates a default view state.
 
 Do not use tutorial graphs as compatibility fixtures. Compatibility fixtures stay under `skenion-examples/compatibility`.
 

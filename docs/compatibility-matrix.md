@@ -15,7 +15,7 @@ runtime compatibility. It exists to keep `skenion-contracts`, `skenion-examples`
 | Graph patch schema | `skenion.graph.patch` `0.1.0` | `skenion-contracts/json-schema/graph/v0.1/patch.schema.json` |
 | Built-in node definitions | `builtins/v0.1` | `skenion-contracts/builtins/v0.1/builtins.manifest.json` and `skenion-contracts/builtins/v0.1/nodes/*.node.json` |
 | Built-in node help | `skenion.node.help` `0.1.0` plus help graphs | `skenion-contracts/builtins/v0.1/help/*.help.json` and `skenion-contracts/help/v0.1/nodes/*.help.graph.json` |
-| Typed control routing | Object-owned `sendName` / `receiveName` on value and UI control nodes | `skenion-contracts/builtins/v0.1` plus `skenion-contracts/docs/control-routing.md` |
+| Typed control routing | Object-owned `sendName` / `receiveName` on semantic value/control objects | `skenion-contracts/builtins/v0.1` plus `skenion-contracts/docs/control-routing.md` |
 | Live preview control updates | `skenion.preview.control-state` `0.1.0` runtime-internal snapshot plus telemetry revision fields | `skenion-contracts/docs/live-preview-control-updates.md` and `skenion-contracts/openapi/runtime-http.v0.yaml` |
 | Runtime HTTP API | `runtime-http.v0` | `skenion-contracts/openapi/runtime-http.v0.yaml` |
 
@@ -70,12 +70,14 @@ definition manifests.
 
 | Concept | Canonical data kind |
 | --- | --- |
-| 32-bit float value | `number.f32` |
+| Float value | `number.float` |
+| Integer value | `number.int` |
+| Unsigned integer value | `number.uint` |
 | Bang event | `event.bang` |
 | Video asset resource | `asset.video` |
 | Video frame stream | `video.frame` |
 | GPU texture resource | `gpu.texture2d` |
-| RGBA color value | `color.rgba` |
+| Color value | `color` |
 
 ## Typed Control Channels
 
@@ -88,24 +90,24 @@ Compatible objects with matching `receiveName` can update their runtime control
 state from that channel:
 
 ```text
-ui.slider-f32(sendName: speed)
-  -> channel number.f32:speed
-  -> ui.slider-f32(receiveName: speed)
+core.float(widget=slider, sendName: speed)
+  -> channel number.float:speed
+  -> core.float(widget=slider, receiveName: speed)
   -> render.fullscreen-shader.speed
 
-ui.toggle(sendName: enabled)
+core.bool(widget=toggle, sendName: enabled)
   -> channel boolean:enabled
-  -> ui.toggle(receiveName: enabled)
+  -> core.bool(widget=toggle, receiveName: enabled)
   -> render.fullscreen-shader.enabled
 
-ui.button(sendName: reset)
+core.bang(sendName: reset)
   -> channel event.bang:reset
   -> core.message(receiveName: reset)
 ```
 
-`core.value-f32`, `core.value-i32`, `core.value-bool`, `core.color-rgba`,
-`core.string`, `core.message`, `core.toggle`, `core.comment`, `core.panel`,
-`ui.button`, `ui.slider-f32`, and `ui.toggle` own their routing params where
+`core.float`, `core.int`, `core.uint`, `core.bool`, `core.color`,
+`core.string`, `core.message`, `core.bang`, `core.comment`, and `core.panel`
+own their routing params where
 applicable. Runtime interaction with these nodes sends
 `/v0/session/control/event` requests and updates runtime control state; it must
 not create graph patches. Editing labels, ranges, names, or defaults remains
@@ -117,9 +119,10 @@ control-state snapshot and telemetry `controlRevision` /
 shader source/interface edits, and render output changes still mark preview
 graph state stale and require restart.
 
-`f32` is legacy and non-canonical. Studio may normalize imported legacy graph
-documents from `f32` to `number.f32`, but newly created documents and fixtures
-must use `number.f32`.
+Representation names such as `f32`, `f16`, `i8`, `u8`, and `rgba8unorm` are
+storage/transport representation metadata, not semantic data kinds. Newly
+created documents and fixtures must use `number.float`, `number.int`,
+`number.uint`, `boolean`, and `color` as the semantic value data kinds.
 
 ## Built-in Node Rules
 
@@ -162,7 +165,8 @@ Required cross-repository checks:
 - examples audit fixture node manifests, graph node snapshots, project payloads,
   and graph patches against contracts builtins.
 - studio tests prove its registry IDs and render ports match contracts builtins,
-  and that newly created sample graphs store `number.f32`.
+  and that newly created sample graphs store semantic value data kinds rather
+  than representation names.
 - contracts own `ShaderInterfaceV01`, `ShaderDiagnosticV01`, and
   `replaceNodeInterface`. Shader input parsing is part of the contract surface,
   not a Studio-only convention.
@@ -176,16 +180,16 @@ Required cross-repository checks:
 - runtime tests and CI smoke validate canonical dynamic shader uniform projects:
 
 ```text
-core.value-f32.value
+core.float.value
   -> render.fullscreen-shader.speed
 
-core.value-bool.value or core.toggle.value
+core.bool.value
   -> render.fullscreen-shader.enabled
 
-core.value-i32.value
+core.int.value
   -> render.fullscreen-shader.iterations
 
-core.color-rgba.value
+core.color.value
   -> render.fullscreen-shader.tint
 
 render.fullscreen-shader.out
@@ -195,22 +199,22 @@ render.fullscreen-shader.out
 The object routing panel demo validates this additional path:
 
 ```text
-ui.slider-f32(sendName: speed)
-  -> channel number.f32:speed
+core.float(widget=slider, sendName: speed)
+  -> channel number.float:speed
 
-ui.slider-f32(receiveName: speed).value
+core.float(widget=slider, receiveName: speed).value
   -> render.fullscreen-shader.speed
 
-ui.toggle(sendName: enabled)
+core.bool(widget=toggle, sendName: enabled)
   -> channel boolean:enabled
 
-ui.toggle(receiveName: enabled).value
+core.bool(widget=toggle, receiveName: enabled).value
   -> render.fullscreen-shader.enabled
 ```
 
-The live preview control smoke validates that `ui.slider-f32` and `ui.toggle`
-events update typed channels and preview control revision while preview
-`stale` remains false.
+The live preview control smoke validates that slider/toggle widgets on
+`core.float` and `core.bool` update typed channels and preview control revision
+while preview `stale` remains false.
 
 Dynamic shader input parsing is supported through WGSL `@skenion.uniform`
 annotations. GLSL, texture inputs, asset loading, script nodes, and multi-pass
