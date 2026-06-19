@@ -113,6 +113,11 @@ applicable. Runtime interaction with these nodes sends
 not create graph patches. Editing labels, ranges, names, or defaults remains
 graph editing.
 
+Pre-v1 cleanup: value objects no longer expose separate `bang` or `set` input
+ports. `bang` and `set` are `ControlMessage` selectors handled by the hot
+`in` inlet; value objects use `in` / `cold` / `value`, `core.bang` uses
+`in` / `out`, and `core.message` uses `in` / `out`.
+
 When local preview is running, runtime control events can update the preview
 control-state snapshot and telemetry `controlRevision` /
 `previewControlRevision` fields without restarting preview. Graph patches,
