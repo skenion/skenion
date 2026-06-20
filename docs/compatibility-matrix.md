@@ -60,9 +60,9 @@ an editable graph and generates a default view state for that copy.
 
 | Repository | Release / branch | Compatibility note |
 | --- | --- | --- |
-| `skenion-contracts` | `skenion-contracts-v0.30.0` | Publishes audio endpoint descriptors, stream config request/resolution, audio clock domains, graph partitions, bridge/resample planning contracts, and canonical `audio.input`, `audio.output`, `audio.clock-bridge`, and `audio.resample` builtins. |
+| `skenion-contracts` | `skenion-contracts-v0.31.0` | Publishes audio endpoint descriptors, stream config request/resolution, audio clock domains, graph partitions, bridge/resample planning contracts, canonical audio builtins, and the `clock.midi-clock` contract/parser first slice. |
 | `skenion-runtime` | `skenion-runtime-v0.31.0` | Plans audio endpoints, clock domains, partitions, direct routes, explicit bridges, explicit resamplers, and exposes the `audio-plan` CLI for compatibility smoke tests. |
-| `skenion-examples` | `main` after audio clock-domain fixtures merge | Contains compatibility fixtures and runtime smoke coverage for same-domain audio routing, explicit bridge/resample routing, and rejected independent-domain crossing without a bridge. |
+| `skenion-examples` | `main` after MIDI Clock parser fixtures merge | Contains compatibility fixtures and runtime smoke coverage for same-domain audio routing, explicit bridge/resample routing, rejected independent-domain crossing without a bridge, and simulated MIDI Clock parser fixtures. |
 | `skenion-studio` | `skenion-studio-v0.27.0` | Renders Max-style object controls and keeps runtime control interactions separate from graph patching. |
 
 ## Canonical Data Kinds

@@ -40,6 +40,10 @@ M05.1 first slice:
 M05 is not complete until Runtime consumes external MIDI source snapshots
 without coupling MIDI input to the realtime audio callback.
 
+M05.1 contract/parser artifacts are released in
+`skenion-contracts-v0.31.0`, with examples MIDI Clock parser fixtures merged on
+`skenion-examples` `main`.
+
 ## Current Order
 
 1. `skenion-contracts`
