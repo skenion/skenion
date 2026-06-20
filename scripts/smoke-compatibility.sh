@@ -77,6 +77,24 @@ if [[ \"\${READY}\" != \"true\" ]]; then
 fi
 cd '${EXAMPLES_DIR}' && SKENION_RUNTIME_URL=http://127.0.0.1:3762 bash scripts/smoke-runtime-live-control-preview.sh"
 
+run "examples: runtime clock source API HTTP smoke" bash -lc \
+  "cd '${RUNTIME_DIR}' && SKENION_PREVIEW_DRY_RUN=1 cargo run -- serve --host 127.0.0.1 --port 3763 &
+SERVER_PID=\$!
+trap 'kill \${SERVER_PID} 2>/dev/null || true' EXIT
+READY=false
+for attempt in \$(seq 1 20); do
+  if curl --fail --silent http://127.0.0.1:3763/health >/dev/null; then
+    READY=true
+    break
+  fi
+  sleep 1
+done
+if [[ \"\${READY}\" != \"true\" ]]; then
+  echo 'runtime health endpoint did not become ready' >&2
+  exit 1
+fi
+cd '${EXAMPLES_DIR}' && SKENION_RUNTIME_URL=http://127.0.0.1:3763 bash scripts/smoke-runtime-clock-source-api.sh"
+
 run "studio: app build smoke" bash -lc \
   "cd '${STUDIO_DIR}' && pnpm install --frozen-lockfile && pnpm run build"
 

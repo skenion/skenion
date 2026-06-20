@@ -14,7 +14,7 @@ family. The current baseline is:
 | M02 Clock / Transport Contract v0 | Closed | Clock/transport model and object-level clock state contract. |
 | M03 Audio Backend v0: Single Output CPAL | Closed | One default CPAL output and one output sample clock domain. |
 | M04 Audio Multi-Endpoint / Clock Domain Planning | Closed | Endpoint descriptors, input/output clock domains, partition planning, explicit bridge/resample validation. |
-| M05 External Clock Sources v0 | Next | MIDI Clock first, then MTC, Ableton Link, and plugin-host/DAW transport capability mapping. |
+| M05 External Clock Sources v0 | In progress | MIDI Clock first, then MTC, Ableton Link, and plugin-host/DAW transport capability mapping. |
 | M06 Studio Audio / Clock UI v0 | Planned | Audio endpoint and clock-domain inspection/control surfaces. |
 | M07 Audio Device Format / Input Backend v0 | Planned | Actual `audio.input` backend, same-device duplex routing, device format conversion, and input latency reporting. |
 | M08 Spatial Audio / Channel Layout Contract v0 | Planned | Channel layout, speaker layout, audio bus metadata, spatial source/listener/panner skeletons, and downmix/upmix policy. |
@@ -64,9 +64,29 @@ remains the CI path, so no physical MIDI device is required for compatibility
 smoke. MIDI callbacks must not drive the audio callback, and realtime audio must
 not read MIDI ports or take `ClockSourceStore` locks.
 
-M05 remains open while this slice is reviewed. Later external-clock work can
-decide whether physical MIDI input is enough to close the milestone or whether
-MTC, Link, or host transport need their own closure slice.
+M05.3 is merged as the physical MIDI input boundary. Runtime can enumerate MIDI
+input ports, open a selected port, timestamp incoming realtime bytes, and feed
+the `ClockSourceStore` path without involving the audio callback.
+
+M05.4 adds `Runtime Clock Source API v0`. This promotes `ClockSourceStore` from
+CLI-only state into Runtime server state and exposes HTTP list/read/start/stop
+surfaces:
+
+- `GET /v0/clock/sources`
+- `GET /v0/clock/sources/{sourceId}`
+- `GET /v0/clock/midi/inputs`
+- `POST /v0/clock/midi/start`
+- `POST /v0/clock/midi/stop`
+
+The API keeps project open separate from external clock lifecycle: opening or
+loading a project must not auto-start MIDI input. MIDI `inputPortIndex` values
+are current Runtime enumeration indices, not stable device identities. Duplicate
+running `sourceId` start requests return a diagnostic rather than replacing the
+existing source.
+
+M05 remains open after M05.4. Later external-clock work can decide whether a
+Runtime Clock Source Service/API refinement, MTC, Link, or host transport need
+their own closure slice.
 
 ## Current Order
 
