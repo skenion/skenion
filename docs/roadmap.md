@@ -44,6 +44,18 @@ M05.1 contract/parser artifacts are released in
 `skenion-contracts-v0.31.0`, with examples MIDI Clock parser fixtures merged on
 `skenion-examples` `main`.
 
+M05.2 adds Runtime MIDI Clock Adapter fixture/simulation mode. The Runtime
+stores timestamped simulated MIDI Clock input as `ClockState` snapshots through
+`ClockSourceStore` and exposes `clock-midi --simulate <fixture> --format json`
+without requiring a physical MIDI device. This slice also keeps MIDI adapter
+state out of the audio callback and distinguishes song-position provenance:
+SPP can be authoritative, local tick accumulation is derived, and continue
+without SPP leaves song position unavailable.
+
+M05 remains open after M05.2. The remaining slice is `M05.3 — Physical MIDI
+Input Adapter v0`, where Runtime opens real MIDI input ports and feeds the same
+timestamped adapter path.
+
 ## Current Order
 
 1. `skenion-contracts`
