@@ -17,6 +17,7 @@ runtime compatibility. It exists to keep `skenion-contracts`, `skenion-examples`
 | Built-in node help | `skenion.node.help` `0.1.0` plus help graphs | `skenion-contracts/builtins/v0.1/help/*.help.json` and `skenion-contracts/help/v0.1/nodes/*.help.graph.json` |
 | Typed control routing | Object-owned `sendName` / `receiveName` on semantic value/control objects | `skenion-contracts/builtins/v0.1` plus `skenion-contracts/docs/control-routing.md` |
 | Live preview control updates | `skenion.preview.control-state` `0.1.0` runtime-internal snapshot plus telemetry revision fields | `skenion-contracts/docs/live-preview-control-updates.md` and `skenion-contracts/openapi/runtime-http.v0.yaml` |
+| Audio clock-domain planning | `AudioDeviceDescriptorV01`, `AudioClockDomainV01`, `AudioGraphPartitionV01`, `AudioClockBridgePlanV01` | `skenion-contracts/docs/audio-clock-domain-contract.md` and `skenion-runtime` audio DSP planner |
 | Runtime HTTP API | `runtime-http.v0` | `skenion-contracts/openapi/runtime-http.v0.yaml` |
 
 ## Project Documents and View State
@@ -58,10 +59,10 @@ an editable graph and generates a default view state for that copy.
 
 | Repository | Release / branch | Compatibility note |
 | --- | --- | --- |
-| `skenion-contracts` | `skenion-contracts-v0.21.0` | Removes legacy routing objects and publishes object-owned control routing builtins/help. |
-| `skenion-runtime` | `skenion-runtime-v0.21.0` | Routes typed channels through object-owned `sendName` / `receiveName` and keeps live preview control updates separate from graph staleness. |
-| `skenion-examples` | `main` after object routing panel merge | Contains compatibility fixtures, project documents, tutorial graphs, and runtime smoke coverage for object-owned typed channels. |
-| `skenion-studio` | `skenion-studio-v0.22.0` | Renders Max-style object controls and keeps runtime control interactions separate from graph patching. |
+| `skenion-contracts` | `skenion-contracts-v0.30.0` | Publishes audio endpoint descriptors, stream config request/resolution, audio clock domains, graph partitions, bridge/resample planning contracts, and canonical `audio.input`, `audio.output`, `audio.clock-bridge`, and `audio.resample` builtins. |
+| `skenion-runtime` | `skenion-runtime-v0.31.0` | Plans audio endpoints, clock domains, partitions, direct routes, explicit bridges, explicit resamplers, and exposes the `audio-plan` CLI for compatibility smoke tests. |
+| `skenion-examples` | `main` after audio clock-domain fixtures merge | Contains compatibility fixtures and runtime smoke coverage for same-domain audio routing, explicit bridge/resample routing, and rejected independent-domain crossing without a bridge. |
+| `skenion-studio` | `skenion-studio-v0.27.0` | Renders Max-style object controls and keeps runtime control interactions separate from graph patching. |
 
 ## Canonical Data Kinds
 
@@ -146,6 +147,38 @@ created documents and fixtures must use `number.float`, `number.int`,
 - Studio must consume `builtinNodeHelpV01` and `builtinNodeHelpGraphsV01` from
   `@skenion/contracts`; it must not keep a separate hand-written help registry.
 
+## Audio Clock Domains
+
+Audio endpoint clocks are explicit planning metadata. `audio.output` owns an
+audio device sample clock for its realtime DSP subgraph, and `audio.input`
+represents an input endpoint with its own clock-domain authority. Matching
+sample rates are not enough to prove a shared clock domain.
+
+Direct `signal.audio` routes are valid only when the planner can resolve the
+source and target endpoint path to the same audio clock domain. Independent
+input/output domains require an explicit `audio.clock-bridge` or
+`audio.resample` node:
+
+```text
+audio.input(clockDomain: device:aggregate-a).left
+  -> audio.output(clockDomain: device:aggregate-a).left
+  -> direct route
+
+audio.input(clockDomain: device:input-clock).left
+  -> audio.clock-bridge.in
+  -> audio.clock-bridge.out
+  -> audio.output(clockDomain: device:output-clock).left
+
+audio.input(clockDomain: device:input-clock).left
+  -> audio.output(clockDomain: device:output-clock).left
+  -> invalid without bridge/resample
+```
+
+`audio.clock-bridge` and `audio.resample` are planning/validation boundary
+nodes in the current baseline. They do not imply multi-device realtime I/O yet.
+The audio callback remains realtime-safe: it must not access graph/session/UI,
+HTTP, file I/O, allocation-heavy code paths, or blocking locks.
+
 ## Learning Surfaces
 
 Learning surfaces are intentionally separate from compatibility fixtures.
@@ -220,6 +253,22 @@ core.bool(widget=toggle, receiveName: enabled).value
 The live preview control smoke validates that slider/toggle widgets on
 `core.float` and `core.bool` update typed channels and preview control revision
 while preview `stale` remains false.
+
+The audio clock-domain smoke validates:
+
+```text
+same audio clock domain
+  -> direct route
+
+independent audio clock domains + audio.clock-bridge
+  -> planned clock bridge route
+
+independent audio clock domains + audio.resample
+  -> planned resample route
+
+independent audio clock domains without bridge/resample
+  -> validation error from audio DSP planner
+```
 
 Dynamic shader input parsing is supported through WGSL `@skenion.uniform`
 annotations. GLSL, texture inputs, asset loading, script nodes, and multi-pass
