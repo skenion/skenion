@@ -19,30 +19,96 @@ runtime compatibility. It exists to keep `skenion-contracts`, `skenion-examples`
 | Live preview control updates | `skenion.preview.control-state` `0.1.0` runtime-internal snapshot plus telemetry revision fields | `skenion-contracts/docs/live-preview-control-updates.md` and `skenion-contracts/openapi/runtime-http.v0.yaml` |
 | External clock source state | `ClockStateV01` field authority plus MIDI Clock tick/start/stop/continue/SPP parser, `clock.midi-clock` builtin, examples parser fixtures, runtime fixture snapshots, the physical MIDI input boundary, and Runtime HTTP clock source list/read/start/stop APIs. M05 is complete for MIDI Clock external source v0; Link, MTC/SMPTE, and host transport are M10 scope. | `skenion-contracts/packages/ts/src/clock.ts`, `skenion-contracts/packages/rust/src/v0_1/clock.rs`, `skenion-contracts/openapi/runtime-http.v0.yaml`, `skenion-contracts/builtins/v0.1/nodes/clock.midi-clock.node.json`, `skenion-examples/compatibility/v0.1/clock-midi-fixtures`, `skenion-examples/compatibility/v0.1/runtime-midi-clock-fixtures`, `skenion-examples/scripts/smoke-runtime-clock-source-api.sh`, and `skenion-runtime` MIDI Clock adapter / clock source API |
 | Audio clock-domain planning | `AudioDeviceDescriptorV01`, `AudioClockDomainV01`, `AudioGraphPartitionV01`, `AudioClockBridgePlanV01` | `skenion-contracts/docs/audio-clock-domain-contract.md` and `skenion-runtime` audio DSP planner |
-| Runtime HTTP API | `runtime-http.v0` | `skenion-contracts/openapi/runtime-http.v0.yaml` |
+| Runtime HTTP API | `runtime-http.v0` canonical session snapshot + mutation protocol | `skenion-contracts/openapi/runtime-http.v0.yaml` |
 
 ## Project Documents and View State
 
 `GraphDocument` remains the runtime/execution graph. It stores nodes, ports,
-params, edges, and graph revision. It must not store Studio layout, viewport,
-panel layout, selection, or collapsed UI state.
+params, edges, and graph revision. It must not store viewport, panel layout, or
+selection state.
 
-`ViewState` is Studio-owned layout state. v0.1 stores canvas node positions and
-viewport. Node drag and viewport pan/zoom update `viewState` only:
+When a project is loaded into Runtime, Runtime is authoritative for
+`snapshot.project.graph` and Runtime-owned `snapshot.project.viewState`. In v0
+that Runtime-owned view state is limited to object box/node view data such as
+canvas coordinates, size, and collapsed state. The Runtime strips viewport
+pan/zoom from canonical session snapshots because viewport is client-local UI
+state.
+
+Node drag changes are runtime mutations, not graph patches and not continuous
+viewport sync:
 
 ```text
-node drag or viewport pan
-  -> viewState change
+node drag A -> B
+  -> one /v0/session/mutate request
+  -> viewPatch.moveNodeView
   -> no graph patch
   -> graph revision unchanged
-  -> runtime session sync state unchanged
+  -> view revision increments
+  -> one runtime history entry
+  -> one undo restores A, one redo restores B
 ```
+
+Viewport pan/zoom stays local to each Studio client and does not send a Runtime
+mutation.
 
 `ProjectDocument` stores `metadata`, `graph`, and `viewState` together and is
 the user-facing file format for `.skenion.json`. Opening a project replaces the
-local graph/view state and clears pending runtime patch/session UI state, but it
-does not automatically load Runtime. The user must explicitly use Load Current
-Graph after connecting Runtime.
+local graph/view state. Loading it into Runtime makes Runtime authoritative for
+the session copy, and Studio thereafter reads graph and node view state from
+`RuntimeSessionSnapshot.project`.
+
+Runtime session communication is canonical:
+
+```text
+GET /v0/session
+  -> RuntimeSessionResponse { ok, snapshot, diagnostics, report }
+
+POST /v0/session/mutate
+  -> RuntimeMutationResponse { ok, applied, conflict, snapshot, history, diagnostics }
+
+SSE /v0/session/events/stream
+  -> RuntimeSessionEvent { kind, snapshot, history, mutation?, diagnostics }
+```
+
+The removed v0 surfaces are `/v0/session/project`, `/v0/session/patch`, and
+`/v0/session/view-state`. Clients must not read graph or view state from
+duplicate top-level response fields.
+
+## Object Boxes And Resolution
+
+Text-entry object boxes are the user-facing model. A user who types `decode`,
+`upload`, `preview`, `*~`, or `user.manipulator` has created an object box with
+object text; they have not chosen an internal Runtime implementation class.
+
+The compatibility target for v0 is:
+
+```text
+object box
+  objectText: "decode"
+  resolution.status: resolved
+  resolution.kind: core.video-decode
+
+object box
+  objectText: "user.manipulator"
+  resolution.status: unresolved
+  diagnostics: [...]
+```
+
+Resolved implementation kinds such as `core.video-decode`,
+`core.gpu-upload`, and `core.preview` are Runtime execution targets. They are
+not the primary identity of a Pd-style text-entry object box in the saved/user
+model. Resolution failure is a diagnostic state on the same object box, not a
+separate user-visible node class.
+
+`core.unresolved-object` is therefore not the stabilized contract direction.
+Any interim placeholder use must migrate to a canonical object box model such
+as `core.object` plus explicit resolution state before the object-box contract
+is considered stable.
+
+Extension object text must be namespaced, for example `user.manipulator`.
+Namespace-free unknown text remains editable as an unresolved object box with a
+diagnostic. Runtime load/mutation should keep the session usable and surface the
+diagnostic through the snapshot and log/event surfaces.
 
 Graph-only import/export stays separate:
 
@@ -60,10 +126,10 @@ an editable graph and generates a default view state for that copy.
 
 | Repository | Release / branch | Compatibility note |
 | --- | --- | --- |
-| `skenion-contracts` | `skenion-contracts-v0.32.0` | Publishes audio endpoint descriptors, stream config request/resolution, audio clock domains, graph partitions, bridge/resample planning contracts, canonical audio builtins, the `clock.midi-clock` contract/parser first slice, and Runtime clock source API request/response contracts. |
-| `skenion-runtime` | `skenion-runtime-v0.34.0` | Plans audio endpoints and clock-domain bridge requirements, exposes the `audio-plan` CLI, runs simulated and physical MIDI Clock adapter paths, and serves Runtime clock source list/read/input/start/stop APIs without coupling them to the audio callback. |
-| `skenion-examples` | `main` after Runtime clock source API smoke merge | Contains compatibility fixtures and runtime smoke coverage for same-domain audio routing, explicit bridge/resample routing, rejected independent-domain crossing without a bridge, simulated MIDI Clock snapshots, no-device MIDI input smoke, and Runtime clock source HTTP API smoke. |
-| `skenion-studio` | `skenion-studio-v0.27.0` | Renders Max-style object controls and keeps runtime control interactions separate from graph patching. |
+| `skenion-contracts` | local v0 contract after Runtime-authoritative session cleanup | Publishes canonical Runtime session snapshot, mutation request/response, Runtime history, and session event stream shapes alongside clock source API contracts. |
+| `skenion-runtime` | local `skenion-runtime-v0.34.0` worktree after Runtime-authoritative session cleanup | Serves canonical session snapshots, unified graph/view mutation, Runtime-owned node view state, global undo/redo history, object resolution diagnostics, and session SSE snapshots. |
+| `skenion-examples` | `main` after Runtime mutation history smoke merge | Contains compatibility fixtures and runtime smoke coverage for same-domain audio routing, explicit bridge/resample routing, rejected independent-domain crossing without a bridge, simulated MIDI Clock snapshots, no-device MIDI input smoke, Runtime clock source HTTP API smoke, and Runtime mutation/history smoke. |
+| `skenion-studio` | local `skenion-studio-v0.27.0` worktree after Runtime-authoritative session cleanup | Reads graph and node view state from `snapshot.project`, sends drag stop as one `moveNodeView` mutation, treats viewport as client-local, and consumes canonical session SSE snapshots. |
 
 ## Canonical Data Kinds
 
