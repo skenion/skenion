@@ -29,8 +29,9 @@ Studio should expose builtin node Help from `@skenion/contracts`:
 - graph fragment copy/paste from help into a project graph
 - promote/fork flow for saving an edited help working copy as project-owned content
 
-Tutorial graphs live in `skenion-examples/tutorials/v0.1` and are indexed by
-`tutorials.manifest.json`. These are learning graphs, not compatibility payloads.
+Current tutorial graphs may still live under `skenion-examples/tutorials/v0.1`
+until M06.81 migration lands. Treat them as legacy learning inputs that should
+open through v0.2 import/migration, not as the active saved project model.
 
 Suggested manual flow:
 
@@ -42,7 +43,7 @@ Suggested manual flow:
 6. Send runtime control events through the inspector.
 7. Open Help for `render.fullscreen-shader`.
 8. Compare local annotation analysis, synced input ports, runtime diagnostics, and generated WGSL.
-9. Open the Dynamic Shader Inputs tutorial graph from `skenion-examples/tutorials/v0.1`.
+9. Open the Dynamic Shader Inputs tutorial graph through the legacy import/migration path.
 10. Inspect the Shader Diagnostics tutorial and confirm the expected diagnostic appears before syncing inputs.
 11. Load the Object Routing Panel Controls sample in Studio.
 12. Connect Runtime, move the `core.float` object with `widget=slider`, and click the `core.bool` object with `widget=toggle`.

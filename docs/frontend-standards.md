@@ -37,10 +37,10 @@ scripts, or tests.
 
 ## Canvas Boundary
 
-Skenion Graph v0.2 is the forward saved graph/project format for subpatches,
-patch libraries, live help, and graph fragments. Graph v0.1 remains an
-import/read-only compatibility surface. React Flow nodes and edges are derived
-view-model state.
+Skenion Graph v0.2 is the active saved graph/project format for subpatches,
+patch libraries, live help, graph fragments, collaboration, package
+installation, and Runtime targets. Graph v0.1 is a legacy import/migration
+surface only. React Flow nodes and edges are derived view-model state.
 
 The Studio implementation must keep an explicit translation layer:
 
@@ -48,17 +48,18 @@ The Studio implementation must keep an explicit translation layer:
   node definitions into canvas nodes, handles, and edges.
 - Studio command builders map canvas gestures into Runtime operation envelopes,
   such as move, connect, edit params, and `pasteGraphFragment`.
-- edge validation calls the Skenion compatibility validator before committing a
+- edge validation calls the Skenion graph validator before committing a
   connection.
 
-The canvas must follow the v0.1 type model:
+The canvas must follow the v0.2 port model. If a legacy v0.1 document is being
+previewed during import, convert it first or use an explicit import adapter:
 
-- edge styling is based on `type.flow`
-- GPU styling is based on `type.dataKind === "gpu.texture2d"`
-- boolean values use `dataKind: "boolean"`
-- bang triggers use `flow: "event"` and `dataKind: "bang"`
-- video assets use `dataKind: "asset.video"`
-- GPU textures use `flow: "resource"` and `dataKind: "gpu.texture2d"`
+- edge styling is based on v0.2 port `rate`, `type`, and cable style metadata
+- GPU styling is based on `type === "gpu.texture2d"` or render/resource rates
+- boolean values use `type: "boolean"`
+- bang triggers use `type: "event.bang"` and event rate
+- video assets use `type: "asset.video"`
+- GPU textures use `type: "gpu.texture2d"`
 
 There is no `flow: "gpu"` value.
 

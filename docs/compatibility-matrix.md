@@ -8,13 +8,13 @@ runtime compatibility. It exists to keep `skenion-contracts`, `skenion-examples`
 
 | Surface | Current baseline | Owner |
 | --- | --- | --- |
-| Graph document schema | `skenion.graph` `0.1.0` | `skenion-contracts/json-schema/graph/v0.1/graph.schema.json` |
+| Graph document schema | Active: `skenion.graph` `0.2.0`; legacy import only: `0.1.0` | `skenion-contracts/json-schema/graph/v0.2/graph.schema.json` |
 | View state schema | `skenion.view-state` `0.1.0` | `skenion-contracts/json-schema/view/v0.1/view-state.schema.json` |
-| Project document schema | `skenion.project` `0.1.0` | `skenion-contracts/json-schema/project/v0.1/project.schema.json` |
-| Node definition schema | `skenion.node.definition` `0.1.0` | `skenion-contracts/json-schema/node/v0.1/node-definition.schema.json` |
-| Graph patch schema | `skenion.graph.patch` `0.1.0` | `skenion-contracts/json-schema/graph/v0.1/patch.schema.json` |
-| Built-in node definitions | `builtins/v0.1` | `skenion-contracts/builtins/v0.1/builtins.manifest.json` and `skenion-contracts/builtins/v0.1/nodes/*.node.json` |
-| Built-in node help | `skenion.node.help` `0.1.0` plus help graphs | `skenion-contracts/builtins/v0.1/help/*.help.json` and `skenion-contracts/help/v0.1/nodes/*.help.graph.json` |
+| Project document schema | Active: `skenion.project` `0.2.0`; legacy import only: `0.1.0` | `skenion-contracts/json-schema/project/v0.2/project.schema.json` |
+| Node definition schema | Active: `skenion.node.definition` `0.2.0`; legacy import only: `0.1.0` | `skenion-contracts/json-schema/node/v0.2/node-definition.schema.json` |
+| Graph patch / operation schema | Active: Runtime v0.2 graph target operations; legacy import only: `skenion.graph.patch` `0.1.0` | `skenion-contracts/openapi/runtime-http.v0.yaml` and `skenion-contracts/json-schema/graph/v0.1/patch.schema.json` |
+| Built-in node definitions | Active v0.2 definitions; v0.1 copies are legacy fixture inputs | `skenion-contracts` builtins and migration fixtures |
+| Built-in node help | Active v0.2 patch definitions/live-help graphs; v0.1 help graphs are legacy import inputs | `skenion-contracts` help patch definitions and migration fixtures |
 | Typed control routing | Object-owned `sendName` / `receiveName` on semantic value/control objects | `skenion-contracts/builtins/v0.1` plus `skenion-contracts/docs/control-routing.md` |
 | Live preview control updates | `skenion.preview.control-state` `0.1.0` runtime-internal snapshot plus telemetry revision fields | `skenion-contracts/docs/live-preview-control-updates.md` and `skenion-contracts/openapi/runtime-http.v0.yaml` |
 | External clock source state | `ClockStateV01` field authority plus MIDI Clock tick/start/stop/continue/SPP parser, `clock.midi-clock` builtin, examples parser fixtures, runtime fixture snapshots, and the physical MIDI input boundary. Runtime-global clock-source list/read/start/stop APIs are compatibility-only and are not the forward object model. M05 is complete for MIDI Clock external source v0; Link, MTC/SMPTE, and host transport are M12 scope as explicit graph objects. | `skenion-contracts/packages/ts/src/clock.ts`, `skenion-contracts/packages/rust/src/v0_1/clock.rs`, `skenion-contracts/builtins/v0.1/nodes/clock.midi-clock.node.json`, `skenion-examples/compatibility/v0.1/clock-midi-fixtures`, `skenion-examples/compatibility/v0.1/runtime-midi-clock-fixtures`, and `skenion-runtime` MIDI Clock adapter |
@@ -51,11 +51,13 @@ node drag A -> B
 Viewport pan/zoom stays local to each Studio client and does not send a Runtime
 mutation.
 
-`ProjectDocument` stores `metadata`, `graph`, and `viewState` together and is
-the user-facing file format for `.skenion.json`. Opening a project replaces the
-local graph/view state. Loading it into Runtime makes Runtime authoritative for
-the session copy, and Studio thereafter reads graph and node view state from
-`RuntimeSessionSnapshot.project`.
+`ProjectDocumentV02` stores `metadata`, a root graph, a patch library, and view
+state together and is the active user-facing file format for `.skenion.json`.
+Opening a v0.1 project is a legacy import/migration operation that yields a
+v0.2 project before editing, Runtime session load, collaboration, marketplace,
+or package resolution begins. Loading the v0.2 project into Runtime makes
+Runtime authoritative for the session copy, and Studio thereafter reads graph,
+patch library, and node view state from `RuntimeSessionSnapshot.project`.
 
 The canonical v0 Runtime session API is session-addressed:
 
@@ -266,8 +268,8 @@ Learning surfaces are intentionally separate from compatibility fixtures.
 | Tutorial manifest and graphs | `skenion-examples` | User-facing learning paths across multiple nodes |
 | Help graph viewer | `skenion-studio` | Volatile editable working-copy view, graph fragment copy, and promote/fork flow |
 
-Existing help graphs may remain valid `skenion.graph` `0.1.0` compatibility
-documents, but v0.2 live help should use patch definitions and graph fragments.
+Existing help graphs may remain valid `skenion.graph` `0.1.0` legacy import
+documents, but active live help uses v0.2 patch definitions and graph fragments.
 Tutorial graphs may intentionally include shader analysis errors only when their
 manifest lists the expected diagnostics.
 
