@@ -13,80 +13,95 @@ family. The current baseline is:
 | M01 Builtin Surface Cleanup / Object Taxonomy | Closed | Canonical object taxonomy and pre-v1 cleanup of duplicate/debug builtins. |
 | M02 Clock / Transport Contract v0 | Closed | Clock/transport model and object-level clock state contract. |
 | M03 Audio Backend v0: Single Output CPAL | Closed | One default CPAL output and one output sample clock domain. |
-| M04 Audio Multi-Endpoint / Clock Domain Planning | Closed | Endpoint descriptors, input/output clock domains, partition planning, explicit bridge/resample validation. |
-| M05 External Clock Sources v0 | In progress | MIDI Clock first, then MTC, Ableton Link, and plugin-host/DAW transport capability mapping. |
-| M06 Studio Audio / Clock UI v0 | Planned | Audio endpoint and clock-domain inspection/control surfaces. |
-| M07 Audio Device Format / Input Backend v0 | Planned | Actual `audio.input` backend, same-device duplex routing, device format conversion, and input latency reporting. |
-| M08 Spatial Audio / Channel Layout Contract v0 | Planned | Channel layout, speaker layout, audio bus metadata, spatial source/listener/panner skeletons, and downmix/upmix policy. |
-| M09 Performance / Presentation Mode v0 | Deferred | Performance-oriented presentation flow after audio/clock UI, input backend, and spatial/channel models stabilize. |
+| M04 Audio Multi-Endpoint / Clock Domain Planning | Current | Endpoint descriptors, input/output clock domains, partition planning, explicit bridge/resample validation. |
+| M05 Runtime IO Substrate v0 | Current | Transport-neutral raw IO discovery and per-object binding contracts for MIDI, HID, Serial, and inline fixtures. |
+| M06 Runtime-Authoritative Session Protocol / Studio Sync v0 | Current | Runtime owns canonical session state, graph/view mutations, global history, diagnostics, and multi-client snapshot events. |
+| M07 Studio Inspect / Logs / Runtime Surface Split v0 | Next | Client logs, Runtime diagnostics, inspector surfaces, and clear Studio-vs-Runtime ownership after session sync cleanup. |
+| M08 IO Codec Contract v0 | Next | Decoder/encoder contracts that interpret raw transport frames as Skenion messages/values and encode them back to transport frames. |
+| M09 Native IO Convenience Objects v0 | Planned | `midiin`, `midiout`, serial/HID IO, and generic sensor IO as convenience objects composed from IO bindings and codecs. |
+| M10 Studio IO Binding UX v0 | Planned | Per-object device dropdowns, codec selection, raw monitor, and diagnostics without Runtime-global IO panels. |
+| M11 Audio Device Format / Input Backend v0 | Planned | Actual `audio.input` backend, same-device duplex routing, device format conversion, and input latency reporting. |
+| M12 Spatial Audio / Channel Layout Contract v0 | Planned | Channel layout, speaker layout, audio bus metadata, spatial source/listener/panner skeletons, and downmix/upmix policy. |
+| M13 Performance / Presentation Mode v0 | Deferred | Performance-oriented presentation flow after Runtime sync, IO object UX, audio input, and spatial/channel models stabilize. |
+| M14 Link / MTC / Host Transport Objects v0 | Planned | Ableton Link, MTC/SMPTE, and plugin-host/DAW transport modeled as explicit graph objects, not Runtime-global sources. |
 
 ## Next Implementation Focus
 
-M05 remains open. The first slice is `M05.1 — clock.midi-clock
-contract/parser`, because the clock authority model already exists and MIDI
-Clock can validate external-source snapshot handoff without driving the audio
-callback directly.
+M06 is now the active Runtime/session foundation. The previous split between
+graph patch, project response, view-state response, and local Studio authority
+is superseded: Runtime owns the session copy of graph, object/node view state,
+history, diagnostics, and the snapshots that other clients converge on.
 
-M05.1 first slice:
+M06 scope:
 
-- parse MIDI tick, start, stop, continue, and Song Position Pointer messages.
-- emit `ClockState` with explicit capability and authority metadata.
-- derive bar/beat only when meter configuration is available.
-- keep Link, MTC, and host transport compatible with the same
-  capability/authority model.
-- reject designs where an external source directly drives the realtime audio
-  callback.
+- `GET /v0/session` returns one canonical `RuntimeSessionSnapshot`.
+- `POST /v0/session/mutate` is the only Studio-used graph/view mutation
+  surface. `/v0/session/project`, `/v0/session/patch`, and
+  `/v0/session/view-state` are not Studio contract surfaces.
+- Runtime-owned view state is limited to object/node view data such as
+  coordinates, size, and collapsed state. Viewport pan/zoom remains client-local.
+- Graph and view mutations can be submitted atomically. Adding a node at a
+  canvas position is `graphPatch.addNode + viewPatch.setNodeView` in one
+  mutation.
+- Dragging a node from A to B is one `viewPatch.moveNodeView` operation, one
+  history entry, one undo, and one redo.
+- Removing a node reconciles Runtime-owned view state. Replacing a node keeps
+  the existing view state for the same node id.
+- Undo/redo is global Runtime history for v0. Selective per-client undo is out
+  of scope.
+- Session events stream full canonical snapshots so multiple clients can keep a
+  nearly synchronized view of Runtime-owned state.
+- Runtime diagnostics are non-fatal session facts when the graph can still be
+  loaded, applied, and shown.
 
-M05 is not complete until Runtime consumes external MIDI source snapshots
-without coupling MIDI input to the realtime audio callback.
+M06.1 defines the canonical object box model. Pd-style text-entry object boxes
+are user-facing objects regardless of whether the text resolves today:
 
-M05.1 contract/parser artifacts are released in
-`skenion-contracts-v0.31.0`, with examples MIDI Clock parser fixtures merged on
-`skenion-examples` `main`.
+- A typed object box persists as a canonical object box, not as a special
+  "unresolved object" class when resolution fails.
+- `objectText` is the user-entered source of truth for text-entry boxes.
+- `decode`, `upload`, `preview`, `*~`, and `user.manipulator` are all object
+  text. Native aliases and extension names are resolver inputs, not separate UI
+  concepts.
+- Runtime resolves object text to an internal implementation kind such as
+  `core.video-decode`, `core.gpu-upload`, or an extension implementation.
+- Resolution success/failure is reported as object resolution state and
+  diagnostics. Unresolved text remains editable on the canvas with warning/error
+  styling.
+- Extension candidates must be namespaced, for example `user.manipulator`.
+  Namespace-free unknown text remains an unresolved object box with a diagnostic.
+- `core.unresolved-object` is not the target model. It should be removed before
+  the v0 object-box contract stabilizes in favor of `core.object` plus
+  resolution state.
+- Display text prefers `objectText`, then a native alias, then the internal kind
+  only as a fallback.
 
-M05.2 adds Runtime MIDI Clock Adapter fixture/simulation mode. The Runtime
-stores timestamped simulated MIDI Clock input as `ClockState` snapshots through
-`ClockSourceStore` and exposes `clock-midi --simulate <fixture> --format json`
-without requiring a physical MIDI device. This slice also keeps MIDI adapter
-state out of the audio callback and distinguishes song-position provenance:
-SPP can be authoritative, local tick accumulation is derived, and continue
-without SPP leaves song position unavailable.
+M07 turns those Runtime facts into Studio surfaces: logs, inspector diagnostics,
+object resolution status, and clear Runtime-vs-client ownership cues. It should
+not reintroduce local graph/view authority in Studio.
 
-M05 remains open after M05.2. The remaining slice is `M05.3 — Physical MIDI
-Input Adapter v0`, where Runtime opens real MIDI input ports and feeds the same
-timestamped adapter path.
+M08 defines codecs. A decoder maps raw transport frames into Skenion
+messages/values; an encoder maps messages/values back to transport frames.
+MIDI note/CC/clock parsing, serial line parsing, binary sensor packet parsing,
+and HID report interpretation are codec behavior, not Runtime IO discovery.
+Custom extensions should be able to provide codecs without patching Runtime
+core.
 
-M05.3 adds the first physical MIDI input boundary. Runtime lists MIDI input
-ports, opens and closes a selected port, receives raw MIDI realtime bytes,
-assigns host monotonic timestamps, and routes `TimestampedMidiMessage` through
-`MidiClockAdapter` into `ClockSourceStore`. The existing simulated fixture mode
-remains the CI path, so no physical MIDI device is required for compatibility
-smoke. MIDI callbacks must not drive the audio callback, and realtime audio must
-not read MIDI ports or take `ClockSourceStore` locks.
+M09 provides convenience objects. `midiin` and `midiout` are native convenience
+objects composed from MIDI transport bindings plus MIDI decoder/encoder
+contracts. Serial and HID objects follow the same pattern. Sensor support stays
+generic: an Arduino temperature sensor, wind direction sensor, potentiometer, or
+custom controller is a selected device plus framing plus decoder, not a
+hard-coded `TemperatureDecoder` built into Runtime discovery.
 
-M05.3 is merged as the physical MIDI input boundary. Runtime can enumerate MIDI
-input ports, open a selected port, timestamp incoming realtime bytes, and feed
-the `ClockSourceStore` path without involving the audio callback.
+M10 is the first Studio IO UX milestone. Studio should expose target device
+dropdowns, transport options, codec selection, raw frame monitoring, decoded
+preview, and diagnostics inside selected object/node parameter editors. It must
+not add a Runtime-wide IO discovery panel or global MIDI settings.
 
-M05.4 adds `Runtime Clock Source API v0`. This promotes `ClockSourceStore` from
-CLI-only state into Runtime server state and exposes HTTP list/read/start/stop
-surfaces:
-
-- `GET /v0/clock/sources`
-- `GET /v0/clock/sources/{sourceId}`
-- `GET /v0/clock/midi/inputs`
-- `POST /v0/clock/midi/start`
-- `POST /v0/clock/midi/stop`
-
-The API keeps project open separate from external clock lifecycle: opening or
-loading a project must not auto-start MIDI input. MIDI `inputPortIndex` values
-are current Runtime enumeration indices, not stable device identities. Duplicate
-running `sourceId` start requests return a diagnostic rather than replacing the
-existing source.
-
-M05 remains open after M05.4. Later external-clock work can decide whether a
-Runtime Clock Source Service/API refinement, MTC, Link, or host transport need
-their own closure slice.
+Clock-producing sources remain explicit graph objects. A MIDI Clock object may
+output `clock.state`; Link, MTC, and host transport objects move to M14. None of
+these should reintroduce Runtime-global clock source APIs.
 
 ## Current Order
 

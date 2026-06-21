@@ -62,13 +62,41 @@ Use HTTP + OpenAPI for:
 
 - health
 - snapshots
+- Runtime-authoritative session load, mutate, history, undo, and redo
+- session snapshot event streams over SSE
 - asset upload
 - asset metadata
 - preview stream setup
 - diagnostics endpoints
 
+For v0, a Runtime session response has one canonical `snapshot`; graph and node
+view state are read from `snapshot.project`. Clients submit graph/view changes
+through `/v0/session/mutate`. Duplicate top-level graph, view, or loaded fields
+are not part of the contract.
+
 Do not use HTTP polling for continuous runtime event traffic unless it is a
-temporary diagnostic path.
+temporary diagnostic path. Session updates should use
+`/v0/session/events/stream` and carry full snapshots so multiple clients can
+converge on Runtime-owned state.
+
+## Object Text Resolution
+
+Pd-style text-entry object boxes are persisted as object boxes with source
+`objectText`. Runtime may resolve that text to an internal implementation kind,
+but the implementation kind is not the user-facing identity of the box.
+
+Examples:
+
+```text
+objectText "decode" -> resolved implementation core.video-decode
+objectText "*~" -> resolved audio implementation
+objectText "user.manipulator" -> extension candidate or unresolved diagnostic
+```
+
+Resolution failure must not delete the box or convert it into a separate
+user-facing "unresolved object" class. It remains the same object box with
+resolution diagnostics that Runtime returns in session snapshots, mutation
+responses, logs, and event streams.
 
 ## Preview And Media
 
