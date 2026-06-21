@@ -24,9 +24,10 @@ as Skenion project files, and they are not runtime IR.
 
 Studio must keep explicit conversion boundaries:
 
-- `toReactFlowViewModel()` maps Skenion Graph v0.1 documents and node
-  definitions into canvas nodes, handles, and edges.
-- `toSkenionPatch()` maps canvas gestures into Skenion graph patch operations.
+- `toReactFlowViewModel()` maps Skenion graph documents, patch definitions, and
+  node definitions into canvas nodes, handles, and edges.
+- Studio command builders map canvas gestures into Runtime operation envelopes,
+  such as move, connect, edit params, and `pasteGraphFragment`.
 - edge validation calls Skenion compatibility logic before a connection is
   committed.
 
@@ -35,7 +36,7 @@ palettes, panels, dialogs, and settings UI.
 
 ## Type Mapping Rules
 
-Canvas styling follows the v0.1 contract:
+Canvas styling follows the active graph/node contract:
 
 - edge category comes from `type.flow`
 - GPU styling comes from `type.dataKind === "gpu.texture2d"`

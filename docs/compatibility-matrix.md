@@ -17,7 +17,7 @@ runtime compatibility. It exists to keep `skenion-contracts`, `skenion-examples`
 | Built-in node help | `skenion.node.help` `0.1.0` plus help graphs | `skenion-contracts/builtins/v0.1/help/*.help.json` and `skenion-contracts/help/v0.1/nodes/*.help.graph.json` |
 | Typed control routing | Object-owned `sendName` / `receiveName` on semantic value/control objects | `skenion-contracts/builtins/v0.1` plus `skenion-contracts/docs/control-routing.md` |
 | Live preview control updates | `skenion.preview.control-state` `0.1.0` runtime-internal snapshot plus telemetry revision fields | `skenion-contracts/docs/live-preview-control-updates.md` and `skenion-contracts/openapi/runtime-http.v0.yaml` |
-| External clock source state | `ClockStateV01` field authority plus MIDI Clock tick/start/stop/continue/SPP parser, `clock.midi-clock` builtin, examples parser fixtures, runtime fixture snapshots, the physical MIDI input boundary, and Runtime HTTP clock source list/read/start/stop APIs. M05 is complete for MIDI Clock external source v0; Link, MTC/SMPTE, and host transport are M10 scope. | `skenion-contracts/packages/ts/src/clock.ts`, `skenion-contracts/packages/rust/src/v0_1/clock.rs`, `skenion-contracts/openapi/runtime-http.v0.yaml`, `skenion-contracts/builtins/v0.1/nodes/clock.midi-clock.node.json`, `skenion-examples/compatibility/v0.1/clock-midi-fixtures`, `skenion-examples/compatibility/v0.1/runtime-midi-clock-fixtures`, `skenion-examples/scripts/smoke-runtime-clock-source-api.sh`, and `skenion-runtime` MIDI Clock adapter / clock source API |
+| External clock source state | `ClockStateV01` field authority plus MIDI Clock tick/start/stop/continue/SPP parser, `clock.midi-clock` builtin, examples parser fixtures, runtime fixture snapshots, and the physical MIDI input boundary. Runtime-global clock-source list/read/start/stop APIs are compatibility-only and are not the forward object model. M05 is complete for MIDI Clock external source v0; Link, MTC/SMPTE, and host transport are M12 scope as explicit graph objects. | `skenion-contracts/packages/ts/src/clock.ts`, `skenion-contracts/packages/rust/src/v0_1/clock.rs`, `skenion-contracts/builtins/v0.1/nodes/clock.midi-clock.node.json`, `skenion-examples/compatibility/v0.1/clock-midi-fixtures`, `skenion-examples/compatibility/v0.1/runtime-midi-clock-fixtures`, and `skenion-runtime` MIDI Clock adapter |
 | Audio clock-domain planning | `AudioDeviceDescriptorV01`, `AudioClockDomainV01`, `AudioGraphPartitionV01`, `AudioClockBridgePlanV01` | `skenion-contracts/docs/audio-clock-domain-contract.md` and `skenion-runtime` audio DSP planner |
 | Runtime HTTP API | `runtime-http.v0` canonical session snapshot + mutation protocol | `skenion-contracts/openapi/runtime-http.v0.yaml` |
 
@@ -39,7 +39,7 @@ viewport sync:
 
 ```text
 node drag A -> B
-  -> one /v0/session/mutate request
+  -> one /v0/sessions/{sessionId}/operations request
   -> viewPatch.moveNodeView
   -> no graph patch
   -> graph revision unchanged
@@ -57,18 +57,24 @@ local graph/view state. Loading it into Runtime makes Runtime authoritative for
 the session copy, and Studio thereafter reads graph and node view state from
 `RuntimeSessionSnapshot.project`.
 
-Runtime session communication is canonical:
+The canonical v0 Runtime session API is session-addressed:
 
 ```text
-GET /v0/session
+GET /v0/sessions/{sessionId}
   -> RuntimeSessionResponse { ok, snapshot, diagnostics, report }
 
-POST /v0/session/mutate
-  -> RuntimeMutationResponse { ok, applied, conflict, snapshot, history, diagnostics }
+POST /v0/sessions/{sessionId}/operations
+  -> RuntimeOperationResponse { ok, applied, conflict, snapshot, history, diagnostics }
 
-SSE /v0/session/events/stream
-  -> RuntimeSessionEvent { kind, snapshot, history, mutation?, diagnostics }
+SSE /v0/sessions/{sessionId}/events/stream
+  -> RuntimeSessionEvent { sessionId, sequence, kind, snapshot, history, operation?, diagnostics }
 ```
+
+`/v0/session`, `/v0/session/mutate`, and `/v0/session/events/stream` may remain
+as default-session compatibility aliases, but new clients and contracts should
+use explicit session ids. `pasteGraphFragment` is a high-level operation under
+`/v0/sessions/{sessionId}/operations`; it should not be pre-lowered by Studio
+into unrelated low-level `addNode` and `addEdge` patches.
 
 The removed v0 surfaces are `/v0/session/project`, `/v0/session/patch`, and
 `/v0/session/view-state`. Clients must not read graph or view state from
@@ -119,16 +125,18 @@ Export Graph  -> graph only
 Import Graph  -> graph only, generated default viewState
 ```
 
-Help graph viewer remains read-only. Open as New Graph copies a help graph into
-an editable graph and generates a default view state for that copy.
+Help source remains immutable, but a help window may open a volatile editable
+working copy. Users can pan, zoom, select, move, edit, connect, delete, copy
+graph fragments, and promote/fork into a project-owned patch. The working copy
+must not save back to first-party or package help source.
 
 ## Verified Releases
 
 | Repository | Release / branch | Compatibility note |
 | --- | --- | --- |
-| `skenion-contracts` | local v0 contract after Runtime-authoritative session cleanup | Publishes canonical Runtime session snapshot, mutation request/response, Runtime history, and session event stream shapes alongside clock source API contracts. |
-| `skenion-runtime` | local `skenion-runtime-v0.34.0` worktree after Runtime-authoritative session cleanup | Serves canonical session snapshots, unified graph/view mutation, Runtime-owned node view state, global undo/redo history, object resolution diagnostics, and session SSE snapshots. |
-| `skenion-examples` | `main` after Runtime mutation history smoke merge | Contains compatibility fixtures and runtime smoke coverage for same-domain audio routing, explicit bridge/resample routing, rejected independent-domain crossing without a bridge, simulated MIDI Clock snapshots, no-device MIDI input smoke, Runtime clock source HTTP API smoke, and Runtime mutation/history smoke. |
+| `skenion-contracts` | local v0 contract after Runtime-authoritative session cleanup | Publishes canonical Runtime session snapshots, operation request/response shapes, Runtime history, actor-scoped undo metadata, session event stream shapes, and object-owned clock state contracts. Runtime-global clock-source APIs are compatibility-only aliases, not the forward contract surface. |
+| `skenion-runtime` | local `skenion-runtime-v0.34.0` worktree after Runtime-authoritative session cleanup | Serves canonical session snapshots, session-addressed graph/view operations, Runtime-owned node view state, authoritative history/audit log, actor-scoped undo metadata, object resolution diagnostics, and session SSE snapshots. |
+| `skenion-examples` | `main` after Runtime mutation history smoke merge | Contains compatibility fixtures and runtime smoke coverage for same-domain audio routing, explicit bridge/resample routing, rejected independent-domain crossing without a bridge, simulated MIDI Clock snapshots, no-device MIDI input smoke, object-owned clock behavior, and Runtime operation/history smoke. |
 | `skenion-studio` | local `skenion-studio-v0.27.0` worktree after Runtime-authoritative session cleanup | Reads graph and node view state from `snapshot.project`, sends drag stop as one `moveNodeView` mutation, treats viewport as client-local, and consumes canonical session SSE snapshots. |
 
 ## Canonical Data Kinds
@@ -177,9 +185,10 @@ core.bang(sendName: reset)
 `core.string`, `core.message`, `core.bang`, `core.comment`, and `core.panel`
 own their routing params where
 applicable. Runtime interaction with these nodes sends
-`/v0/session/control/event` requests and updates runtime control state; it must
-not create graph patches. Editing labels, ranges, names, or defaults remains
-graph editing.
+session-addressed control operations and updates runtime control state; it must
+not create graph patches. The legacy `/v0/session/control/event` path may remain
+as a default-session compatibility alias, but new clients should target explicit
+session ids. Editing labels, ranges, names, or defaults remains graph editing.
 
 Pre-v1 cleanup: value objects no longer expose separate `bang` or `set` input
 ports. `bang` and `set` are `ControlMessage` selectors handled by the hot
@@ -253,13 +262,14 @@ Learning surfaces are intentionally separate from compatibility fixtures.
 | Surface | Owner | Purpose |
 | --- | --- | --- |
 | Builtin help metadata | `skenion-contracts` | Inspector/palette help text and node behavior summary |
-| Builtin help graphs | `skenion-contracts` | Small read-only example patches for each builtin node |
+| Builtin help graphs | `skenion-contracts` | Small immutable source example patches for each builtin node |
 | Tutorial manifest and graphs | `skenion-examples` | User-facing learning paths across multiple nodes |
-| Help graph viewer | `skenion-studio` | Read-only graph display and "Open as New Graph" copy flow |
+| Help graph viewer | `skenion-studio` | Volatile editable working-copy view, graph fragment copy, and promote/fork flow |
 
-Help graphs must be valid `skenion.graph` `0.1.0` documents. Tutorial graphs
-may intentionally include shader analysis errors only when their manifest lists
-the expected diagnostics.
+Existing help graphs may remain valid `skenion.graph` `0.1.0` compatibility
+documents, but v0.2 live help should use patch definitions and graph fragments.
+Tutorial graphs may intentionally include shader analysis errors only when their
+manifest lists the expected diagnostics.
 
 ## Compatibility Checks
 

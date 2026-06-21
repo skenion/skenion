@@ -14,6 +14,76 @@ skenion-studio    0.2.18
 Compatibility is determined by protocol version ranges and negotiated runtime
 capabilities, not by matching application versions.
 
+## Product Release Train
+
+Repository package versions stay independent, but product releases must be
+aligned by a release train manifest.
+
+The product train is the user-facing compatibility unit. A train manifest should
+record:
+
+- product train id, such as `0.29` or `2026.06`
+- `@skenion/contracts` npm version and `skenion-contracts` crate version
+- `skenion-runtime` crate version
+- `skenion-runtime` binary release assets by OS/arch, with checksums
+- `@skenion/sdk` npm version
+- Studio web/desktop release version
+- Examples tag or commit used for conformance
+- Manual version and GitHub Pages deployment
+- graph, node, runtime-wire, extension, and manifest protocol baselines
+- required and optional runtime capabilities
+
+Do not force every repository to bump to the same SemVer number just to ship a
+product train. Instead, ship the train only when the manifest points to released
+artifacts that have all passed compatibility checks.
+
+Recommended release order:
+
+1. Contracts npm/crate.
+2. Runtime crate and multi-arch binary assets.
+3. SDK npm.
+4. Examples conformance against released artifacts.
+5. Studio web/desktop package.
+6. Docs Manual deployment.
+
+PR CI may checkout sibling in-flight branches for integration. Release and
+publish workflows must consume released artifacts only: registry packages,
+release tags, GitHub Release assets, or a checked-in train manifest.
+
+## Runtime And Desktop Artifacts
+
+`skenion-runtime` is both a Rust crate and a product binary.
+
+The crate is useful for Rust consumers and docs.rs. The binary is required for
+standalone Runtime installs and for Studio Desktop `local-managed` mode where
+Tauri bundles Runtime as a sidecar. Runtime release completion therefore
+requires GitHub Release assets in addition to crates.io publication.
+
+Design target matrix:
+
+| Target | Initial tier |
+| --- | --- |
+| `aarch64-apple-darwin` | release-blocking |
+| `x86_64-apple-darwin` | release-blocking |
+| `x86_64-pc-windows-msvc` | release-blocking |
+| `aarch64-pc-windows-msvc` | preview until native smoke is stable |
+| `x86_64-unknown-linux-gnu` | release-blocking |
+| `aarch64-unknown-linux-gnu` | preview until native smoke is stable |
+
+Runtime binary assets should use sidecar-consumable names, include checksums,
+and be verified by Studio Desktop packaging before a product train is marked
+complete.
+
+Studio Desktop release workflows should download Runtime artifacts from the
+train manifest, verify checksums, stage the sidecar binaries for Tauri, build
+per-platform installers, and eventually handle signing and notarization before
+public desktop release.
+
+Full desktop app auto-updater rollout is not required for the initial product
+train. Package and patch update UX is separate from app auto-update: users must
+still be able to discover, install, and update public patcher/package artifacts
+through the package marketplace flow.
+
 ## Release Please
 
 Every releasable repository should use Release Please.

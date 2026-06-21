@@ -25,8 +25,9 @@ Open `http://localhost:5173`.
 Studio should expose builtin node Help from `@skenion/contracts`:
 
 - summary, description, tags, ports, params, and runtime behavior
-- read-only help patch graph
-- Open as New Graph for editable exploration
+- immutable help source opened as a volatile editable working copy
+- graph fragment copy/paste from help into a project graph
+- promote/fork flow for saving an edited help working copy as project-owned content
 
 Tutorial graphs live in `skenion-examples/tutorials/v0.1` and are indexed by
 `tutorials.manifest.json`. These are learning graphs, not compatibility payloads.
@@ -34,8 +35,8 @@ Tutorial graphs live in `skenion-examples/tutorials/v0.1` and are indexed by
 Suggested manual flow:
 
 1. Open Help for `core.float`.
-2. Inspect the help graph.
-3. Open it as a new graph.
+2. Inspect the help graph working copy.
+3. Move or edit nodes in the working copy and confirm the source help artifact is not modified.
 4. Connect Runtime.
 5. Confirm Studio shows the Runtime-owned session graph.
 6. Send runtime control events through the inspector.

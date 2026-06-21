@@ -48,7 +48,13 @@ See [Roadmap](docs/roadmap.md) for the initial implementation order.
 - Use Protobuf + Buf as the live TS/Rust control contract.
 - Use JSON Schema for persisted graph/project documents.
 - Use Release Please and Semantic Versioning per repository, without lockstep
-  versioning.
+  versioning. Product compatibility is aligned through release train manifests.
+- Use Tauri as the desktop shell for Studio; Tauri coordinates windows,
+  sidecars, runtime profiles, and clipboard bridging while Runtime remains the
+  graph authority.
+- Treat realtime Runtime-authoritative collaboration, live help patch graphs,
+  package marketplace install/update UX, and Runtime multi-arch binary artifacts
+  as v0 foundation work.
 - Require 100% test coverage for package-owned executable source, while keeping
   generated artifacts and thin integration shells explicitly out of scope.
 - Keep control, media, telemetry, assets, and debug planes separate.

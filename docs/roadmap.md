@@ -15,29 +15,60 @@ family. The current baseline is:
 | M03 Audio Backend v0: Single Output CPAL | Closed | One default CPAL output and one output sample clock domain. |
 | M04 Audio Multi-Endpoint / Clock Domain Planning | Current | Endpoint descriptors, input/output clock domains, partition planning, explicit bridge/resample validation. |
 | M05 Runtime IO Substrate v0 | Current | Transport-neutral raw IO discovery and per-object binding contracts for MIDI, HID, Serial, and inline fixtures. |
-| M06 Runtime-Authoritative Session Protocol / Studio Sync v0 | Current | Runtime owns canonical session state, graph/view mutations, global history, diagnostics, and multi-client snapshot events. |
-| M07 Studio Inspect / Logs / Runtime Surface Split v0 | Next | Client logs, Runtime diagnostics, inspector surfaces, and clear Studio-vs-Runtime ownership after session sync cleanup. |
-| M08 IO Codec Contract v0 | Next | Decoder/encoder contracts that interpret raw transport frames as Skenion messages/values and encode them back to transport frames. |
-| M09 Native IO Convenience Objects v0 | Planned | `midiin`, `midiout`, serial/HID IO, and generic sensor IO as convenience objects composed from IO bindings and codecs. |
-| M10 Studio IO Binding UX v0 | Planned | Per-object device dropdowns, codec selection, raw monitor, and diagnostics without Runtime-global IO panels. |
-| M11 Audio Device Format / Input Backend v0 | Planned | Actual `audio.input` backend, same-device duplex routing, device format conversion, and input latency reporting. |
-| M12 Spatial Audio / Channel Layout Contract v0 | Planned | Channel layout, speaker layout, audio bus metadata, spatial source/listener/panner skeletons, and downmix/upmix policy. |
-| M13 Performance / Presentation Mode v0 | Deferred | Performance-oriented presentation flow after Runtime sync, IO object UX, audio input, and spatial/channel models stabilize. |
-| M14 Link / MTC / Host Transport Objects v0 | Planned | Ableton Link, MTC/SMPTE, and plugin-host/DAW transport modeled as explicit graph objects, not Runtime-global sources. |
+| M06 IO Codec Contract v0 | Current | Decoder/encoder contracts that interpret raw transport frames as Skenion messages/values and encode messages/values back to transport frames. |
+| M06.5 Native Runtime Extension ABI v0 | Current | Native extension ABI, package manifests, capability registration, diagnostics, and SDK authoring substrate. |
+| M06.75 Graph v0.2 Subpatch / Live Help Foundation | Current | Patch libraries, `core.inlet`/`core.outlet`, live help as real patch graphs, `GraphFragmentV02`, and high-level paste semantics. |
+| M06.8 Desktop Multi-Window / Runtime Session Profiles v0 | Current | Tauri desktop shell, local-managed/local-shared/remote profiles, sidecar lifecycle, and same-session multi-view editing. |
+| M06.82 Realtime Collaboration / CRDT-OT Sync v0 | Current | Runtime-authoritative OT/rebase collaboration, CRDT-compatible ids, presence, operation replay, and actor-scoped undo metadata. |
+| M06.85 Package Marketplace / Install UX v0 | Current | Public package/patch discovery, Stargazed ranking, install/update/remove UX, installed inventory, and package compatibility diagnostics. |
+| M06.9 Product Release Train / Multi-Arch Distribution v0 | Current | Release train manifest, Runtime multi-arch binary artifacts, desktop sidecar packaging, and Manual release gates. |
+| M07 Native IO Convenience Objects v0 | Planned | `midiin`, `midiout`, serial/HID IO, and generic sensor IO as convenience objects composed from IO bindings and codecs. |
+| M08 Studio IO Binding UX v0 | Planned | Per-object device dropdowns, codec selection, raw monitor, and diagnostics without Runtime-global IO panels. |
+| M09 Audio Device Format / Input Backend v0 | Planned | Actual `audio.input` backend, same-device duplex routing, device format conversion, and input latency reporting. |
+| M10 Spatial Audio / Channel Layout Contract v0 | Planned | Channel layout, speaker layout, audio bus metadata, spatial source/listener/panner skeletons, and downmix/upmix policy. |
+| M11 Performance / Presentation Mode v0 | Deferred | Performance-oriented presentation flow after Runtime sync, IO object UX, audio input, and spatial/channel models stabilize. |
+| M12 Link / MTC / Host Transport Objects v0 | Planned | Ableton Link, MTC/SMPTE, and plugin-host/DAW transport modeled as explicit graph objects, not Runtime-global sources. |
 
 ## Next Implementation Focus
 
-M06 is now the active Runtime/session foundation. The previous split between
-graph patch, project response, view-state response, and local Studio authority
-is superseded: Runtime owns the session copy of graph, object/node view state,
-history, diagnostics, and the snapshots that other clients converge on.
+The current v0 foundation is stricter than the older bootstrap roadmap. These
+items must be treated as foundational contracts, not optional polish:
 
-M06 scope:
+1. Graph v0.2 subpatch/live help and `GraphFragmentV02`.
+2. Explicit Runtime session addressing and high-level paste operations.
+3. Tauri desktop window/profile/sidecar substrate.
+4. Runtime-authoritative realtime collaboration.
+5. Package marketplace/install/update UX.
+6. Product release train manifest and Runtime multi-arch binary artifacts.
 
-- `GET /v0/session` returns one canonical `RuntimeSessionSnapshot`.
-- `POST /v0/session/mutate` is the only Studio-used graph/view mutation
-  surface. `/v0/session/project`, `/v0/session/patch`, and
+The implementation order is contract-first:
+
+```text
+skenion ADRs and release policy
+  -> skenion-contracts schemas/OpenAPI
+  -> skenion-runtime session/paste/collaboration/package substrate
+  -> skenion-studio Tauri, graph fragment UX, collaboration, marketplace
+  -> skenion-sdk helpers
+  -> skenion-examples conformance
+  -> skenion-docs Manual
+```
+
+M06.75 through M06.9 are now the active Runtime/session, desktop, collaboration,
+marketplace, and release foundation. The previous split between graph patch,
+project response, view-state response, and local Studio authority is
+superseded: Runtime owns the session copy of graph, object/node view state,
+history, diagnostics, operation ordering, and the snapshots/events that other
+clients converge on.
+
+Foundation session scope:
+
+- `GET /v0/sessions/{sessionId}` returns one canonical
+  `RuntimeSessionSnapshot`.
+- `POST /v0/sessions/{sessionId}/operations` is the forward graph/view
+  operation surface. `/v0/session/project`, `/v0/session/patch`, and
   `/v0/session/view-state` are not Studio contract surfaces.
+- `/v0/session` and `/v0/session/mutate` may remain as default-session
+  compatibility aliases, but new work must use explicit session ids.
 - Runtime-owned view state is limited to object/node view data such as
   coordinates, size, and collapsed state. Viewport pan/zoom remains client-local.
 - Graph and view mutations can be submitted atomically. Adding a node at a
@@ -47,14 +78,16 @@ M06 scope:
   history entry, one undo, and one redo.
 - Removing a node reconciles Runtime-owned view state. Replacing a node keeps
   the existing view state for the same node id.
-- Undo/redo is global Runtime history for v0. Selective per-client undo is out
-  of scope.
-- Session events stream full canonical snapshots so multiple clients can keep a
-  nearly synchronized view of Runtime-owned state.
+- Runtime keeps an authoritative session history. Collaboration operations must
+  carry actor-scoped undo metadata from v0; global history remains available as
+  an audit/log surface.
+- Session events stream canonical snapshots and/or ordered operation metadata
+  so multiple clients can converge on Runtime-owned state.
 - Runtime diagnostics are non-fatal session facts when the graph can still be
   loaded, applied, and shown.
 
-M06.1 defines the canonical object box model. Pd-style text-entry object boxes
+The canonical object box model remains part of the graph/runtime foundation.
+Pd-style text-entry object boxes
 are user-facing objects regardless of whether the text resolves today:
 
 - A typed object box persists as a canonical object box, not as a special
@@ -76,111 +109,124 @@ are user-facing objects regardless of whether the text resolves today:
 - Display text prefers `objectText`, then a native alias, then the internal kind
   only as a fallback.
 
-M07 turns those Runtime facts into Studio surfaces: logs, inspector diagnostics,
-object resolution status, and clear Runtime-vs-client ownership cues. It should
-not reintroduce local graph/view authority in Studio.
-
-M08 defines codecs. A decoder maps raw transport frames into Skenion
+M06 defines codecs. A decoder maps raw transport frames into Skenion
 messages/values; an encoder maps messages/values back to transport frames.
 MIDI note/CC/clock parsing, serial line parsing, binary sensor packet parsing,
 and HID report interpretation are codec behavior, not Runtime IO discovery.
 Custom extensions should be able to provide codecs without patching Runtime
 core.
 
-M09 provides convenience objects. `midiin` and `midiout` are native convenience
+M07 provides convenience objects. `midiin` and `midiout` are native convenience
 objects composed from MIDI transport bindings plus MIDI decoder/encoder
 contracts. Serial and HID objects follow the same pattern. Sensor support stays
 generic: an Arduino temperature sensor, wind direction sensor, potentiometer, or
 custom controller is a selected device plus framing plus decoder, not a
 hard-coded `TemperatureDecoder` built into Runtime discovery.
 
-M10 is the first Studio IO UX milestone. Studio should expose target device
+M08 is the first Studio IO UX milestone. Studio should expose target device
 dropdowns, transport options, codec selection, raw frame monitoring, decoded
 preview, and diagnostics inside selected object/node parameter editors. It must
 not add a Runtime-wide IO discovery panel or global MIDI settings.
 
 Clock-producing sources remain explicit graph objects. A MIDI Clock object may
-output `clock.state`; Link, MTC, and host transport objects move to M14. None of
+output `clock.state`; Link, MTC, and host transport objects move to M12. None of
 these should reintroduce Runtime-global clock source APIs.
 
 ## Current Order
 
 1. `skenion-contracts`
-2. `skenion-sdk`
-3. `skenion-runtime`
-4. `skenion-examples`
-5. `skenion-studio`
+2. `skenion-runtime`
+3. `skenion-studio`
+4. `skenion-sdk`
+5. `skenion-examples`
+6. `skenion-docs`
 
 ## 1. Contracts
 
 `skenion-contracts` is the source of truth for graph documents, node definition
 manifests, live protocol envelopes, and HTTP surfaces.
 
-Immediate work:
+Immediate foundation work:
 
-- release the current v0.1 graph and node definition contract
-- expose a TypeScript package for schema constants and validation helpers
-- keep `schemaVersion: "0.0.0"` graph files as the frozen legacy baseline
-- keep v0.1 graph documents as patch wiring documents, not runtime schedules
+- define Graph v0.2 patch libraries and `GraphFragmentV02`
+- define session-addressed Runtime operations and event envelopes
+- define collaboration operation, presence, causality, and undo metadata
+- define package marketplace/install/update contracts
+- define release train manifest and Runtime artifact metadata
 
 The TypeScript SDK and Rust runtime should consume this repository rather than
 copying schemas.
 
-## 2. SDK
+## 2. Runtime
 
-`skenion-sdk` starts before Studio because node authoring and manifest
-normalization need to be stable before a visual editor depends on them.
+`skenion-runtime` is the authoritative session, operation, collaboration, and
+package-resolution coordinator.
 
-Immediate work:
+Immediate foundation work:
 
-- provide `defineNode()` for script and plugin node manifests
-- provide `t.*` type builders that emit v0.1 `flow + dataKind + constraints`
-- validate generated manifests through `@skenion/contracts`
-- expose only the v0.1 script lifecycle hooks: `onInit`, `onInput`,
-  `onEvent`, and `onDispose`
+- implement explicit session registry and default-session aliases
+- implement operation envelope ingestion and event replay
+- implement high-level `pasteGraphFragment` lowering
+- implement Runtime-authoritative collaboration ordering/rebase
+- implement package cache, installed registry, and manifest validation
+- publish multi-arch Runtime binary assets
+
+## 3. Studio
+
+`skenion-studio` consumes Runtime-owned state and provides web/desktop user
+interfaces.
+
+Immediate foundation work:
+
+- implement Tauri shell, window registry, and runtime profiles
+- implement graph fragment copy/paste UX
+- implement help volatile working-copy windows
+- implement collaborative editing UI
+- implement marketplace browser and installed package inventory
+- implement desktop sidecar packaging
+
+React Flow state remains a derived view model only.
+
+## 4. SDK
+
+`skenion-sdk` provides helper APIs after the underlying contract surfaces are
+stable enough to wrap.
+
+Immediate foundation work:
+
+- graph fragment and paste helpers
+- session-aware Runtime client helpers
+- collaboration operation builders and reconciliation helpers
+- package marketplace/install/update helpers
+- release train manifest compatibility helpers
 
 The SDK must stay UI-framework agnostic.
 
-## 3. Runtime
+## 5. Examples
 
-`skenion-runtime` should load and validate the same node definition manifests
-that the SDK emits.
+`skenion-examples` proves the contract, Runtime, Studio, and SDK with
+license-clean fixtures and conformance scripts.
 
-Immediate work:
+Immediate foundation work:
 
-- load built-in node manifests
-- reject unsupported permissions and incompatible graph edges
-- compile graph documents into runtime internals without persisting scheduler
-  details back into the graph document
-- expose MVP control over WebSocket Protobuf envelopes and HTTP diagnostics
+- subpatch/live-help fixtures
+- graph fragment copy/paste fixtures
+- realtime collaboration convergence fixtures
+- package marketplace/install/update fixtures
+- released-artifact conformance against train manifests
 
-## 4. Examples
+Examples must not depend on unpublished private packages for release
+conformance.
 
-`skenion-examples` should prove the contract and SDK with small, public,
-license-clean projects.
+## 6. Docs
 
-Immediate work:
+`skenion-docs` publishes the public Manual after the contracts and behavior are
+stable enough to document without exposing internal research.
 
-- minimal value graph
-- bang/event trigger graph
-- video asset decode and GPU upload graph
-- audio analysis signal graph
-- script node authoring example
+Immediate foundation work:
 
-Examples must not depend on unpublished private packages.
-
-## 5. Studio
-
-`skenion-studio` comes after the contract, SDK, and runtime loader have enough
-shape to avoid baking temporary model assumptions into the editor.
-
-Initial Studio direction:
-
-- React + TypeScript + Mantine
-- `@xyflow/react` for the canvas interaction layer
-- Skenion Graph v0.1 as the saved project format
-- React Flow state as a derived view model only
-- edge validation delegated to the Skenion compatibility validator
-
-Auto-layout can add ELK.js later when the graph model and canvas needs are
-clearer.
+- subpatch/live help Manual pages
+- desktop multi-window and runtime profile Manual pages
+- collaboration behavior Manual pages
+- marketplace/install/update Manual pages
+- release train and install artifact Manual pages
