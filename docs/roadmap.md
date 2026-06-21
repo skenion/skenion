@@ -67,6 +67,20 @@ M06 is next. The first Studio slice is `M06.1 — Studio Clock Sources Panel v0`
 - keep project open, Runtime connect, graph patching, and preview start
   separate from MIDI source start.
 
+M06 UI surface policy:
+
+- Inspect is an open/close side panel mode for one selected target at a time:
+  node, edge, or builtin help. It should not host Runtime clock source
+  list/start/stop controls.
+- Runtime Control is the side panel mode for explicit Runtime actions:
+  connection, session, preview, telemetry, history, and Runtime clock source
+  list/read/start/stop.
+- Settings are persistent project or object configuration and should use a
+  Dialog once a saved settings model exists. Popovers are reserved for compact
+  inline choices such as enum or format selection.
+- M06.1 does not add persistent MIDI source configuration, auto-start settings,
+  or stable MIDI input identity storage.
+
 ## Current Order
 
 1. `skenion-contracts`
