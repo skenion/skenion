@@ -1,41 +1,49 @@
 # Releases
 
-Skenion uses independent Semantic Versioning per repository.
+Skenion v0 uses lockstep product Semantic Versioning across releasable
+repositories and artifacts.
 
-Versions are not lockstep:
+If the product train is `0.55`, every releasable package/application/artifact
+in that train must ship the same product version, using registry-compatible
+SemVer such as `0.55.0` where a patch component is required:
 
 ```text
-skenion-contracts 1.4.0
-skenion-runtime   0.3.12
-skenion-sdk       0.5.2
-skenion-studio    0.2.18
+@skenion/contracts  0.55.0
+skenion-contracts   0.55.0
+skenion-runtime     0.55.0
+@skenion/sdk        0.55.0
+skenion-studio      0.55.0
 ```
 
-Compatibility is determined by protocol version ranges and negotiated runtime
-capabilities, not by matching application versions.
+Compatibility is determined by the release train and exact current protocol
+versions, not by accepting older repository versions, deprecated paths, or broad
+version ranges. Unsupported graph, project, node, operation, extension,
+package, manifest, Runtime HTTP, or protocol versions must be rejected with a
+structured diagnostic.
+
+This supersedes the prior policy that repository versions were independent
+SemVer streams and that v0 could keep legacy import, migration, default-alias,
+or deprecated compatibility paths.
 
 ## Product Release Train
-
-Repository package versions stay independent, but product releases must be
-aligned by a release train manifest.
 
 The product train is the user-facing compatibility unit. A train manifest should
 record:
 
-- product train id, such as `0.29` or `2026.06`
-- `@skenion/contracts` npm version and `skenion-contracts` crate version
-- `skenion-runtime` crate version
+- product train id, such as `0.55`
+- the lockstep `@skenion/contracts` npm version and `skenion-contracts` crate version
+- the lockstep `skenion-runtime` crate version
 - `skenion-runtime` binary release assets by OS/arch, with checksums
-- `@skenion/sdk` npm version
-- Studio web/desktop release version
+- the lockstep `@skenion/sdk` npm version
+- the lockstep Studio web/desktop release version
 - Examples tag or commit used for conformance
 - Manual version and GitHub Pages deployment
-- graph, node, runtime-wire, extension, and manifest protocol baselines
+- exact graph, node, runtime-wire, extension, and manifest protocol baselines
 - required and optional runtime capabilities
 
-Do not force every repository to bump to the same SemVer number just to ship a
-product train. Instead, ship the train only when the manifest points to released
-artifacts that have all passed compatibility checks.
+Do not close a product release milestone unless every releasable repository and
+artifact in the train has published the same product version and passed the
+release train gates.
 
 Recommended release order:
 
@@ -86,7 +94,8 @@ through the package marketplace flow.
 
 ## Release Please
 
-Every releasable repository should use Release Please.
+Every releasable repository should use Release Please configured for the same
+lockstep product version.
 
 Release Please owns:
 
@@ -98,6 +107,11 @@ Release Please owns:
 
 Package publishing should be separate and should run only after Release Please
 reports that a release was created.
+
+Do not merge or publish a Release Please PR that bumps a package, crate, app, or
+Manual version away from the current product train version. A repository with no
+code changes still remains part of the lockstep train through its release tag,
+artifact metadata, deployment marker, or train manifest entry.
 
 Release Please workflows should use this token order:
 

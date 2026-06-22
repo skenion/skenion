@@ -19,7 +19,7 @@ family. The current baseline is:
 | M06.5 Native Runtime Extension ABI v0 | Current | Native extension ABI, package manifests, capability registration, diagnostics, and SDK authoring substrate. |
 | M06.75 Graph v0.2 Subpatch / Live Help Foundation | Current | Patch libraries, `core.inlet`/`core.outlet`, live help as real patch graphs, `GraphFragmentV02`, and high-level paste semantics. |
 | M06.8 Desktop Multi-Window / Runtime Session Profiles v0 | Current | Tauri desktop shell, local-managed/local-shared/remote profiles, sidecar lifecycle, and same-session multi-view editing. |
-| M06.81 Graph v0.2 Active Cutover / v0.1 Retirement | Current | Make v0.2 project/graph/patch-library documents the active editor/runtime/source-of-truth model and demote v0.1 to legacy import/migration only. |
+| M06.81 Graph v0.2 Active Cutover / v0.1 Retirement | Current | Make the current v0 graph/project/patch-library documents the active editor/runtime/source-of-truth model and reject v0.1 or other unsupported versions instead of preserving legacy import/migration paths. |
 | M06.82 Realtime Collaboration / CRDT-OT Sync v0 | Current | Runtime-authoritative OT/rebase collaboration, CRDT-compatible ids, presence, operation replay, and actor-scoped undo metadata. |
 | M06.85 Package Marketplace / Install UX v0 | Current | Public package/patch discovery, Stargazed ranking, install/update/remove UX, installed inventory, and package compatibility diagnostics. |
 | M06.9 Product Release Train / Multi-Arch Distribution v0 | Current | Release train manifest, Runtime multi-arch binary artifacts, desktop sidecar packaging, and Manual release gates. |
@@ -36,7 +36,7 @@ The current v0 foundation is stricter than the older bootstrap roadmap. These
 items must be treated as foundational contracts, not optional polish:
 
 1. Graph v0.2 subpatch/live help and `GraphFragmentV02`.
-2. Graph v0.2 active editor/runtime cutover; v0.1 becomes legacy import/migration only.
+2. Current v0 graph active editor/runtime cutover; v0.1 and other unsupported versions are rejected.
 3. Explicit Runtime session addressing and high-level paste operations.
 4. Tauri desktop window/profile/sidecar substrate.
 5. Runtime-authoritative realtime collaboration.
@@ -64,9 +64,9 @@ clients converge on.
 
 M06.81 is the hard cutover point for graph contracts. New authoring, Runtime,
 collaboration, marketplace, package, extension, SDK, examples, and Manual work
-must use v0.2 project/graph/patch-library contracts. v0.1 documents may be read
-only by explicit legacy import/migration paths and must not receive new active
-features.
+must use the current v0 project/graph/patch-library contracts. v0.1 documents
+and any other unsupported versions must be rejected rather than imported,
+migrated, or kept as deprecated compatibility surfaces.
 
 Foundation session scope:
 
@@ -75,8 +75,9 @@ Foundation session scope:
 - `POST /v0/sessions/{sessionId}/operations` is the forward graph/view
   operation surface. `/v0/session/project`, `/v0/session/patch`, and
   `/v0/session/view-state` are not Studio contract surfaces.
-- `/v0/session` and `/v0/session/mutate` may remain as default-session
-  compatibility aliases, but new work must use explicit session ids.
+- `/v0/session` and `/v0/session/mutate` are transitional technical debt to
+  remove; new work must use explicit session ids and must not add compatibility
+  aliases.
 - Runtime-owned view state is limited to object/node view data such as
   coordinates, size, and collapsed state. Viewport pan/zoom remains client-local.
 - Graph and view mutations can be submitted atomically. Adding a node at a
@@ -157,7 +158,7 @@ manifests, live protocol envelopes, and HTTP surfaces.
 Immediate foundation work:
 
 - define Graph v0.2 patch libraries and `GraphFragmentV02`
-- define v0.1-to-v0.2 import/migration helpers and retire v0.1 active authoring
+- define strict current-version validators and remove v0.1 import/migration helpers
 - define session-addressed Runtime operations and event envelopes
 - define collaboration operation, presence, causality, and undo metadata
 - define package marketplace/install/update contracts
@@ -173,7 +174,7 @@ package-resolution coordinator.
 
 Immediate foundation work:
 
-- implement explicit session registry and default-session aliases
+- implement explicit session registry and remove default-session aliases
 - make v0.2 `ProjectDocumentV02` and patch libraries the active session model
 - implement operation envelope ingestion and event replay
 - implement high-level `pasteGraphFragment` lowering
@@ -189,7 +190,7 @@ interfaces.
 Immediate foundation work:
 
 - implement Tauri shell, window registry, and runtime profiles
-- switch active editor/project state to v0.2 and keep v0.1 import-only
+- switch active editor/project state to the current v0 graph contract and reject v0.1 inputs
 - implement graph fragment copy/paste UX
 - implement help volatile working-copy windows
 - implement collaborative editing UI

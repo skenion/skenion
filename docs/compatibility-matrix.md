@@ -2,22 +2,27 @@
 
 This matrix records the current source-of-truth boundaries for graph, node, and
 runtime compatibility. It exists to keep `skenion-contracts`, `skenion-examples`,
-`skenion-studio`, and `skenion-runtime` from drifting independently.
+`skenion-studio`, and `skenion-runtime` on one lockstep product train.
+
+Skenion v0 has no legacy or deprecated compatibility mode. Each surface accepts
+only the current exact schema/protocol version listed here. Older graph,
+project, node, operation, extension, package, manifest, Runtime HTTP, or
+protocol versions must be rejected with structured diagnostics.
 
 ## Current Baseline
 
 | Surface | Current baseline | Owner |
 | --- | --- | --- |
-| Graph document schema | Active: `skenion.graph` `0.2.0`; legacy import only: `0.1.0` | `skenion-contracts/json-schema/graph/v0.2/graph.schema.json` |
+| Graph document schema | Current exact: `skenion.graph` `0.2.0`; reject `0.1.0` and all other versions | `skenion-contracts/json-schema/graph/v0.2/graph.schema.json` |
 | View state schema | `skenion.view-state` `0.1.0` | `skenion-contracts/json-schema/view/v0.1/view-state.schema.json` |
-| Project document schema | Active: `skenion.project` `0.2.0`; legacy import only: `0.1.0` | `skenion-contracts/json-schema/project/v0.2/project.schema.json` |
-| Node definition schema | Active: `skenion.node.definition` `0.2.0`; legacy import only: `0.1.0` | `skenion-contracts/json-schema/node/v0.2/node-definition.schema.json` |
-| Graph patch / operation schema | Active: Runtime v0.2 graph target operations; legacy import only: `skenion.graph.patch` `0.1.0` | `skenion-contracts/openapi/runtime-http.v0.yaml` and `skenion-contracts/json-schema/graph/v0.1/patch.schema.json` |
-| Built-in node definitions | Active v0.2 definitions; v0.1 copies are legacy fixture inputs | `skenion-contracts` builtins and migration fixtures |
-| Built-in node help | Active v0.2 patch definitions/live-help graphs; v0.1 help graphs are legacy import inputs | `skenion-contracts` help patch definitions and migration fixtures |
+| Project document schema | Current exact: `skenion.project` `0.2.0`; reject `0.1.0` and all other versions | `skenion-contracts/json-schema/project/v0.2/project.schema.json` |
+| Node definition schema | Current exact: `skenion.node.definition` `0.2.0`; reject `0.1.0` and all other versions | `skenion-contracts/json-schema/node/v0.2/node-definition.schema.json` |
+| Graph patch / operation schema | Current Runtime graph target operations only; reject `skenion.graph.patch` `0.1.0` | `skenion-contracts/openapi/runtime-http.v0.yaml` |
+| Built-in node definitions | Current v0.2 definitions only; v0.1 copies are removal debt | `skenion-contracts` builtins |
+| Built-in node help | Current v0.2 patch definitions/live-help graphs only; v0.1 help graphs are removal debt | `skenion-contracts` help patch definitions |
 | Typed control routing | Object-owned `sendName` / `receiveName` on semantic value/control objects | `skenion-contracts/builtins/v0.1` plus `skenion-contracts/docs/control-routing.md` |
 | Live preview control updates | `skenion.preview.control-state` `0.1.0` runtime-internal snapshot plus telemetry revision fields | `skenion-contracts/docs/live-preview-control-updates.md` and `skenion-contracts/openapi/runtime-http.v0.yaml` |
-| External clock source state | `ClockStateV01` field authority plus MIDI Clock tick/start/stop/continue/SPP parser, `clock.midi-clock` builtin, examples parser fixtures, runtime fixture snapshots, and the physical MIDI input boundary. Runtime-global clock-source list/read/start/stop APIs are compatibility-only and are not the forward object model. M05 is complete for MIDI Clock external source v0; Link, MTC/SMPTE, and host transport are M12 scope as explicit graph objects. | `skenion-contracts/packages/ts/src/clock.ts`, `skenion-contracts/packages/rust/src/v0_1/clock.rs`, `skenion-contracts/builtins/v0.1/nodes/clock.midi-clock.node.json`, `skenion-examples/compatibility/v0.1/clock-midi-fixtures`, `skenion-examples/compatibility/v0.1/runtime-midi-clock-fixtures`, and `skenion-runtime` MIDI Clock adapter |
+| External clock source state | Object-owned clock state and MIDI Clock parser behavior only. Runtime-global clock-source list/read/start/stop APIs are removal debt and must not be preserved as compatibility. Link, MTC/SMPTE, and host transport are M12 scope as explicit graph objects. | `skenion-contracts` clock contracts and `skenion-runtime` MIDI Clock adapter |
 | Audio clock-domain planning | `AudioDeviceDescriptorV01`, `AudioClockDomainV01`, `AudioGraphPartitionV01`, `AudioClockBridgePlanV01` | `skenion-contracts/docs/audio-clock-domain-contract.md` and `skenion-runtime` audio DSP planner |
 | Runtime HTTP API | `runtime-http.v0` canonical session snapshot + mutation protocol | `skenion-contracts/openapi/runtime-http.v0.yaml` |
 
@@ -53,11 +58,12 @@ mutation.
 
 `ProjectDocumentV02` stores `metadata`, a root graph, a patch library, and view
 state together and is the active user-facing file format for `.skenion.json`.
-Opening a v0.1 project is a legacy import/migration operation that yields a
-v0.2 project before editing, Runtime session load, collaboration, marketplace,
-or package resolution begins. Loading the v0.2 project into Runtime makes
-Runtime authoritative for the session copy, and Studio thereafter reads graph,
-patch library, and node view state from `RuntimeSessionSnapshot.project`.
+Opening a v0.1 project is not supported in v0; Studio and Runtime must reject
+unsupported project/graph versions before editing, Runtime session load,
+collaboration, marketplace, or package resolution begins. Loading the current
+project into Runtime makes Runtime authoritative for the session copy, and
+Studio thereafter reads graph, patch library, and node view state from
+`RuntimeSessionSnapshot.project`.
 
 The canonical v0 Runtime session API is session-addressed:
 
@@ -72,11 +78,11 @@ SSE /v0/sessions/{sessionId}/events/stream
   -> RuntimeSessionEvent { sessionId, sequence, kind, snapshot, history, operation?, diagnostics }
 ```
 
-`/v0/session`, `/v0/session/mutate`, and `/v0/session/events/stream` may remain
-as default-session compatibility aliases, but new clients and contracts should
-use explicit session ids. `pasteGraphFragment` is a high-level operation under
-`/v0/sessions/{sessionId}/operations`; it should not be pre-lowered by Studio
-into unrelated low-level `addNode` and `addEdge` patches.
+`/v0/session`, `/v0/session/mutate`, and `/v0/session/events/stream` are
+transitional removal debt, not compatibility promises. New clients and
+contracts must use explicit session ids. `pasteGraphFragment` is a high-level
+operation under `/v0/sessions/{sessionId}/operations`; it should not be
+pre-lowered by Studio into unrelated low-level `addNode` and `addEdge` patches.
 
 The removed v0 surfaces are `/v0/session/project`, `/v0/session/patch`, and
 `/v0/session/view-state`. Clients must not read graph or view state from
@@ -132,14 +138,19 @@ working copy. Users can pan, zoom, select, move, edit, connect, delete, copy
 graph fragments, and promote/fork into a project-owned patch. The working copy
 must not save back to first-party or package help source.
 
-## Verified Releases
+## Verified Release Train
 
-| Repository | Release / branch | Compatibility note |
-| --- | --- | --- |
-| `skenion-contracts` | local v0 contract after Runtime-authoritative session cleanup | Publishes canonical Runtime session snapshots, operation request/response shapes, Runtime history, actor-scoped undo metadata, session event stream shapes, and object-owned clock state contracts. Runtime-global clock-source APIs are compatibility-only aliases, not the forward contract surface. |
-| `skenion-runtime` | local `skenion-runtime-v0.34.0` worktree after Runtime-authoritative session cleanup | Serves canonical session snapshots, session-addressed graph/view operations, Runtime-owned node view state, authoritative history/audit log, actor-scoped undo metadata, object resolution diagnostics, and session SSE snapshots. |
-| `skenion-examples` | `main` after Runtime mutation history smoke merge | Contains compatibility fixtures and runtime smoke coverage for same-domain audio routing, explicit bridge/resample routing, rejected independent-domain crossing without a bridge, simulated MIDI Clock snapshots, no-device MIDI input smoke, object-owned clock behavior, and Runtime operation/history smoke. |
-| `skenion-studio` | local `skenion-studio-v0.27.0` worktree after Runtime-authoritative session cleanup | Reads graph and node view state from `snapshot.project`, sends drag stop as one `moveNodeView` mutation, treats viewport as client-local, and consumes canonical session SSE snapshots. |
+This section must name one lockstep product version when a release train is
+ready. Do not record mismatched local worktree versions here.
+
+| Artifact group | Required train state |
+| --- | --- |
+| Contracts npm/crate | Same product version as the train, published from Release Please/GitHub Actions |
+| Runtime crate/binaries | Same product version as the train, with multi-arch sidecar assets and checksums |
+| SDK npm | Same product version as the train |
+| Studio web/desktop | Same product version as the train, with Runtime sidecar compatibility verified |
+| Examples | Same product train tag/commit, current-version fixtures only |
+| Manual | Same product Manual version deployed to GitHub Pages |
 
 ## Canonical Data Kinds
 
@@ -188,9 +199,10 @@ core.bang(sendName: reset)
 own their routing params where
 applicable. Runtime interaction with these nodes sends
 session-addressed control operations and updates runtime control state; it must
-not create graph patches. The legacy `/v0/session/control/event` path may remain
-as a default-session compatibility alias, but new clients should target explicit
-session ids. Editing labels, ranges, names, or defaults remains graph editing.
+not create graph patches. The `/v0/session/control/event` default-session path
+is transitional removal debt and must not be preserved as compatibility. New
+clients must target explicit session ids. Editing labels, ranges, names, or
+defaults remains graph editing.
 
 Pre-v1 cleanup: value objects no longer expose separate `bang` or `set` input
 ports. `bang` and `set` are `ControlMessage` selectors handled by the hot
@@ -211,18 +223,17 @@ created documents and fixtures must use `number.float`, `number.int`,
 ## Built-in Node Rules
 
 - `skenion-contracts` owns canonical built-in node manifests.
-- `skenion-studio` consumes `builtinNodeDefinitionsV01` from `@skenion/contracts`.
-- `skenion-examples` may keep fixture copies, but CI must structurally audit
-  them against `skenion-contracts/builtins/v0.1/builtins.manifest.json` and
-  `skenion-contracts/builtins/v0.1/nodes`.
+- `skenion-studio` consumes the current built-in node definitions from
+  `@skenion/contracts`.
+- `skenion-examples` may keep current-version fixture copies, but CI must
+  structurally audit them against the current contracts built-in manifest.
 - `skenion-runtime` validates and plans canonical examples from
   `skenion-examples`.
 - Product-facing render cables may display as `render.frame`; the low-level
-  v0.1 stored resource type remains `resource<gpu.texture2d>` until a later
-  persisted schema changes that contract.
+  stored resource type must follow the current accepted graph schema exactly.
 - Every new builtin node must include node definition, compact help metadata,
   and a valid help graph in the same PR.
-- Studio must consume `builtinNodeHelpV01` and `builtinNodeHelpGraphsV01` from
+- Studio must consume the current built-in help metadata and help graphs from
   `@skenion/contracts`; it must not keep a separate hand-written help registry.
 
 ## Audio Clock Domains
@@ -268,8 +279,9 @@ Learning surfaces are intentionally separate from compatibility fixtures.
 | Tutorial manifest and graphs | `skenion-examples` | User-facing learning paths across multiple nodes |
 | Help graph viewer | `skenion-studio` | Volatile editable working-copy view, graph fragment copy, and promote/fork flow |
 
-Existing help graphs may remain valid `skenion.graph` `0.1.0` legacy import
-documents, but active live help uses v0.2 patch definitions and graph fragments.
+Existing help graphs must be current-version patch definitions/graph fragments
+or be rejected. Do not preserve `skenion.graph` `0.1.0` help graphs as legacy
+import documents.
 Tutorial graphs may intentionally include shader analysis errors only when their
 manifest lists the expected diagnostics.
 
