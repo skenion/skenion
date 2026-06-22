@@ -66,13 +66,13 @@
         "ecosystem": "npm",
         "name": "@skenion/contracts",
         "version": "0.43.0",
-        "url": null
+        "url": "https://www.npmjs.com/package/@skenion/contracts/v/0.43.0"
       },
       "crate": {
         "ecosystem": "crates.io",
         "name": "skenion-contracts",
         "version": "0.43.0",
-        "url": null
+        "url": "https://crates.io/crates/skenion-contracts/0.43.0"
       }
     },
     "runtime": {
@@ -210,7 +210,7 @@
         "ecosystem": "npm",
         "name": "@skenion/sdk",
         "version": "0.43.0",
-        "url": null
+        "url": "https://www.npmjs.com/package/@skenion/sdk/v/0.43.0"
       }
     },
     "studio": {
@@ -218,13 +218,13 @@
         "ecosystem": "npm",
         "name": "@skenion/studio-web",
         "version": "0.43.0",
-        "url": null
+        "url": "https://www.npmjs.com/package/@skenion/studio-web/v/0.43.0"
       },
       "desktop": {
         "ecosystem": "npm",
         "name": "@skenion/studio-desktop",
         "version": "0.43.0",
-        "url": null
+        "url": "https://www.npmjs.com/package/@skenion/studio-desktop/v/0.43.0"
       },
       "desktopPackages": {
         "aarch64-apple-darwin": {
@@ -489,25 +489,27 @@
     "registryPackages": {
       "contractsNpm": {
         "id": "contracts-npm-exists",
-        "status": "pending",
+        "status": "passed",
         "required": true,
         "package": {
           "ecosystem": "npm",
           "name": "@skenion/contracts",
           "version": "0.43.0",
-          "url": null
-        }
+          "url": "https://www.npmjs.com/package/@skenion/contracts/v/0.43.0"
+        },
+        "evidenceUrl": "https://registry.npmjs.org/@skenion/contracts/0.43.0"
       },
       "contractsCrate": {
         "id": "contracts-crate-exists",
-        "status": "pending",
+        "status": "passed",
         "required": true,
         "package": {
           "ecosystem": "crates.io",
           "name": "skenion-contracts",
           "version": "0.43.0",
-          "url": null
-        }
+          "url": "https://crates.io/crates/skenion-contracts/0.43.0"
+        },
+        "evidenceUrl": "https://crates.io/crates/skenion-contracts/0.43.0"
       },
       "runtimeCrate": {
         "id": "runtime-crate-exists",
@@ -523,36 +525,39 @@
       },
       "sdkNpm": {
         "id": "sdk-npm-exists",
-        "status": "pending",
+        "status": "passed",
         "required": true,
         "package": {
           "ecosystem": "npm",
           "name": "@skenion/sdk",
           "version": "0.43.0",
-          "url": null
-        }
+          "url": "https://www.npmjs.com/package/@skenion/sdk/v/0.43.0"
+        },
+        "evidenceUrl": "https://registry.npmjs.org/@skenion/sdk/0.43.0"
       },
       "studioWeb": {
         "id": "studio-web-package-exists",
-        "status": "pending",
+        "status": "passed",
         "required": true,
         "package": {
           "ecosystem": "npm",
           "name": "@skenion/studio-web",
           "version": "0.43.0",
-          "url": null
-        }
+          "url": "https://www.npmjs.com/package/@skenion/studio-web/v/0.43.0"
+        },
+        "evidenceUrl": "https://github.com/echovisionlab/skenion-studio/actions/runs/27972699206"
       },
       "studioDesktop": {
         "id": "studio-desktop-package-exists",
-        "status": "pending",
+        "status": "passed",
         "required": true,
         "package": {
           "ecosystem": "npm",
           "name": "@skenion/studio-desktop",
           "version": "0.43.0",
-          "url": null
-        }
+          "url": "https://www.npmjs.com/package/@skenion/studio-desktop/v/0.43.0"
+        },
+        "evidenceUrl": "https://github.com/echovisionlab/skenion-studio/actions/runs/27972699206"
       }
     },
     "githubReleaseAssets": {
@@ -699,51 +704,57 @@
     "studioPackageSmoke": {
       "aarch64-apple-darwin": {
         "id": "studio-smoke-aarch64-apple-darwin",
-        "status": "pending",
+        "status": "passed",
         "required": true,
         "target": "aarch64-apple-darwin",
         "desktopPackageArtifactId": "studio-desktop-aarch64-apple-darwin",
-        "runtimeSidecarArtifactId": "studio-runtime-sidecar-aarch64-apple-darwin"
+        "runtimeSidecarArtifactId": "studio-runtime-sidecar-aarch64-apple-darwin",
+        "evidenceUrl": "https://github.com/echovisionlab/skenion-studio/actions/runs/27974258954/job/82787904603"
       },
       "x86_64-apple-darwin": {
         "id": "studio-smoke-x86_64-apple-darwin",
-        "status": "pending",
+        "status": "passed",
         "required": true,
         "target": "x86_64-apple-darwin",
         "desktopPackageArtifactId": "studio-desktop-x86_64-apple-darwin",
-        "runtimeSidecarArtifactId": "studio-runtime-sidecar-x86_64-apple-darwin"
+        "runtimeSidecarArtifactId": "studio-runtime-sidecar-x86_64-apple-darwin",
+        "evidenceUrl": "https://github.com/echovisionlab/skenion-studio/actions/runs/27974258954/job/82787904621"
       },
       "x86_64-pc-windows-msvc": {
         "id": "studio-smoke-x86_64-pc-windows-msvc",
-        "status": "pending",
+        "status": "passed",
         "required": true,
         "target": "x86_64-pc-windows-msvc",
         "desktopPackageArtifactId": "studio-desktop-x86_64-pc-windows-msvc",
-        "runtimeSidecarArtifactId": "studio-runtime-sidecar-x86_64-pc-windows-msvc"
+        "runtimeSidecarArtifactId": "studio-runtime-sidecar-x86_64-pc-windows-msvc",
+        "evidenceUrl": "https://github.com/echovisionlab/skenion-studio/actions/runs/27974258954/job/82787904639"
       },
       "aarch64-pc-windows-msvc": {
         "id": "studio-smoke-aarch64-pc-windows-msvc",
-        "status": "pending",
+        "status": "passed",
         "required": true,
         "target": "aarch64-pc-windows-msvc",
         "desktopPackageArtifactId": "studio-desktop-aarch64-pc-windows-msvc",
-        "runtimeSidecarArtifactId": "studio-runtime-sidecar-aarch64-pc-windows-msvc"
+        "runtimeSidecarArtifactId": "studio-runtime-sidecar-aarch64-pc-windows-msvc",
+        "evidenceUrl": "https://github.com/echovisionlab/skenion-studio/actions/runs/27974258954/job/82787904673"
       },
       "x86_64-unknown-linux-gnu": {
         "id": "studio-smoke-x86_64-unknown-linux-gnu",
-        "status": "pending",
+        "status": "passed",
         "required": true,
         "target": "x86_64-unknown-linux-gnu",
         "desktopPackageArtifactId": "studio-desktop-x86_64-unknown-linux-gnu",
-        "runtimeSidecarArtifactId": "studio-runtime-sidecar-x86_64-unknown-linux-gnu"
+        "runtimeSidecarArtifactId": "studio-runtime-sidecar-x86_64-unknown-linux-gnu",
+        "evidenceUrl": "https://github.com/echovisionlab/skenion-studio/actions/runs/27974258954/job/82787904666"
       },
       "aarch64-unknown-linux-gnu": {
         "id": "studio-smoke-aarch64-unknown-linux-gnu",
-        "status": "pending",
+        "status": "passed",
         "required": true,
         "target": "aarch64-unknown-linux-gnu",
         "desktopPackageArtifactId": "studio-desktop-aarch64-unknown-linux-gnu",
-        "runtimeSidecarArtifactId": "studio-runtime-sidecar-aarch64-unknown-linux-gnu"
+        "runtimeSidecarArtifactId": "studio-runtime-sidecar-aarch64-unknown-linux-gnu",
+        "evidenceUrl": "https://github.com/echovisionlab/skenion-studio/actions/runs/27974258954/job/82787904640"
       }
     },
     "examplesConformance": {
