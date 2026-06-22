@@ -654,7 +654,8 @@ jobs:
             echo "6. Docs"
             echo
             echo "Prepare mode validates and summarizes without dispatching."
-            echo "Publish and verify modes call the pinned skenion-ci@v1 reusable workflows."
+            echo "Publish mode dispatches train Release Please PR workflows only."
+            echo "Verify mode is a separate post-release gate after release PRs are merged and artifacts exist."
           } >> "${GITHUB_STEP_SUMMARY}"
 
   publish-contracts:
@@ -754,20 +755,6 @@ jobs:
       - validate
       - validate-manifest
       - plan
-    uses: echovisionlab/skenion-ci/.github/workflows/verify-release-artifacts.yml@v1
-    with:
-      manifest: ${{ needs.validate.outputs.manifest_ref }}
-      manifest-ref: ${{ github.sha }}
-      train-version: ${{ needs.validate.outputs.train_version }}
-    secrets: inherit
-
-  verify-after-publish:
-    name: Verify release train after dispatch
-    if: ${{ needs.validate.outputs.mode == 'publish' }}
-    needs:
-      - validate
-      - validate-manifest
-      - publish-docs
     uses: echovisionlab/skenion-ci/.github/workflows/verify-release-artifacts.yml@v1
     with:
       manifest: ${{ needs.validate.outputs.manifest_ref }}
