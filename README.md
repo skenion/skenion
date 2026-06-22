@@ -21,7 +21,7 @@ Skenion starts as a multi-repository project:
 
 | Repository | Role |
 | --- | --- |
-| `skenion` | Project hub, architecture, RFCs, ADRs, roadmap, governance |
+| `skenion` | Project hub, product release train conductor, architecture, RFCs, ADRs, roadmap, governance |
 | `skenion-docs` | Human-readable model docs for data delivery, processing, and object semantics |
 | `skenion-contracts` | Protobuf, JSON Schema, OpenAPI, generated packages, conformance tests |
 | `skenion-runtime` | Rust native runtime and CLI |
@@ -47,8 +47,14 @@ See [Roadmap](docs/roadmap.md) for the initial implementation order.
   state treated only as a derived view model.
 - Use Protobuf + Buf as the live TS/Rust control contract.
 - Use JSON Schema for persisted graph/project documents.
-- Use Release Please and Semantic Versioning per repository, without lockstep
-  versioning. Product compatibility is aligned through release train manifests.
+- Use lockstep product SemVer for v0 release trains. The hub repository owns
+  conductor state and train manifests; `skenion-ci` owns reusable workflow
+  implementation.
+- Use Release Please for v0 through conductor-dispatched release PRs with an
+  explicit `release-as`, starting with product train `0.43.0`
+  (`trainId: "0.43"`).
+- Publish npm packages, crates, Runtime binaries, Studio desktop packages, and
+  Manual releases through GitHub Actions only, never from a local machine.
 - Use Tauri as the desktop shell for Studio; Tauri coordinates windows,
   sidecars, runtime profiles, and clipboard bridging while Runtime remains the
   graph authority.

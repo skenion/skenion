@@ -17,9 +17,9 @@ family. The current baseline is:
 | M05 Runtime IO Substrate v0 | Current | Transport-neutral raw IO discovery and per-object binding contracts for MIDI, HID, Serial, and inline fixtures. |
 | M06 IO Codec Contract v0 | Current | Decoder/encoder contracts that interpret raw transport frames as Skenion messages/values and encode messages/values back to transport frames. |
 | M06.5 Native Runtime Extension ABI v0 | Current | Native extension ABI, package manifests, capability registration, diagnostics, and SDK authoring substrate. |
-| M06.75 Graph v0.2 Subpatch / Live Help Foundation | Current | Patch libraries, `core.inlet`/`core.outlet`, live help as real patch graphs, `GraphFragmentV02`, and high-level paste semantics. |
+| M06.75 Graph 0.1 Subpatch / Live Help Foundation | Current | Patch libraries, `core.inlet`/`core.outlet`, live help as real patch graphs, `GraphFragmentV01`, and high-level paste semantics on the consolidated current `0.1` graph surface. |
 | M06.8 Desktop Multi-Window / Runtime Session Profiles v0 | Current | Tauri desktop shell, local-managed/local-shared/remote profiles, sidecar lifecycle, and same-session multi-view editing. |
-| M06.81 Graph v0.2 Active Cutover / v0.1 Retirement | Current | Make the current v0 graph/project/patch-library documents the active editor/runtime/source-of-truth model and reject v0.1 or other unsupported versions instead of preserving legacy import/migration paths. |
+| M06.81 Graph 0.1 Active Consolidation | Current | Make the consolidated current `0.1` graph/project/patch-library documents the active editor/runtime/source-of-truth model and reject unsupported versions instead of preserving legacy import/migration paths. |
 | M06.82 Realtime Collaboration / CRDT-OT Sync v0 | Current | Runtime-authoritative OT/rebase collaboration, CRDT-compatible ids, presence, operation replay, and actor-scoped undo metadata. |
 | M06.85 Package Marketplace / Install UX v0 | Current | Public package/patch discovery, Stargazed ranking, install/update/remove UX, installed inventory, and package compatibility diagnostics. |
 | M06.9 Product Release Train / Multi-Arch Distribution v0 | Current | Release train manifest, Runtime multi-arch binary artifacts, desktop sidecar packaging, and Manual release gates. |
@@ -35,8 +35,8 @@ family. The current baseline is:
 The current v0 foundation is stricter than the older bootstrap roadmap. These
 items must be treated as foundational contracts, not optional polish:
 
-1. Graph v0.2 subpatch/live help and `GraphFragmentV02`.
-2. Current v0 graph active editor/runtime cutover; v0.1 and other unsupported versions are rejected.
+1. Graph 0.1 subpatch/live help and `GraphFragmentV01`.
+2. Current graph active editor/runtime cutover; unsupported versions are rejected.
 3. Explicit Runtime session addressing and high-level paste operations.
 4. Tauri desktop window/profile/sidecar substrate.
 5. Runtime-authoritative realtime collaboration.
@@ -62,11 +62,12 @@ superseded: Runtime owns the session copy of graph, object/node view state,
 history, diagnostics, operation ordering, and the snapshots/events that other
 clients converge on.
 
-M06.81 is the hard cutover point for graph contracts. New authoring, Runtime,
-collaboration, marketplace, package, extension, SDK, examples, and Manual work
-must use the current v0 project/graph/patch-library contracts. v0.1 documents
-and any other unsupported versions must be rejected rather than imported,
-migrated, or kept as deprecated compatibility surfaces.
+M06.81 is the hard consolidation point for graph contracts. New authoring,
+Runtime, collaboration, marketplace, package, extension, SDK, examples, and
+Manual work must use the consolidated current `0.1`
+project/graph/patch-library contracts. Documents that do not match the current
+`0.1` schema/protocol surface must be rejected rather than imported, migrated,
+or kept as deprecated compatibility surfaces.
 
 Foundation session scope:
 
@@ -145,8 +146,8 @@ these should reintroduce Runtime-global clock source APIs.
 
 1. `skenion-contracts`
 2. `skenion-runtime`
-3. `skenion-studio`
-4. `skenion-sdk`
+3. `skenion-sdk`
+4. `skenion-studio`
 5. `skenion-examples`
 6. `skenion-docs`
 
@@ -157,8 +158,8 @@ manifests, live protocol envelopes, and HTTP surfaces.
 
 Immediate foundation work:
 
-- define Graph v0.2 patch libraries and `GraphFragmentV02`
-- define strict current-version validators and remove v0.1 import/migration helpers
+- define Graph 0.1 patch libraries and `GraphFragmentV01`
+- define strict current-version validators and remove import/migration helpers
 - define session-addressed Runtime operations and event envelopes
 - define collaboration operation, presence, causality, and undo metadata
 - define package marketplace/install/update contracts
@@ -175,7 +176,7 @@ package-resolution coordinator.
 Immediate foundation work:
 
 - implement explicit session registry and remove default-session aliases
-- make v0.2 `ProjectDocumentV02` and patch libraries the active session model
+- make current `ProjectDocumentV01` and patch libraries the active session model
 - implement operation envelope ingestion and event replay
 - implement high-level `pasteGraphFragment` lowering
 - implement Runtime-authoritative collaboration ordering/rebase
@@ -190,7 +191,8 @@ interfaces.
 Immediate foundation work:
 
 - implement Tauri shell, window registry, and runtime profiles
-- switch active editor/project state to the current v0 graph contract and reject v0.1 inputs
+- switch active editor/project state to the current `0.1` graph contract and
+  reject unsupported inputs
 - implement graph fragment copy/paste UX
 - implement help volatile working-copy windows
 - implement collaborative editing UI
@@ -210,7 +212,7 @@ Immediate foundation work:
 - session-aware Runtime client helpers
 - collaboration operation builders and reconciliation helpers
 - package marketplace/install/update helpers
-- release train manifest compatibility helpers
+- release train manifest validation and consumption helpers
 
 The SDK must stay UI-framework agnostic.
 

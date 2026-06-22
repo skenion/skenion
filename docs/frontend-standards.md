@@ -37,10 +37,11 @@ scripts, or tests.
 
 ## Canvas Boundary
 
-Skenion Graph v0.2 is the active saved graph/project format for subpatches,
-patch libraries, live help, graph fragments, collaboration, package
-installation, and Runtime targets. Graph v0.1 is a legacy import/migration
-surface only. React Flow nodes and edges are derived view-model state.
+Skenion Graph `0.1` is the consolidated current saved graph/project format for
+subpatches, patch libraries, live help, graph fragments, collaboration, package
+installation, and Runtime targets. Unsupported schema versions are rejected
+with diagnostics rather than opened through legacy import/migration paths.
+React Flow nodes and edges are derived view-model state.
 
 The Studio implementation must keep an explicit translation layer:
 
@@ -51,10 +52,9 @@ The Studio implementation must keep an explicit translation layer:
 - edge validation calls the Skenion graph validator before committing a
   connection.
 
-The canvas must follow the v0.2 port model. If a legacy v0.1 document is being
-previewed during import, convert it first or use an explicit import adapter:
+The canvas must follow the current `0.1` port model:
 
-- edge styling is based on v0.2 port `rate`, `type`, and cable style metadata
+- edge styling is based on current port `rate`, `type`, and cable style metadata
 - GPU styling is based on `type === "gpu.texture2d"` or render/resource rates
 - boolean values use `type: "boolean"`
 - bang triggers use `type: "event.bang"` and event rate

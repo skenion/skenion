@@ -7,11 +7,8 @@ Accepted
 ## Context
 
 Skenion is a multi-repository product. Contracts, Runtime, SDK, Studio,
-examples, and docs do not all share the same implementation cadence. Forcing
-all repositories to use one lockstep SemVer number would create artificial
-releases and noisy version bumps.
-
-At the same time, users need a clear answer to which released artifacts work
+examples, and docs do not all share the same implementation cadence, but v0
+users need one clear product version that names the artifacts that work
 together.
 
 Runtime is also both a Rust crate and an executable product binary. Tauri
@@ -20,19 +17,26 @@ needs OS/arch-specific Runtime binaries.
 
 ## Decision
 
-Repository versions remain independent SemVer.
+Skenion v0 repositories and artifacts use lockstep product SemVer. If the
+product train is `0.43.0`, every releasable package, crate, app, Runtime
+sidecar asset, Examples release marker, and Manual release marker in that train
+must use `0.43.0` or the matching major/minor Manual path.
 
-Product releases are aligned by a machine-readable release train manifest. The
-manifest is the product compatibility unit.
+Product releases are coordinated by a machine-readable release train manifest.
+The manifest is the product compatibility unit and release completion record.
 
 The manifest schema is owned by `skenion-contracts`.
 
-Product train manifest instances are owned by the root `skenion` repository
-under:
+Product train manifest instances are owned by the hub conductor repository,
+`echovisionlab/skenion`, under:
 
 ```text
 releases/trains/<train-id>.json
 ```
+
+Reusable release workflow implementation is owned by
+`echovisionlab/skenion-ci`. The hub conductor workflow dispatches the train and
+records product state; reusable workflow details stay in `skenion-ci`.
 
 The release train manifest must include:
 
@@ -45,8 +49,27 @@ The release train manifest must include:
 - Examples tag or commit
 - Manual version and deploy status
 - protocol baselines
-- capability set
+- `capabilitySet` with protocol surfaces and required Runtime, Studio,
+  package/marketplace, and Manual capabilities
 - release completion gates
+
+The release order is:
+
+1. Contracts.
+2. Runtime.
+3. SDK.
+4. Studio.
+5. Examples.
+6. Docs.
+
+Contracts are the train seed. Downstream release workflows must consume the
+exact released train version from registries, release tags, GitHub Release
+assets, or the checked-in train manifest. Release jobs must not consume sibling
+branches, `main`, broad semver ranges, or stale hard-coded dependency tags.
+
+Release Please remains the version/changelog/release mechanism, but v0 Release
+Please PRs are conductor-dispatched with explicit `release-as`. Automatic
+independent per-repository release authority is stale for v0 trains.
 
 Runtime release workflows must publish multi-arch binary assets in addition to
 the Rust crate.
@@ -87,3 +110,7 @@ PR CI may still checkout sibling branches for in-flight integration.
 
 Manual deployment is a release completion gate. Main branch CI is not release
 completion.
+
+Registry publishing must run only from GitHub Actions release workflows. Local
+machines may run dry-run verification, but must never publish npm packages,
+crates, Runtime binaries, Studio packages, or Manual releases.

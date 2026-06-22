@@ -31,16 +31,18 @@ Required envelope concepts:
 Handshake must negotiate:
 
 - runtime/editor build version
-- supported protocol version range
-- graph schema version range
+- current protocol version
+- current graph schema version
 - capability set
 - max message size
 - compression support
 - preview protocol support
 - asset protocol support
 
-Protocol major mismatches fail fast. Minor differences are allowed only when
-capabilities gate behavior.
+Unsupported protocol or graph schema versions fail fast with structured
+diagnostics. During v0, version fields are exact current-version discriminators;
+capabilities gate behavior inside that current surface rather than accepting
+older protocol versions as compatibility.
 
 ## Persisted Graph And Project Documents
 
@@ -72,14 +74,15 @@ Use HTTP + OpenAPI for:
 For v0, a Runtime session response has one canonical `snapshot`; graph and node
 view state are read from `snapshot.project`. New clients submit graph/view
 changes through `/v0/sessions/{sessionId}/operations`. `/v0/session/mutate`
-is only a default-session compatibility alias. Duplicate top-level graph, view,
-or loaded fields are not part of the contract.
+is removal debt, not a compatibility alias. Duplicate top-level graph, view, or
+loaded fields are not part of the contract.
 
 Do not use HTTP polling for continuous runtime event traffic unless it is a
 temporary diagnostic path. Session updates should use
 `/v0/sessions/{sessionId}/events/stream` and carry enough sequence/replay
 metadata for multiple clients to converge on Runtime-owned state. The legacy
-`/v0/session/events/stream` path may remain as a default-session alias.
+`/v0/session/events/stream` path is removal debt and must not be preserved as
+v0 product behavior.
 
 ## Object Text Resolution
 
@@ -143,7 +146,10 @@ Required checks:
 - Rust roundtrip tests
 - cross-language conformance tests
 
-## SemVer For Contracts
+## Contract Change Severity
+
+During v0, contract changes feed the lockstep product train version. They do
+not give `skenion-contracts` independent release authority outside the train.
 
 Patch:
 

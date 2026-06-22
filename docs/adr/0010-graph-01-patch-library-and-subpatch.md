@@ -1,4 +1,4 @@
-# ADR 0010: Graph v0.2 Patch Library And Subpatch Boundary Model
+# ADR 0010: Graph 0.1 Patch Library And Subpatch Boundary Model
 
 ## Status
 
@@ -11,14 +11,15 @@ packages all need the same graph substrate. Treating help as a separate document
 model or treating subpatches as an editor-only feature would make copy/paste,
 package distribution, and Runtime execution diverge.
 
-Graph v0.1 documents already exist and must keep their meaning. Graph v0.2 is
-the forward contract for patch libraries, richer port contracts, subpatches,
-and live help.
+The v0 graph contract is consolidated under the current `0.1` label. The
+patch-library, richer port contract, subpatch, and live help design is merged
+into that current `0.1` surface. The older pre-consolidation `0.1` meaning is
+not preserved as a legacy import/read-only compatibility surface.
 
 ## Decision
 
-Graph v0.2 projects contain a patch library. A patch library entry is a named
-patch definition with:
+Current `0.1` projects contain a patch library. A patch library entry is a
+named patch definition with:
 
 - stable patch id
 - revision
@@ -59,7 +60,7 @@ the patch-backed node.
 `core.outlet` has one internal input port and creates one external output port
 on the patch-backed node.
 
-Boundary metadata comes from node params and v0.2 port fields:
+Boundary metadata comes from node params and current `0.1` port fields:
 
 - `portId`
 - label
@@ -91,15 +92,12 @@ Resolution order:
 Ambiguous patch ids must produce diagnostics rather than picking an arbitrary
 candidate. Package-qualified references may bypass ambiguity.
 
-## v0.1 Compatibility
+## Version Policy
 
-Do not expand the meaning of persisted Graph v0.1 documents. v0.1 remains an
-import/read-only compatibility surface while v0.2 becomes the forward contract
-for patch libraries, subpatches, and live help.
-
-v0.1 help graphs may be imported or converted into v0.2 patch definitions, but
-they should not gain new persisted semantics while still claiming
-`schemaVersion: "0.1.0"`.
+Current graph/project/patch-library documents use the consolidated `0.1`
+surface. Unsupported versions and stale pre-consolidation documents must be
+rejected with structured diagnostics rather than migrated, imported, or kept as
+deprecated compatibility surfaces.
 
 ## Consequences
 

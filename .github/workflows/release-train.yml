@@ -1,0 +1,755 @@
+name: Release Train Conductor
+
+on:
+  workflow_dispatch:
+    inputs:
+      train_version:
+        description: Lockstep product version, such as 0.43.0
+        required: true
+        default: 0.43.0
+        type: string
+      mode:
+        description: Prepare, publish, or verify the train
+        required: true
+        default: prepare
+        type: choice
+        options:
+          - prepare
+          - publish
+          - verify
+      manifest_ref:
+        description: Manifest path in this repository
+        required: true
+        default: releases/trains/0.43.0.json
+        type: string
+
+permissions:
+  contents: read
+  actions: write
+
+concurrency:
+  group: release-train-${{ inputs.train_version }}
+  cancel-in-progress: false
+
+jobs:
+  validate:
+    name: Validate train inputs
+    runs-on: ubuntu-latest
+    outputs:
+      mode: ${{ steps.validate.outputs.mode }}
+      train_id: ${{ steps.validate.outputs.train_id }}
+      train_version: ${{ steps.validate.outputs.train_version }}
+      manifest_ref: ${{ steps.validate.outputs.manifest_ref }}
+    steps:
+      - name: Check out conductor state
+        uses: actions/checkout@v4
+
+      - name: Validate manifest and release train inputs
+        id: validate
+        env:
+          MODE: ${{ inputs.mode }}
+          TRAIN_VERSION: ${{ inputs.train_version }}
+          MANIFEST_REF: ${{ inputs.manifest_ref }}
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          case "${MODE}" in
+            prepare|publish|verify) ;;
+            *)
+              echo "Unsupported mode: ${MODE}" >&2
+              exit 1
+              ;;
+          esac
+
+          if [[ ! "${TRAIN_VERSION}" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "train_version must be registry-compatible SemVer like 0.43.0" >&2
+            exit 1
+          fi
+
+          if [[ "${MANIFEST_REF}" = /* || "${MANIFEST_REF}" == *".."* ]]; then
+            echo "manifest_ref must be a repository-relative manifest path" >&2
+            exit 1
+          fi
+
+          if [[ ! -f "${MANIFEST_REF}" ]]; then
+            echo "manifest not found: ${MANIFEST_REF}" >&2
+            exit 1
+          fi
+
+          train_id="${TRAIN_VERSION%.*}"
+          export EXPECTED_TRAIN_ID="${train_id}"
+
+          node <<'NODE'
+          const fs = require("fs");
+
+          const manifestRef = process.env.MANIFEST_REF;
+          const trainVersion = process.env.TRAIN_VERSION;
+          const trainId = process.env.EXPECTED_TRAIN_ID;
+          const manifest = JSON.parse(fs.readFileSync(manifestRef, "utf8"));
+
+          const expectedTargets = [
+            "aarch64-apple-darwin",
+            "x86_64-apple-darwin",
+            "x86_64-pc-windows-msvc",
+            "aarch64-pc-windows-msvc",
+            "x86_64-unknown-linux-gnu",
+            "aarch64-unknown-linux-gnu"
+          ];
+          const releaseBlockingTargets = new Set([
+            "aarch64-apple-darwin",
+            "x86_64-apple-darwin",
+            "x86_64-pc-windows-msvc",
+            "x86_64-unknown-linux-gnu"
+          ]);
+          const expectedProtocol = {
+            graph: "0.1",
+            project: "0.1",
+            node: "0.1",
+            extension: "0.1",
+            runtimeHttp: "v0",
+            runtimeCollaboration: "v0"
+          };
+          const expectedProfiles = ["local-managed", "local-shared", "remote"];
+
+          function fail(message) {
+            console.error(message);
+            process.exit(1);
+          }
+
+          function requireObject(value, label) {
+            if (!value || typeof value !== "object" || Array.isArray(value)) {
+              fail(`${label} must be an object`);
+            }
+            return value;
+          }
+
+          function requireString(value, label) {
+            if (typeof value !== "string" || value.trim() === "") {
+              fail(`${label} must be a non-empty string`);
+            }
+            return value;
+          }
+
+          function requireBoolean(value, label) {
+            if (typeof value !== "boolean") {
+              fail(`${label} must be a boolean`);
+            }
+            return value;
+          }
+
+          function requireStatus(value, label) {
+            if (!["pending", "passed", "failed", "waived"].includes(value)) {
+              fail(`${label} must be pending, passed, failed, or waived`);
+            }
+            return value;
+          }
+
+          function requireAllowedKeys(value, required, optional, label) {
+            const object = requireObject(value, label);
+            const allowed = new Set([...required, ...optional]);
+            for (const key of required) {
+              if (!Object.hasOwn(object, key)) {
+                fail(`${label}.${key} is required`);
+              }
+            }
+            for (const key of Object.keys(object)) {
+              if (!allowed.has(key)) {
+                fail(`${label}.${key} is not part of the release-train v0.1 schema`);
+              }
+            }
+            return object;
+          }
+
+          function requireExactFields(value, fields, label) {
+            return requireAllowedKeys(value, fields, [], label);
+          }
+
+          function requireEquals(actual, expected, label) {
+            if (actual !== expected) {
+              fail(`${label} must be ${expected}`);
+            }
+          }
+
+          function requireNullableString(value, label) {
+            if (value !== null) {
+              requireString(value, label);
+            }
+          }
+
+          function requireSemver(value, label) {
+            requireString(value, label);
+            if (!/^[0-9]+\.[0-9]+\.[0-9]+$/.test(value)) {
+              fail(`${label} must be registry-compatible SemVer`);
+            }
+          }
+
+          function requireSha256OrNull(value, label) {
+            if (value !== null && !/^[a-fA-F0-9]{64}$/.test(value)) {
+              fail(`${label} must be null or a 64 character sha256 hex digest`);
+            }
+          }
+
+          function requireProfiles(value, label) {
+            if (!Array.isArray(value)) {
+              fail(`${label} must be an array`);
+            }
+            const unique = [...new Set(value)].sort();
+            if (JSON.stringify(unique) !== JSON.stringify([...expectedProfiles].sort())) {
+              fail(`${label} must include local-managed, local-shared, and remote`);
+            }
+          }
+
+          function supportTierForTarget(target) {
+            return releaseBlockingTargets.has(target) ? "release-blocking" : "preview";
+          }
+
+          function validateProtocol(value, label) {
+            const protocol = requireExactFields(value, Object.keys(expectedProtocol), label);
+            for (const [key, expected] of Object.entries(expectedProtocol)) {
+              requireEquals(protocol[key], expected, `${label}.${key}`);
+            }
+          }
+
+          function validateRegistryPackage(value, label, ecosystem, name) {
+            const pkg = requireAllowedKeys(value, ["ecosystem", "name", "version"], ["url"], label);
+            requireEquals(pkg.ecosystem, ecosystem, `${label}.ecosystem`);
+            requireEquals(pkg.name, name, `${label}.name`);
+            requireEquals(pkg.version, trainVersion, `${label}.version`);
+            if (Object.hasOwn(pkg, "url")) {
+              requireNullableString(pkg.url, `${label}.url`);
+            }
+            return pkg;
+          }
+
+          function validateChecksum(value, label) {
+            const checksum = requireExactFields(value, ["algorithm", "value"], label);
+            requireEquals(checksum.algorithm, "sha256", `${label}.algorithm`);
+            requireSha256OrNull(checksum.value, `${label}.value`);
+            return checksum;
+          }
+
+          function validateArtifactSource(value, label) {
+            const source = requireObject(value, label);
+            requireString(source.kind, `${label}.kind`);
+            if (source.kind === "github-release-asset") {
+              requireExactFields(source, ["kind", "repository", "tag", "assetName", "url"], label);
+              requireString(source.repository, `${label}.repository`);
+              requireString(source.tag, `${label}.tag`);
+              requireString(source.assetName, `${label}.assetName`);
+              requireNullableString(source.url, `${label}.url`);
+            } else if (source.kind === "url") {
+              requireExactFields(source, ["kind", "url"], label);
+              requireString(source.url, `${label}.url`);
+            } else {
+              fail(`${label}.kind must be github-release-asset or url`);
+            }
+          }
+
+          function validateArtifactMap(value, label, expectedKind) {
+            const artifacts = requireExactFields(value, expectedTargets, label);
+            const idsByTarget = {};
+
+            for (const target of expectedTargets) {
+              const artifact = requireExactFields(
+                artifacts[target],
+                ["id", "target", "supportTier", "kind", "name", "version", "source", "checksum", "sizeBytes"],
+                `${label}.${target}`
+              );
+              requireString(artifact.id, `${label}.${target}.id`);
+              requireEquals(artifact.target, target, `${label}.${target}.target`);
+              requireEquals(
+                artifact.supportTier,
+                supportTierForTarget(target),
+                `${label}.${target}.supportTier`
+              );
+              requireEquals(artifact.kind, expectedKind, `${label}.${target}.kind`);
+              requireString(artifact.name, `${label}.${target}.name`);
+              requireEquals(artifact.version, trainVersion, `${label}.${target}.version`);
+              validateArtifactSource(artifact.source, `${label}.${target}.source`);
+              validateChecksum(artifact.checksum, `${label}.${target}.checksum`);
+              if (artifact.sizeBytes !== null && (!Number.isInteger(artifact.sizeBytes) || artifact.sizeBytes < 0)) {
+                fail(`${label}.${target}.sizeBytes must be null or a non-negative integer`);
+              }
+              idsByTarget[target] = artifact.id;
+            }
+
+            return idsByTarget;
+          }
+
+          function validateRegistryGate(value, label, componentPackage) {
+            const gate = requireAllowedKeys(value, ["id", "status", "required", "package"], ["evidenceUrl"], label);
+            requireString(gate.id, `${label}.id`);
+            requireStatus(gate.status, `${label}.status`);
+            requireBoolean(gate.required, `${label}.required`);
+            const gatePackage = validateRegistryPackage(
+              gate.package,
+              `${label}.package`,
+              componentPackage.ecosystem,
+              componentPackage.name
+            );
+            requireEquals(gatePackage.version, componentPackage.version, `${label}.package.version`);
+            if (Object.hasOwn(gate, "evidenceUrl")) {
+              requireString(gate.evidenceUrl, `${label}.evidenceUrl`);
+            }
+          }
+
+          function validateArtifactCollectionGate(value, label, expectedIds) {
+            const gate = requireAllowedKeys(
+              value,
+              ["id", "status", "required", "repository", "tag", "artifactIds"],
+              ["evidenceUrl"],
+              label
+            );
+            requireString(gate.id, `${label}.id`);
+            requireStatus(gate.status, `${label}.status`);
+            requireBoolean(gate.required, `${label}.required`);
+            requireString(gate.repository, `${label}.repository`);
+            requireString(gate.tag, `${label}.tag`);
+            if (!Array.isArray(gate.artifactIds) || gate.artifactIds.length === 0) {
+              fail(`${label}.artifactIds must be a non-empty array`);
+            }
+            const actual = [...new Set(gate.artifactIds)].sort();
+            const expected = [...expectedIds].sort();
+            if (JSON.stringify(actual) !== JSON.stringify(expected)) {
+              fail(`${label}.artifactIds must match the component artifact ids`);
+            }
+            if (Object.hasOwn(gate, "evidenceUrl")) {
+              requireString(gate.evidenceUrl, `${label}.evidenceUrl`);
+            }
+          }
+
+          function validateTargetSmokeGate(value, label, target, expectedFields, expectedIds) {
+            const gate = requireAllowedKeys(value, expectedFields, ["evidenceUrl"], label);
+            requireString(gate.id, `${label}.id`);
+            requireStatus(gate.status, `${label}.status`);
+            requireBoolean(gate.required, `${label}.required`);
+            requireEquals(gate.target, target, `${label}.target`);
+            for (const [field, expectedId] of Object.entries(expectedIds)) {
+              requireEquals(gate[field], expectedId, `${label}.${field}`);
+            }
+            if (Object.hasOwn(gate, "evidenceUrl")) {
+              requireString(gate.evidenceUrl, `${label}.evidenceUrl`);
+            }
+          }
+
+          requireExactFields(manifest, [
+            "schema",
+            "schemaVersion",
+            "trainId",
+            "trainVersion",
+            "protocolBaselines",
+            "capabilitySet",
+            "components",
+            "releaseGates"
+          ], "manifest");
+          requireEquals(manifest.schema, "skenion.release-train", "manifest.schema");
+          requireEquals(manifest.schemaVersion, "0.1.0", "manifest.schemaVersion");
+          requireEquals(manifest.trainId, trainId, "manifest.trainId");
+          requireEquals(manifest.trainVersion, trainVersion, "manifest.trainVersion");
+          requireSemver(manifest.trainVersion, "manifest.trainVersion");
+
+          validateProtocol(manifest.protocolBaselines, "protocolBaselines");
+
+          const capabilitySet = requireExactFields(
+            manifest.capabilitySet,
+            ["protocolSurfaces", "runtime", "studio", "marketplace", "manual"],
+            "capabilitySet"
+          );
+          validateProtocol(capabilitySet.protocolSurfaces, "capabilitySet.protocolSurfaces");
+
+          const runtimeCapabilities = requireExactFields(
+            capabilitySet.runtime,
+            [
+              "sessionAddressing",
+              "eventReplay",
+              "multiWindow",
+              "connectionProfiles",
+              "collaboration",
+              "operationLog",
+              "ioDiscovery",
+              "authPolicy"
+            ],
+            "capabilitySet.runtime"
+          );
+          for (const key of ["sessionAddressing", "eventReplay", "multiWindow", "operationLog"]) {
+            requireEquals(runtimeCapabilities[key], true, `capabilitySet.runtime.${key}`);
+          }
+          requireProfiles(runtimeCapabilities.connectionProfiles, "capabilitySet.runtime.connectionProfiles");
+          requireEquals(runtimeCapabilities.collaboration, "server-authoritative-ot", "capabilitySet.runtime.collaboration");
+          requireEquals(runtimeCapabilities.ioDiscovery, "raw-descriptor", "capabilitySet.runtime.ioDiscovery");
+          requireEquals(runtimeCapabilities.authPolicy, "deferred", "capabilitySet.runtime.authPolicy");
+
+          const studioCapabilities = requireExactFields(
+            capabilitySet.studio,
+            ["graphEditor", "patchLibrary", "subpatches", "livingHelp", "graphClipboard", "desktopShell", "connectionProfiles"],
+            "capabilitySet.studio"
+          );
+          for (const key of ["graphEditor", "patchLibrary", "subpatches", "livingHelp", "graphClipboard"]) {
+            requireEquals(studioCapabilities[key], true, `capabilitySet.studio.${key}`);
+          }
+          requireEquals(studioCapabilities.desktopShell, "tauri", "capabilitySet.studio.desktopShell");
+          requireProfiles(studioCapabilities.connectionProfiles, "capabilitySet.studio.connectionProfiles");
+
+          const marketplace = requireExactFields(
+            capabilitySet.marketplace,
+            ["packageDiscovery", "packageInstall", "packageUpdate", "extensionPackages"],
+            "capabilitySet.marketplace"
+          );
+          for (const key of ["packageDiscovery", "packageInstall", "packageUpdate", "extensionPackages"]) {
+            requireEquals(marketplace[key], true, `capabilitySet.marketplace.${key}`);
+          }
+
+          const manualCapabilities = requireExactFields(
+            capabilitySet.manual,
+            ["versionedPaths", "pagesDeployment", "latestPromotionRequiresMatrix", "patchReleasesUseMajorMinorPath"],
+            "capabilitySet.manual"
+          );
+          for (const key of ["versionedPaths", "pagesDeployment", "latestPromotionRequiresMatrix", "patchReleasesUseMajorMinorPath"]) {
+            requireEquals(manualCapabilities[key], true, `capabilitySet.manual.${key}`);
+          }
+
+          const components = requireExactFields(
+            manifest.components,
+            ["contracts", "runtime", "sdk", "studio", "examples", "docs"],
+            "components"
+          );
+          const contracts = requireExactFields(components.contracts, ["npm", "crate"], "components.contracts");
+          const contractsNpm = validateRegistryPackage(contracts.npm, "components.contracts.npm", "npm", "@skenion/contracts");
+          const contractsCrate = validateRegistryPackage(contracts.crate, "components.contracts.crate", "crates.io", "skenion-contracts");
+
+          const runtime = requireExactFields(components.runtime, ["crate", "binaries"], "components.runtime");
+          const runtimeCrate = validateRegistryPackage(runtime.crate, "components.runtime.crate", "crates.io", "skenion-runtime");
+          const runtimeIdsByTarget = validateArtifactMap(runtime.binaries, "components.runtime.binaries", "runtime-binary");
+
+          const sdk = requireExactFields(components.sdk, ["npm"], "components.sdk");
+          const sdkNpm = validateRegistryPackage(sdk.npm, "components.sdk.npm", "npm", "@skenion/sdk");
+
+          const studio = requireExactFields(
+            components.studio,
+            ["web", "desktop", "desktopPackages", "runtimeSidecars"],
+            "components.studio"
+          );
+          const studioWeb = validateRegistryPackage(studio.web, "components.studio.web", "npm", "@skenion/studio-web");
+          const studioDesktop = validateRegistryPackage(studio.desktop, "components.studio.desktop", "npm", "@skenion/studio-desktop");
+          const studioDesktopIdsByTarget = validateArtifactMap(
+            studio.desktopPackages,
+            "components.studio.desktopPackages",
+            "studio-desktop-package"
+          );
+          const studioSidecarIdsByTarget = validateArtifactMap(
+            studio.runtimeSidecars,
+            "components.studio.runtimeSidecars",
+            "studio-runtime-sidecar"
+          );
+
+          const examples = requireAllowedKeys(components.examples, ["repository", "version", "tag"], ["commit"], "components.examples");
+          requireString(examples.repository, "components.examples.repository");
+          requireEquals(examples.version, trainVersion, "components.examples.version");
+          requireString(examples.tag, "components.examples.tag");
+          if (Object.hasOwn(examples, "commit")) {
+            requireString(examples.commit, "components.examples.commit");
+          }
+
+          const docs = requireExactFields(components.docs, ["manual"], "components.docs");
+          const docsManual = requireExactFields(docs.manual, ["version", "path", "pagesUrl"], "components.docs.manual");
+          requireEquals(docsManual.version, trainVersion, "components.docs.manual.version");
+          requireEquals(docsManual.path, `/manual/${trainId}/`, "components.docs.manual.path");
+          requireString(docsManual.pagesUrl, "components.docs.manual.pagesUrl");
+
+          const allArtifactIds = [
+            ...Object.values(runtimeIdsByTarget),
+            ...Object.values(studioDesktopIdsByTarget),
+            ...Object.values(studioSidecarIdsByTarget)
+          ];
+          if (new Set(allArtifactIds).size !== allArtifactIds.length) {
+            fail("artifact ids must be unique across Runtime and Studio artifacts");
+          }
+
+          const releaseGates = requireExactFields(
+            manifest.releaseGates,
+            [
+              "registryPackages",
+              "githubReleaseAssets",
+              "checksumVerification",
+              "runtimeSmoke",
+              "studioPackageSmoke",
+              "examplesConformance",
+              "docsPagesDeployment"
+            ],
+            "releaseGates"
+          );
+
+          const registryPackages = requireExactFields(
+            releaseGates.registryPackages,
+            ["contractsNpm", "contractsCrate", "runtimeCrate", "sdkNpm", "studioWeb", "studioDesktop"],
+            "releaseGates.registryPackages"
+          );
+          validateRegistryGate(registryPackages.contractsNpm, "releaseGates.registryPackages.contractsNpm", contractsNpm);
+          validateRegistryGate(registryPackages.contractsCrate, "releaseGates.registryPackages.contractsCrate", contractsCrate);
+          validateRegistryGate(registryPackages.runtimeCrate, "releaseGates.registryPackages.runtimeCrate", runtimeCrate);
+          validateRegistryGate(registryPackages.sdkNpm, "releaseGates.registryPackages.sdkNpm", sdkNpm);
+          validateRegistryGate(registryPackages.studioWeb, "releaseGates.registryPackages.studioWeb", studioWeb);
+          validateRegistryGate(registryPackages.studioDesktop, "releaseGates.registryPackages.studioDesktop", studioDesktop);
+
+          const githubReleaseAssets = requireExactFields(
+            releaseGates.githubReleaseAssets,
+            ["runtime", "studio"],
+            "releaseGates.githubReleaseAssets"
+          );
+          validateArtifactCollectionGate(
+            githubReleaseAssets.runtime,
+            "releaseGates.githubReleaseAssets.runtime",
+            Object.values(runtimeIdsByTarget)
+          );
+          validateArtifactCollectionGate(
+            githubReleaseAssets.studio,
+            "releaseGates.githubReleaseAssets.studio",
+            [...Object.values(studioDesktopIdsByTarget), ...Object.values(studioSidecarIdsByTarget)]
+          );
+
+          const checksumGate = requireAllowedKeys(
+            releaseGates.checksumVerification,
+            ["id", "status", "required", "artifactIds"],
+            ["expectedChecksums", "evidenceUrl"],
+            "releaseGates.checksumVerification"
+          );
+          requireString(checksumGate.id, "releaseGates.checksumVerification.id");
+          requireStatus(checksumGate.status, "releaseGates.checksumVerification.status");
+          requireBoolean(checksumGate.required, "releaseGates.checksumVerification.required");
+          if (!Array.isArray(checksumGate.artifactIds) || checksumGate.artifactIds.length === 0) {
+            fail("releaseGates.checksumVerification.artifactIds must be a non-empty array");
+          }
+          const checksumIds = [...new Set(checksumGate.artifactIds)].sort();
+          if (JSON.stringify(checksumIds) !== JSON.stringify([...allArtifactIds].sort())) {
+            fail("releaseGates.checksumVerification.artifactIds must include every artifact id");
+          }
+          if (Object.hasOwn(checksumGate, "expectedChecksums")) {
+            const expectedChecksums = requireObject(
+              checksumGate.expectedChecksums,
+              "releaseGates.checksumVerification.expectedChecksums"
+            );
+            for (const [artifactId, checksum] of Object.entries(expectedChecksums)) {
+              if (!allArtifactIds.includes(artifactId)) {
+                fail(`releaseGates.checksumVerification.expectedChecksums references unknown artifact ${artifactId}`);
+              }
+              validateChecksum(checksum, `releaseGates.checksumVerification.expectedChecksums.${artifactId}`);
+            }
+          }
+          if (Object.hasOwn(checksumGate, "evidenceUrl")) {
+            requireString(checksumGate.evidenceUrl, "releaseGates.checksumVerification.evidenceUrl");
+          }
+
+          const runtimeSmoke = requireExactFields(releaseGates.runtimeSmoke, expectedTargets, "releaseGates.runtimeSmoke");
+          const studioPackageSmoke = requireExactFields(
+            releaseGates.studioPackageSmoke,
+            expectedTargets,
+            "releaseGates.studioPackageSmoke"
+          );
+          for (const target of expectedTargets) {
+            validateTargetSmokeGate(
+              runtimeSmoke[target],
+              `releaseGates.runtimeSmoke.${target}`,
+              target,
+              ["id", "status", "required", "target", "artifactId"],
+              { artifactId: runtimeIdsByTarget[target] }
+            );
+            validateTargetSmokeGate(
+              studioPackageSmoke[target],
+              `releaseGates.studioPackageSmoke.${target}`,
+              target,
+              ["id", "status", "required", "target", "desktopPackageArtifactId", "runtimeSidecarArtifactId"],
+              {
+                desktopPackageArtifactId: studioDesktopIdsByTarget[target],
+                runtimeSidecarArtifactId: studioSidecarIdsByTarget[target]
+              }
+            );
+          }
+
+          const examplesConformance = requireAllowedKeys(
+            releaseGates.examplesConformance,
+            ["id", "status", "required", "repository", "ref", "version"],
+            ["evidenceUrl"],
+            "releaseGates.examplesConformance"
+          );
+          requireString(examplesConformance.id, "releaseGates.examplesConformance.id");
+          requireStatus(examplesConformance.status, "releaseGates.examplesConformance.status");
+          requireBoolean(examplesConformance.required, "releaseGates.examplesConformance.required");
+          requireEquals(
+            examplesConformance.repository,
+            examples.repository,
+            "releaseGates.examplesConformance.repository"
+          );
+          requireEquals(examplesConformance.ref, examples.tag, "releaseGates.examplesConformance.ref");
+          requireEquals(examplesConformance.version, trainVersion, "releaseGates.examplesConformance.version");
+          if (Object.hasOwn(examplesConformance, "evidenceUrl")) {
+            requireString(examplesConformance.evidenceUrl, "releaseGates.examplesConformance.evidenceUrl");
+          }
+
+          const docsPagesDeployment = requireAllowedKeys(
+            releaseGates.docsPagesDeployment,
+            ["id", "status", "required", "manualVersion", "manualPath", "pagesUrl"],
+            ["evidenceUrl"],
+            "releaseGates.docsPagesDeployment"
+          );
+          requireString(docsPagesDeployment.id, "releaseGates.docsPagesDeployment.id");
+          requireStatus(docsPagesDeployment.status, "releaseGates.docsPagesDeployment.status");
+          requireBoolean(docsPagesDeployment.required, "releaseGates.docsPagesDeployment.required");
+          requireEquals(docsPagesDeployment.manualVersion, trainVersion, "releaseGates.docsPagesDeployment.manualVersion");
+          requireEquals(docsPagesDeployment.manualPath, docsManual.path, "releaseGates.docsPagesDeployment.manualPath");
+          requireEquals(docsPagesDeployment.pagesUrl, docsManual.pagesUrl, "releaseGates.docsPagesDeployment.pagesUrl");
+          if (Object.hasOwn(docsPagesDeployment, "evidenceUrl")) {
+            requireString(docsPagesDeployment.evidenceUrl, "releaseGates.docsPagesDeployment.evidenceUrl");
+          }
+          NODE
+
+          {
+            echo "mode=${MODE}"
+            echo "train_id=${train_id}"
+            echo "train_version=${TRAIN_VERSION}"
+            echo "manifest_ref=${MANIFEST_REF}"
+          } >> "${GITHUB_OUTPUT}"
+
+  plan:
+    name: Prepare train plan
+    runs-on: ubuntu-latest
+    needs: validate
+    steps:
+      - name: Summarize conductor plan
+        env:
+          MODE: ${{ needs.validate.outputs.mode }}
+          TRAIN_ID: ${{ needs.validate.outputs.train_id }}
+          TRAIN_VERSION: ${{ needs.validate.outputs.train_version }}
+          MANIFEST_REF: ${{ needs.validate.outputs.manifest_ref }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          {
+            echo "## Release Train ${TRAIN_VERSION}"
+            echo
+            echo "- Mode: ${MODE}"
+            echo "- Train id: ${TRAIN_ID}"
+            echo "- Manifest: ${MANIFEST_REF}"
+            echo "- Conductor: echovisionlab/skenion"
+            echo "- Workflow library: echovisionlab/skenion-ci@v1"
+            echo
+            echo "Release order:"
+            echo "1. Contracts"
+            echo "2. Runtime"
+            echo "3. SDK"
+            echo "4. Studio"
+            echo "5. Examples"
+            echo "6. Docs"
+            echo
+            echo "Prepare mode is a local dry run. Publish and verify modes call"
+            echo "the pinned skenion-ci@v1 reusable workflows once that workflow"
+            echo "library has landed."
+          } >> "${GITHUB_STEP_SUMMARY}"
+
+  publish-contracts:
+    name: Dispatch Contracts release
+    if: ${{ needs.validate.outputs.mode == 'publish' }}
+    needs:
+      - validate
+      - plan
+    uses: echovisionlab/skenion-ci/.github/workflows/release-please-dispatch.yml@v1
+    with:
+      component: contracts
+      repository: echovisionlab/skenion-contracts
+      release_as: ${{ needs.validate.outputs.train_version }}
+      manifest_ref: ${{ needs.validate.outputs.manifest_ref }}
+    secrets: inherit
+
+  publish-runtime:
+    name: Dispatch Runtime release
+    if: ${{ needs.validate.outputs.mode == 'publish' }}
+    needs:
+      - validate
+      - publish-contracts
+    uses: echovisionlab/skenion-ci/.github/workflows/release-please-dispatch.yml@v1
+    with:
+      component: runtime
+      repository: echovisionlab/skenion-runtime
+      release_as: ${{ needs.validate.outputs.train_version }}
+      manifest_ref: ${{ needs.validate.outputs.manifest_ref }}
+    secrets: inherit
+
+  publish-sdk:
+    name: Dispatch SDK release
+    if: ${{ needs.validate.outputs.mode == 'publish' }}
+    needs:
+      - validate
+      - publish-runtime
+    uses: echovisionlab/skenion-ci/.github/workflows/release-please-dispatch.yml@v1
+    with:
+      component: sdk
+      repository: echovisionlab/skenion-sdk
+      release_as: ${{ needs.validate.outputs.train_version }}
+      manifest_ref: ${{ needs.validate.outputs.manifest_ref }}
+    secrets: inherit
+
+  publish-studio:
+    name: Dispatch Studio release
+    if: ${{ needs.validate.outputs.mode == 'publish' }}
+    needs:
+      - validate
+      - publish-sdk
+    uses: echovisionlab/skenion-ci/.github/workflows/release-please-dispatch.yml@v1
+    with:
+      component: studio
+      repository: echovisionlab/skenion-studio
+      release_as: ${{ needs.validate.outputs.train_version }}
+      manifest_ref: ${{ needs.validate.outputs.manifest_ref }}
+    secrets: inherit
+
+  publish-examples:
+    name: Dispatch Examples release
+    if: ${{ needs.validate.outputs.mode == 'publish' }}
+    needs:
+      - validate
+      - publish-studio
+    uses: echovisionlab/skenion-ci/.github/workflows/release-please-dispatch.yml@v1
+    with:
+      component: examples
+      repository: echovisionlab/skenion-examples
+      release_as: ${{ needs.validate.outputs.train_version }}
+      manifest_ref: ${{ needs.validate.outputs.manifest_ref }}
+    secrets: inherit
+
+  publish-docs:
+    name: Dispatch Docs release
+    if: ${{ needs.validate.outputs.mode == 'publish' }}
+    needs:
+      - validate
+      - publish-examples
+    uses: echovisionlab/skenion-ci/.github/workflows/release-please-dispatch.yml@v1
+    with:
+      component: docs
+      repository: echovisionlab/skenion-docs
+      release_as: ${{ needs.validate.outputs.train_version }}
+      manifest_ref: ${{ needs.validate.outputs.manifest_ref }}
+    secrets: inherit
+
+  verify:
+    name: Verify release train
+    if: ${{ needs.validate.outputs.mode == 'verify' }}
+    needs:
+      - validate
+      - plan
+    uses: echovisionlab/skenion-ci/.github/workflows/release-train-verify.yml@v1
+    with:
+      train_version: ${{ needs.validate.outputs.train_version }}
+      manifest_ref: ${{ needs.validate.outputs.manifest_ref }}
+    secrets: inherit
+
+  verify-after-publish:
+    name: Verify release train after dispatch
+    if: ${{ needs.validate.outputs.mode == 'publish' }}
+    needs:
+      - validate
+      - publish-docs
+    uses: echovisionlab/skenion-ci/.github/workflows/release-train-verify.yml@v1
+    with:
+      train_version: ${{ needs.validate.outputs.train_version }}
+      manifest_ref: ${{ needs.validate.outputs.manifest_ref }}
+    secrets: inherit

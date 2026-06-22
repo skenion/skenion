@@ -25,8 +25,8 @@ The canonical v0 session-addressed Runtime API is:
 /v0/sessions/{sessionId}/...
 ```
 
-`/v0/session/...` may remain as a default-session alias while clients migrate,
-but it is not the forward canonical shape.
+`/v0/session/...` is removal debt from the bootstrap surface, not a v0 product
+compatibility alias. New clients and contracts must use explicit session ids.
 
 Paste is a high-level Runtime operation. The semantic input is:
 
@@ -34,7 +34,7 @@ Paste is a high-level Runtime operation. The semantic input is:
 - target graph or patch path
 - base revision for that target
 - destination position or anchor
-- `GraphFragmentV02`
+- `GraphFragmentV01`
 - paste options
 
 Actor/client identity is not part of graph fragment semantics. It is optional
@@ -49,8 +49,9 @@ POST /v0/sessions/{sessionId}/operations
 ```
 
 `pasteGraphFragment` is an operation kind inside that envelope, not a separate
-ad-hoc endpoint. `/v0/session/mutate` may remain as a compatibility alias for
-the default session and for legacy low-level graph/view mutations.
+ad-hoc endpoint. `/v0/session/mutate` is removal debt and must not be
+preserved as a default-session compatibility alias or legacy low-level
+graph/view mutation surface.
 
 `PatchPath` must distinguish at least:
 
@@ -66,7 +67,7 @@ The path must identify which revision its `baseRevision` refers to.
 
 Contracts must define:
 
-- `GraphFragmentV02`
+- `GraphFragmentV01`
 - `GraphTargetRef`
 - `PatchPath`
 - `PasteGraphFragmentRequest`
@@ -91,5 +92,6 @@ Runtime owns id remapping, fragment validation, paste lowering, history, and
 event broadcast. Studio owns selection-to-fragment conversion and destination
 choice, but it does not own paste semantics.
 
-Default-session compatibility can remain during migration, but new code should
-be written against explicit session ids.
+Default-session compatibility aliases are not part of the v0 product contract.
+Code should be written against explicit session ids, and remaining aliases
+should be removed as technical debt.

@@ -47,7 +47,7 @@ and diagnostics endpoints.
 Benefits:
 
 - explicit contract ownership
-- independent releases
+- independent implementation ownership with lockstep v0 product release trains
 - cleaner public contribution boundaries
 - less pressure to create vague shared utility packages
 - CI/release policy remains reusable without becoming org-global

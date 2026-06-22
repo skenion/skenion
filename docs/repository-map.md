@@ -1,8 +1,9 @@
 # Repository Map
 
 Skenion uses multiple public repositories because the runtime, editor, protocol,
-SDK, examples, and CI rules have different release cadences and stability
-requirements.
+SDK, examples, and CI rules have different ownership boundaries and stability
+requirements. During v0, released artifacts move together on one lockstep
+product train.
 
 ## Immediate Repositories
 
@@ -14,6 +15,9 @@ Owns:
 
 - architecture notes
 - RFCs and ADRs
+- product release train conductor state
+- release train manifests
+- release ordering and completion reporting
 - release policy
 - repository boundaries
 - compatibility policy
@@ -125,7 +129,7 @@ Examples must not depend on unpublished private packages.
 
 ### `skenion-ci`
 
-Skenion-specific CI and release automation.
+Skenion-specific reusable CI and release automation.
 
 Owns:
 
@@ -139,6 +143,9 @@ Owns:
 
 Use `skenion-ci` instead of an org-level `.github` repository so the automation
 scope stays product-specific.
+
+`skenion-ci` owns reusable workflow implementation. It does not own product
+train manifest state or decide release completion; the hub conductor does.
 
 ## Repositories To Add Later
 

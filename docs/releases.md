@@ -25,6 +25,9 @@ This supersedes the prior policy that repository versions were independent
 SemVer streams and that v0 could keep legacy import, migration, default-alias,
 or deprecated compatibility paths.
 
+The first v0 train defaults to product version `0.43.0` with
+`trainId: "0.43"`.
+
 ## Product Release Train
 
 The product train is the user-facing compatibility unit. A train manifest should
@@ -39,7 +42,14 @@ record:
 - Examples tag or commit used for conformance
 - Manual version and GitHub Pages deployment
 - exact graph, node, runtime-wire, extension, and manifest protocol baselines
-- required and optional runtime capabilities
+- `capabilitySet` covering protocol surfaces plus required Runtime, Studio,
+  package/marketplace, and Manual capabilities
+
+`echovisionlab/skenion` is the conductor and product state owner. It owns train
+manifest instances, release order, cross-repository dispatch, release gate
+state, and completion reporting. `echovisionlab/skenion-ci` owns reusable
+workflow implementation and should expose pinned `workflow_call` entrypoints
+for conductor use.
 
 Do not close a product release milestone unless every releasable repository and
 artifact in the train has published the same product version and passed the
@@ -50,8 +60,8 @@ Recommended release order:
 1. Contracts npm/crate.
 2. Runtime crate and multi-arch binary assets.
 3. SDK npm.
-4. Examples conformance against released artifacts.
-5. Studio web/desktop package.
+4. Studio web/desktop package.
+5. Examples conformance against released artifacts.
 6. Docs Manual deployment.
 
 PR CI may checkout sibling in-flight branches for integration. Release and
@@ -94,8 +104,11 @@ through the package marketplace flow.
 
 ## Release Please
 
-Every releasable repository should use Release Please configured for the same
-lockstep product version.
+Every releasable repository should use Release Please for version files,
+changelogs, tags, and GitHub releases. During v0, Release Please PRs are
+conductor-dispatched from `echovisionlab/skenion` with an explicit
+`release-as` matching the train version. Automatic independent per-repository
+release authority is stale for v0 product trains.
 
 Release Please owns:
 
@@ -195,8 +208,8 @@ Contract repository:
 Common automation belongs in `skenion-ci`, not in an org-level `.github`
 repository.
 
-`skenion-ci` should provide reusable workflows with `workflow_call`, tagged as
-stable major versions:
+`skenion-ci` is the reusable workflow library. It should provide reusable
+workflows with `workflow_call`, tagged as stable major versions:
 
 ```text
 v1
@@ -213,3 +226,7 @@ jobs:
 
 Publish workflows should use minimal permissions and GitHub environments for
 manual approval where appropriate.
+
+The hub conductor workflow may prepare and validate a train locally before
+`skenion-ci@v1` exists. Publish and verification modes should call the pinned
+workflow library once the corresponding `@v1` reusable workflows are available.

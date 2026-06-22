@@ -13,13 +13,13 @@ protocol versions must be rejected with structured diagnostics.
 
 | Surface | Current baseline | Owner |
 | --- | --- | --- |
-| Graph document schema | Current exact: `skenion.graph` `0.2.0`; reject `0.1.0` and all other versions | `skenion-contracts/json-schema/graph/v0.2/graph.schema.json` |
+| Graph document schema | Current exact: `skenion.graph` `0.1.0`; reject all other versions | `skenion-contracts/json-schema/graph/v0.1/graph.schema.json` |
 | View state schema | `skenion.view-state` `0.1.0` | `skenion-contracts/json-schema/view/v0.1/view-state.schema.json` |
-| Project document schema | Current exact: `skenion.project` `0.2.0`; reject `0.1.0` and all other versions | `skenion-contracts/json-schema/project/v0.2/project.schema.json` |
-| Node definition schema | Current exact: `skenion.node.definition` `0.2.0`; reject `0.1.0` and all other versions | `skenion-contracts/json-schema/node/v0.2/node-definition.schema.json` |
+| Project document schema | Current exact: `skenion.project` `0.1.0`; reject all other versions | `skenion-contracts/json-schema/project/v0.1/project.schema.json` |
+| Node definition schema | Current exact: `skenion.node.definition` `0.1.0`; reject all other versions | `skenion-contracts/json-schema/node/v0.1/node-definition.schema.json` |
 | Graph patch / operation schema | Current Runtime graph target operations only; reject `skenion.graph.patch` `0.1.0` | `skenion-contracts/openapi/runtime-http.v0.yaml` |
-| Built-in node definitions | Current v0.2 definitions only; v0.1 copies are removal debt | `skenion-contracts` builtins |
-| Built-in node help | Current v0.2 patch definitions/live-help graphs only; v0.1 help graphs are removal debt | `skenion-contracts` help patch definitions |
+| Built-in node definitions | Current consolidated `0.1` definitions only; stale pre-consolidation copies are removal debt | `skenion-contracts` builtins |
+| Built-in node help | Current consolidated `0.1` patch definitions/live-help graphs only; stale pre-consolidation help graphs are removal debt | `skenion-contracts` help patch definitions |
 | Typed control routing | Object-owned `sendName` / `receiveName` on semantic value/control objects | `skenion-contracts/builtins/v0.1` plus `skenion-contracts/docs/control-routing.md` |
 | Live preview control updates | `skenion.preview.control-state` `0.1.0` runtime-internal snapshot plus telemetry revision fields | `skenion-contracts/docs/live-preview-control-updates.md` and `skenion-contracts/openapi/runtime-http.v0.yaml` |
 | External clock source state | Object-owned clock state and MIDI Clock parser behavior only. Runtime-global clock-source list/read/start/stop APIs are removal debt and must not be preserved as compatibility. Link, MTC/SMPTE, and host transport are M12 scope as explicit graph objects. | `skenion-contracts` clock contracts and `skenion-runtime` MIDI Clock adapter |
@@ -56,14 +56,13 @@ node drag A -> B
 Viewport pan/zoom stays local to each Studio client and does not send a Runtime
 mutation.
 
-`ProjectDocumentV02` stores `metadata`, a root graph, a patch library, and view
+`ProjectDocumentV01` stores `metadata`, a root graph, a patch library, and view
 state together and is the active user-facing file format for `.skenion.json`.
-Opening a v0.1 project is not supported in v0; Studio and Runtime must reject
-unsupported project/graph versions before editing, Runtime session load,
-collaboration, marketplace, or package resolution begins. Loading the current
-project into Runtime makes Runtime authoritative for the session copy, and
-Studio thereafter reads graph, patch library, and node view state from
-`RuntimeSessionSnapshot.project`.
+Studio and Runtime must reject unsupported project/graph versions before
+editing, Runtime session load, collaboration, marketplace, or package
+resolution begins. Loading the current project into Runtime makes Runtime
+authoritative for the session copy, and Studio thereafter reads graph, patch
+library, and node view state from `RuntimeSessionSnapshot.project`.
 
 The canonical v0 Runtime session API is session-addressed:
 
@@ -94,7 +93,7 @@ Text-entry object boxes are the user-facing model. A user who types `decode`,
 `upload`, `preview`, `*~`, or `user.manipulator` has created an object box with
 object text; they have not chosen an internal Runtime implementation class.
 
-The compatibility target for v0 is:
+The current object-box target for v0 is:
 
 ```text
 object box
@@ -280,7 +279,7 @@ Learning surfaces are intentionally separate from compatibility fixtures.
 | Help graph viewer | `skenion-studio` | Volatile editable working-copy view, graph fragment copy, and promote/fork flow |
 
 Existing help graphs must be current-version patch definitions/graph fragments
-or be rejected. Do not preserve `skenion.graph` `0.1.0` help graphs as legacy
+or be rejected. Do not preserve stale pre-consolidation help graphs as legacy
 import documents.
 Tutorial graphs may intentionally include shader analysis errors only when their
 manifest lists the expected diagnostics.
