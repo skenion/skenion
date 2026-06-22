@@ -80,7 +80,7 @@
         "ecosystem": "crates.io",
         "name": "skenion-runtime",
         "version": "0.43.0",
-        "url": null
+        "url": "https://crates.io/crates/skenion-runtime/0.43.0"
       },
       "binaries": {
         "aarch64-apple-darwin": {
@@ -95,13 +95,13 @@
             "repository": "echovisionlab/Skenion-runtime",
             "tag": "skenion-runtime-v0.43.0",
             "assetName": "skenion-runtime-v0.43.0-aarch64-apple-darwin.tar.gz",
-            "url": null
+            "url": "https://github.com/echovisionlab/skenion-runtime/releases/download/skenion-runtime-v0.43.0/skenion-runtime-v0.43.0-aarch64-apple-darwin.tar.gz"
           },
           "checksum": {
             "algorithm": "sha256",
-            "value": null
+            "value": "22188b1899d44dd26d5791ec739b5f3914b7d600aff611708c698e3ce09f4d16"
           },
-          "sizeBytes": null
+          "sizeBytes": 4690278
         },
         "x86_64-apple-darwin": {
           "id": "runtime-x86_64-apple-darwin",
@@ -115,13 +115,13 @@
             "repository": "echovisionlab/Skenion-runtime",
             "tag": "skenion-runtime-v0.43.0",
             "assetName": "skenion-runtime-v0.43.0-x86_64-apple-darwin.tar.gz",
-            "url": null
+            "url": "https://github.com/echovisionlab/skenion-runtime/releases/download/skenion-runtime-v0.43.0/skenion-runtime-v0.43.0-x86_64-apple-darwin.tar.gz"
           },
           "checksum": {
             "algorithm": "sha256",
-            "value": null
+            "value": "e3ea7d096961143621a81ebcb3348642cf785346c8afca8b2ad1ad472ac23a14"
           },
-          "sizeBytes": null
+          "sizeBytes": 4897264
         },
         "x86_64-pc-windows-msvc": {
           "id": "runtime-x86_64-pc-windows-msvc",
@@ -135,13 +135,13 @@
             "repository": "echovisionlab/Skenion-runtime",
             "tag": "skenion-runtime-v0.43.0",
             "assetName": "skenion-runtime-v0.43.0-x86_64-pc-windows-msvc.tar.gz",
-            "url": null
+            "url": "https://github.com/echovisionlab/skenion-runtime/releases/download/skenion-runtime-v0.43.0/skenion-runtime-v0.43.0-x86_64-pc-windows-msvc.tar.gz"
           },
           "checksum": {
             "algorithm": "sha256",
-            "value": null
+            "value": "550a7db9907337e7a1627ef1d6fff8141e229400dfe4ae8cac0283f494dd4d9d"
           },
-          "sizeBytes": null
+          "sizeBytes": 5098161
         },
         "aarch64-pc-windows-msvc": {
           "id": "runtime-aarch64-pc-windows-msvc",
@@ -155,13 +155,13 @@
             "repository": "echovisionlab/Skenion-runtime",
             "tag": "skenion-runtime-v0.43.0",
             "assetName": "skenion-runtime-v0.43.0-aarch64-pc-windows-msvc.tar.gz",
-            "url": null
+            "url": "https://github.com/echovisionlab/skenion-runtime/releases/download/skenion-runtime-v0.43.0/skenion-runtime-v0.43.0-aarch64-pc-windows-msvc.tar.gz"
           },
           "checksum": {
             "algorithm": "sha256",
-            "value": null
+            "value": "702a1eb6f89fd25f5df977de056915870fff2cb1bfc2d06ffc3f792196c6a005"
           },
-          "sizeBytes": null
+          "sizeBytes": 4776748
         },
         "x86_64-unknown-linux-gnu": {
           "id": "runtime-x86_64-unknown-linux-gnu",
@@ -175,13 +175,13 @@
             "repository": "echovisionlab/Skenion-runtime",
             "tag": "skenion-runtime-v0.43.0",
             "assetName": "skenion-runtime-v0.43.0-x86_64-unknown-linux-gnu.tar.gz",
-            "url": null
+            "url": "https://github.com/echovisionlab/skenion-runtime/releases/download/skenion-runtime-v0.43.0/skenion-runtime-v0.43.0-x86_64-unknown-linux-gnu.tar.gz"
           },
           "checksum": {
             "algorithm": "sha256",
-            "value": null
+            "value": "404fa5149f14665d917476fcfa57d38c135d06e456751d37a7fc6a1a43617238"
           },
-          "sizeBytes": null
+          "sizeBytes": 6574998
         },
         "aarch64-unknown-linux-gnu": {
           "id": "runtime-aarch64-unknown-linux-gnu",
@@ -195,13 +195,13 @@
             "repository": "echovisionlab/Skenion-runtime",
             "tag": "skenion-runtime-v0.43.0",
             "assetName": "skenion-runtime-v0.43.0-aarch64-unknown-linux-gnu.tar.gz",
-            "url": null
+            "url": "https://github.com/echovisionlab/skenion-runtime/releases/download/skenion-runtime-v0.43.0/skenion-runtime-v0.43.0-aarch64-unknown-linux-gnu.tar.gz"
           },
           "checksum": {
             "algorithm": "sha256",
-            "value": null
+            "value": "e59813ff4c5e4a459d18182d41da6c863567cc5d80d69c484bf7f6e76c1d0ecc"
           },
-          "sizeBytes": null
+          "sizeBytes": 6523814
         }
       }
     },
@@ -511,14 +511,15 @@
       },
       "runtimeCrate": {
         "id": "runtime-crate-exists",
-        "status": "pending",
+        "status": "passed",
         "required": true,
         "package": {
           "ecosystem": "crates.io",
           "name": "skenion-runtime",
           "version": "0.43.0",
-          "url": null
-        }
+          "url": "https://crates.io/crates/skenion-runtime/0.43.0"
+        },
+        "evidenceUrl": "https://github.com/echovisionlab/skenion-runtime/actions/runs/27966157953"
       },
       "sdkNpm": {
         "id": "sdk-npm-exists",
@@ -557,7 +558,7 @@
     "githubReleaseAssets": {
       "runtime": {
         "id": "runtime-release-assets",
-        "status": "pending",
+        "status": "passed",
         "required": true,
         "repository": "echovisionlab/Skenion-runtime",
         "tag": "skenion-runtime-v0.43.0",
@@ -568,7 +569,8 @@
           "runtime-aarch64-pc-windows-msvc",
           "runtime-x86_64-unknown-linux-gnu",
           "runtime-aarch64-unknown-linux-gnu"
-        ]
+        ],
+        "evidenceUrl": "https://github.com/echovisionlab/skenion-runtime/releases/tag/skenion-runtime-v0.43.0"
       },
       "studio": {
         "id": "studio-release-assets",
@@ -615,50 +617,83 @@
         "studio-runtime-sidecar-aarch64-pc-windows-msvc",
         "studio-runtime-sidecar-x86_64-unknown-linux-gnu",
         "studio-runtime-sidecar-aarch64-unknown-linux-gnu"
-      ]
+      ],
+      "expectedChecksums": {
+        "runtime-aarch64-apple-darwin": {
+          "algorithm": "sha256",
+          "value": "22188b1899d44dd26d5791ec739b5f3914b7d600aff611708c698e3ce09f4d16"
+        },
+        "runtime-x86_64-apple-darwin": {
+          "algorithm": "sha256",
+          "value": "e3ea7d096961143621a81ebcb3348642cf785346c8afca8b2ad1ad472ac23a14"
+        },
+        "runtime-x86_64-pc-windows-msvc": {
+          "algorithm": "sha256",
+          "value": "550a7db9907337e7a1627ef1d6fff8141e229400dfe4ae8cac0283f494dd4d9d"
+        },
+        "runtime-aarch64-pc-windows-msvc": {
+          "algorithm": "sha256",
+          "value": "702a1eb6f89fd25f5df977de056915870fff2cb1bfc2d06ffc3f792196c6a005"
+        },
+        "runtime-x86_64-unknown-linux-gnu": {
+          "algorithm": "sha256",
+          "value": "404fa5149f14665d917476fcfa57d38c135d06e456751d37a7fc6a1a43617238"
+        },
+        "runtime-aarch64-unknown-linux-gnu": {
+          "algorithm": "sha256",
+          "value": "e59813ff4c5e4a459d18182d41da6c863567cc5d80d69c484bf7f6e76c1d0ecc"
+        }
+      },
+      "evidenceUrl": "https://github.com/echovisionlab/skenion-runtime/releases/tag/skenion-runtime-v0.43.0"
     },
     "runtimeSmoke": {
       "aarch64-apple-darwin": {
         "id": "runtime-smoke-aarch64-apple-darwin",
-        "status": "pending",
+        "status": "passed",
         "required": true,
         "target": "aarch64-apple-darwin",
-        "artifactId": "runtime-aarch64-apple-darwin"
+        "artifactId": "runtime-aarch64-apple-darwin",
+        "evidenceUrl": "https://github.com/echovisionlab/skenion-runtime/actions/runs/27966157953/job/82760449137"
       },
       "x86_64-apple-darwin": {
         "id": "runtime-smoke-x86_64-apple-darwin",
-        "status": "pending",
+        "status": "passed",
         "required": true,
         "target": "x86_64-apple-darwin",
-        "artifactId": "runtime-x86_64-apple-darwin"
+        "artifactId": "runtime-x86_64-apple-darwin",
+        "evidenceUrl": "https://github.com/echovisionlab/skenion-runtime/actions/runs/27966157953/job/82760449042"
       },
       "x86_64-pc-windows-msvc": {
         "id": "runtime-smoke-x86_64-pc-windows-msvc",
-        "status": "pending",
+        "status": "passed",
         "required": true,
         "target": "x86_64-pc-windows-msvc",
-        "artifactId": "runtime-x86_64-pc-windows-msvc"
+        "artifactId": "runtime-x86_64-pc-windows-msvc",
+        "evidenceUrl": "https://github.com/echovisionlab/skenion-runtime/actions/runs/27966157953/job/82760449029"
       },
       "aarch64-pc-windows-msvc": {
         "id": "runtime-smoke-aarch64-pc-windows-msvc",
-        "status": "pending",
+        "status": "passed",
         "required": true,
         "target": "aarch64-pc-windows-msvc",
-        "artifactId": "runtime-aarch64-pc-windows-msvc"
+        "artifactId": "runtime-aarch64-pc-windows-msvc",
+        "evidenceUrl": "https://github.com/echovisionlab/skenion-runtime/actions/runs/27966157953/job/82760449028"
       },
       "x86_64-unknown-linux-gnu": {
         "id": "runtime-smoke-x86_64-unknown-linux-gnu",
-        "status": "pending",
+        "status": "passed",
         "required": true,
         "target": "x86_64-unknown-linux-gnu",
-        "artifactId": "runtime-x86_64-unknown-linux-gnu"
+        "artifactId": "runtime-x86_64-unknown-linux-gnu",
+        "evidenceUrl": "https://github.com/echovisionlab/skenion-runtime/actions/runs/27966157953/job/82760449025"
       },
       "aarch64-unknown-linux-gnu": {
         "id": "runtime-smoke-aarch64-unknown-linux-gnu",
-        "status": "pending",
+        "status": "passed",
         "required": true,
         "target": "aarch64-unknown-linux-gnu",
-        "artifactId": "runtime-aarch64-unknown-linux-gnu"
+        "artifactId": "runtime-aarch64-unknown-linux-gnu",
+        "evidenceUrl": "https://github.com/echovisionlab/skenion-runtime/actions/runs/27966157953/job/82760448982"
       }
     },
     "studioPackageSmoke": {
