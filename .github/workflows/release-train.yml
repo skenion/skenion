@@ -62,7 +62,7 @@ jobs:
               ;;
           esac
 
-          if [[ ! "${TRAIN_VERSION}" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+          if [[ ! "${TRAIN_VERSION}" =~ ^(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)$ ]]; then
             echo "train_version must be registry-compatible SemVer like 0.43.0" >&2
             exit 1
           fi
@@ -179,7 +179,7 @@ jobs:
 
           function requireSemver(value, label) {
             requireString(value, label);
-            if (!/^[0-9]+\.[0-9]+\.[0-9]+$/.test(value)) {
+            if (!/^(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)$/.test(value)) {
               fail(`${label} must be registry-compatible SemVer`);
             }
           }
@@ -610,10 +610,22 @@ jobs:
             echo "manifest_ref=${MANIFEST_REF}"
           } >> "${GITHUB_OUTPUT}"
 
+  validate-manifest:
+    name: Validate train manifest
+    needs: validate
+    uses: echovisionlab/skenion-ci/.github/workflows/validate-train-manifest.yml@v1
+    with:
+      manifest: ${{ needs.validate.outputs.manifest_ref }}
+      manifest-ref: ${{ github.sha }}
+      train-version: ${{ needs.validate.outputs.train_version }}
+      mode: ${{ needs.validate.outputs.mode }}
+
   plan:
     name: Prepare train plan
     runs-on: ubuntu-latest
-    needs: validate
+    needs:
+      - validate
+      - validate-manifest
     steps:
       - name: Summarize conductor plan
         env:
@@ -641,9 +653,8 @@ jobs:
             echo "5. Examples"
             echo "6. Docs"
             echo
-            echo "Prepare mode is a local dry run. Publish and verify modes call"
-            echo "the pinned skenion-ci@v1 reusable workflows once that workflow"
-            echo "library has landed."
+            echo "Prepare mode validates and summarizes without dispatching."
+            echo "Publish and verify modes call the pinned skenion-ci@v1 reusable workflows."
           } >> "${GITHUB_STEP_SUMMARY}"
 
   publish-contracts:
@@ -651,13 +662,14 @@ jobs:
     if: ${{ needs.validate.outputs.mode == 'publish' }}
     needs:
       - validate
+      - validate-manifest
       - plan
-    uses: echovisionlab/skenion-ci/.github/workflows/release-please-dispatch.yml@v1
+    uses: echovisionlab/skenion-ci/.github/workflows/dispatch-release-please.yml@v1
     with:
-      component: contracts
-      repository: echovisionlab/skenion-contracts
-      release_as: ${{ needs.validate.outputs.train_version }}
-      manifest_ref: ${{ needs.validate.outputs.manifest_ref }}
+      target-repo: echovisionlab/skenion-contracts
+      train-version: ${{ needs.validate.outputs.train_version }}
+      mode: publish
+      dry-run: false
     secrets: inherit
 
   publish-runtime:
@@ -665,13 +677,14 @@ jobs:
     if: ${{ needs.validate.outputs.mode == 'publish' }}
     needs:
       - validate
+      - validate-manifest
       - publish-contracts
-    uses: echovisionlab/skenion-ci/.github/workflows/release-please-dispatch.yml@v1
+    uses: echovisionlab/skenion-ci/.github/workflows/dispatch-release-please.yml@v1
     with:
-      component: runtime
-      repository: echovisionlab/skenion-runtime
-      release_as: ${{ needs.validate.outputs.train_version }}
-      manifest_ref: ${{ needs.validate.outputs.manifest_ref }}
+      target-repo: echovisionlab/skenion-runtime
+      train-version: ${{ needs.validate.outputs.train_version }}
+      mode: publish
+      dry-run: false
     secrets: inherit
 
   publish-sdk:
@@ -679,13 +692,14 @@ jobs:
     if: ${{ needs.validate.outputs.mode == 'publish' }}
     needs:
       - validate
+      - validate-manifest
       - publish-runtime
-    uses: echovisionlab/skenion-ci/.github/workflows/release-please-dispatch.yml@v1
+    uses: echovisionlab/skenion-ci/.github/workflows/dispatch-release-please.yml@v1
     with:
-      component: sdk
-      repository: echovisionlab/skenion-sdk
-      release_as: ${{ needs.validate.outputs.train_version }}
-      manifest_ref: ${{ needs.validate.outputs.manifest_ref }}
+      target-repo: echovisionlab/skenion-sdk
+      train-version: ${{ needs.validate.outputs.train_version }}
+      mode: publish
+      dry-run: false
     secrets: inherit
 
   publish-studio:
@@ -693,13 +707,14 @@ jobs:
     if: ${{ needs.validate.outputs.mode == 'publish' }}
     needs:
       - validate
+      - validate-manifest
       - publish-sdk
-    uses: echovisionlab/skenion-ci/.github/workflows/release-please-dispatch.yml@v1
+    uses: echovisionlab/skenion-ci/.github/workflows/dispatch-release-please.yml@v1
     with:
-      component: studio
-      repository: echovisionlab/skenion-studio
-      release_as: ${{ needs.validate.outputs.train_version }}
-      manifest_ref: ${{ needs.validate.outputs.manifest_ref }}
+      target-repo: echovisionlab/skenion-studio
+      train-version: ${{ needs.validate.outputs.train_version }}
+      mode: publish
+      dry-run: false
     secrets: inherit
 
   publish-examples:
@@ -707,13 +722,14 @@ jobs:
     if: ${{ needs.validate.outputs.mode == 'publish' }}
     needs:
       - validate
+      - validate-manifest
       - publish-studio
-    uses: echovisionlab/skenion-ci/.github/workflows/release-please-dispatch.yml@v1
+    uses: echovisionlab/skenion-ci/.github/workflows/dispatch-release-please.yml@v1
     with:
-      component: examples
-      repository: echovisionlab/skenion-examples
-      release_as: ${{ needs.validate.outputs.train_version }}
-      manifest_ref: ${{ needs.validate.outputs.manifest_ref }}
+      target-repo: echovisionlab/skenion-examples
+      train-version: ${{ needs.validate.outputs.train_version }}
+      mode: publish
+      dry-run: false
     secrets: inherit
 
   publish-docs:
@@ -721,13 +737,14 @@ jobs:
     if: ${{ needs.validate.outputs.mode == 'publish' }}
     needs:
       - validate
+      - validate-manifest
       - publish-examples
-    uses: echovisionlab/skenion-ci/.github/workflows/release-please-dispatch.yml@v1
+    uses: echovisionlab/skenion-ci/.github/workflows/dispatch-release-please.yml@v1
     with:
-      component: docs
-      repository: echovisionlab/skenion-docs
-      release_as: ${{ needs.validate.outputs.train_version }}
-      manifest_ref: ${{ needs.validate.outputs.manifest_ref }}
+      target-repo: echovisionlab/skenion-docs
+      train-version: ${{ needs.validate.outputs.train_version }}
+      mode: publish
+      dry-run: false
     secrets: inherit
 
   verify:
@@ -735,11 +752,13 @@ jobs:
     if: ${{ needs.validate.outputs.mode == 'verify' }}
     needs:
       - validate
+      - validate-manifest
       - plan
-    uses: echovisionlab/skenion-ci/.github/workflows/release-train-verify.yml@v1
+    uses: echovisionlab/skenion-ci/.github/workflows/verify-release-artifacts.yml@v1
     with:
-      train_version: ${{ needs.validate.outputs.train_version }}
-      manifest_ref: ${{ needs.validate.outputs.manifest_ref }}
+      manifest: ${{ needs.validate.outputs.manifest_ref }}
+      manifest-ref: ${{ github.sha }}
+      train-version: ${{ needs.validate.outputs.train_version }}
     secrets: inherit
 
   verify-after-publish:
@@ -747,9 +766,11 @@ jobs:
     if: ${{ needs.validate.outputs.mode == 'publish' }}
     needs:
       - validate
+      - validate-manifest
       - publish-docs
-    uses: echovisionlab/skenion-ci/.github/workflows/release-train-verify.yml@v1
+    uses: echovisionlab/skenion-ci/.github/workflows/verify-release-artifacts.yml@v1
     with:
-      train_version: ${{ needs.validate.outputs.train_version }}
-      manifest_ref: ${{ needs.validate.outputs.manifest_ref }}
+      manifest: ${{ needs.validate.outputs.manifest_ref }}
+      manifest-ref: ${{ github.sha }}
+      train-version: ${{ needs.validate.outputs.train_version }}
     secrets: inherit
