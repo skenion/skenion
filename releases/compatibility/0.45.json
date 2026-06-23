@@ -302,10 +302,20 @@
         "version": "0.45",
         "path": "/manual/0.45/",
         "pages-url": "https://skenion.github.io/skenion-docs/",
+        "source": {
+          "repository": "skenion/skenion-docs",
+          "commit": "23e12e7ed9321f8060e2e5619e991cd405fab4b6",
+          "commit-url": "https://github.com/skenion/skenion-docs/commit/23e12e7ed9321f8060e2e5619e991cd405fab4b6",
+          "ci": {
+            "status": "passed",
+            "workflow": "CI",
+            "url": "https://github.com/skenion/skenion-docs/actions/runs/28037170218"
+          }
+        },
         "pages-status": "pending",
         "pages-deployed": false,
         "promoted": false,
-        "reason": "Docs PR and GitHub Pages deployment evidence are pending."
+        "reason": "GitHub Pages deployment evidence is pending."
       }
     }
   },
