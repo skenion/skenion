@@ -38,17 +38,17 @@ dependency tags.
 
 Each manifest should use the Contracts release-train schema and include:
 
-- flat `schema`, `schemaVersion`, `trainId`, and `trainVersion` fields
+- flat `schema`, `schema-version`, `train-id`, and `train-version` fields
 - lockstep component versions
 - current protocol baselines
-- `capabilitySet` with schema-approved Runtime, Studio, marketplace, and
+- `capability-set` with schema-approved Runtime, Studio, marketplace, and
   Manual capability areas
 - Runtime and Studio multi-arch artifact placeholders or released artifacts
 - checksums for every released binary/package asset
 - release-blocking and preview target tiers
-- `releaseGates` with pending, passed, failed, or waived state
+- `release-gates` with pending, passed, failed, or waived state
 
-The first v0 train is `0.43.0` with `trainId: "0.43"`.
+The first v0 train is `0.43.0` with `train-id: "0.43"`.
 
 ## Release Gates
 

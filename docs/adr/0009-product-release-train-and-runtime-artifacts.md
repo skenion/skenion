@@ -47,7 +47,7 @@ The release train manifest must include:
 - Examples tag or commit
 - Manual version and deploy status
 - protocol baselines
-- `capabilitySet` with protocol surfaces and required Runtime, Studio,
+- `capability-set` with protocol surfaces and required Runtime, Studio,
   package/marketplace, and Manual capabilities
 - release completion gates
 
