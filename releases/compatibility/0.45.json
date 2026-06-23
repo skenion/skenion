@@ -2,9 +2,9 @@
   "schema": "skenion.compatibility-matrix",
   "schema-version": "0.1.0",
   "id": "contracts-0.45",
-  "status": "draft",
+  "status": "promotion-candidate",
   "promoted": false,
-  "promotion-state": "draft",
+  "promotion-state": "promotion-candidate",
   "contracts-line": "0.45",
   "contracts-range": ">=0.45.0 <0.46.0",
   "owner-repository": "skenion/skenion",
@@ -623,7 +623,7 @@
       "manual": {
         "version": "0.45",
         "path": "/manual/0.45/",
-        "pages-url": "https://skenion.github.io/skenion-docs/",
+        "pages-url": "https://skenion.github.io/skenion-docs/manual/0.45/",
         "source": {
           "repository": "skenion/skenion-docs",
           "commit": "3eab4f7f78b375e3a784a226f03188ced4138071",
@@ -726,7 +726,11 @@
     },
     "docs-pages-deployment": {
       "status": "pending",
-      "required": true
+      "required": true,
+      "id": "docs-pages-deployment",
+      "manual-version": "0.45.0",
+      "manual-path": "/manual/0.45/",
+      "pages-url": "https://skenion.github.io/skenion-docs/manual/0.45/"
     }
   }
 }
