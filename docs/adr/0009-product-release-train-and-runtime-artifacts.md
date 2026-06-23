@@ -39,12 +39,15 @@ The matrix is the product compatibility unit and promotion record.
 
 The compatibility matrix schema is owned by `skenion-contracts`.
 
-Compatibility matrix instances are owned by the hub repository, `skenion/skenion`,
-under:
+Compatibility matrix instances are owned by the hub repository,
+`skenion/skenion`, under:
 
 ```text
-releases/trains/<train-id>.json
+releases/compatibility/<contracts-line>.json
 ```
+
+The first active corrected matrix is `releases/compatibility/0.45.json`.
+Historical lockstep train manifests are not active product release metadata.
 
 Reusable release workflow implementation is owned by
 `skenion/skenion-ci`. Hub verification workflows collect evidence and record

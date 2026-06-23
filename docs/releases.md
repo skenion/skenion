@@ -36,10 +36,10 @@ supersedes the older policy that v0 could keep legacy import, migration,
 default-alias, or deprecated compatibility paths.
 
 The dangling 0.44 release state is historical evidence, not a state to repair
-with tag surgery. Do not force-move tags, rewrite train state, or compensate
-with local publishing. Record what exists, fix release workflows through normal
-PRs, and use Contracts `0.45` as the first compatibility-matrix line for the
-corrected model.
+with tag surgery. Do not force-move tags, rewrite obsolete release metadata, or
+compensate with local publishing. Record what exists, fix release workflows
+through normal PRs, and use Contracts `0.45` as the first compatibility-matrix
+line for the corrected model.
 
 ## Compatibility Matrix Promotion
 
@@ -64,8 +64,11 @@ matrix entry should record:
 owns matrix instances, artifact evidence, promotion gate state, and completion
 reporting. It does not own component Release Please authority and must not
 dispatch Release Please with forced `release-as` train versions.
-`skenion/skenion-ci` owns reusable workflow implementation and may expose pinned
-`workflow_call` entrypoints for verification and promotion evidence.
+`skenion/skenion-ci` owns reusable workflow implementation and exposes pinned
+`workflow_call` entrypoints for verification and promotion evidence. The active
+hub workflow is `.github/workflows/verify-compatibility-matrix.yml`, which calls
+`skenion/skenion-ci/.github/workflows/verify-compatibility-matrix.yml@v2` with
+the organization `GH_TOKEN` secret for GitHub artifact verification.
 
 The checked-in compatibility matrix plus hub verification evidence is the
 product promotion authority. Every matrix must make this state machine explicit:
@@ -131,10 +134,10 @@ compatibility matrix, verify checksums, stage the sidecar binaries for Tauri,
 build per-platform installers, and eventually handle signing and notarization
 before public desktop release.
 
-Full desktop app auto-updater rollout is not required for the initial product
-train. Package and patch update UX is separate from app auto-update: users must
-still be able to discover, install, and update public patcher/package artifacts
-through the package marketplace flow.
+Full desktop app auto-updater rollout is not required for the initial v0
+compatibility set. Package and patch update UX is separate from app
+auto-update: users must still be able to discover, install, and update public
+patcher/package artifacts through the package marketplace flow.
 
 ## Release Please
 
@@ -247,8 +250,9 @@ jobs:
 Publish workflows should use minimal permissions and GitHub environments for
 manual approval where appropriate.
 
-Hub verification workflows should pin `skenion/skenion-ci@v1` for compatibility
-matrix validation, artifact evidence, and promotion reporting. If `@v1` is
-missing or still points at an older train-conductor surface, the verification
+Hub verification workflows should pin
+`skenion/skenion-ci/.github/workflows/verify-compatibility-matrix.yml@v2` for
+compatibility matrix validation, artifact evidence, and promotion reporting. If
+`@v2` is missing or does not expose the compatibility matrix verifier, the
 workflow must fail clearly instead of falling back to `main`, sibling branches,
 or an unpinned workflow ref.

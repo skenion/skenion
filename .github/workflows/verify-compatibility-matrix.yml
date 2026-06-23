@@ -1,0 +1,53 @@
+name: Verify compatibility matrix
+
+on:
+  workflow_dispatch:
+    inputs:
+      matrix:
+        description: Compatibility matrix path in this repository
+        required: true
+        default: releases/compatibility/0.45.json
+        type: string
+  pull_request:
+    paths:
+      - .github/workflows/verify-compatibility-matrix.yml
+      - releases/compatibility/**
+  push:
+    branches:
+      - main
+    paths:
+      - .github/workflows/verify-compatibility-matrix.yml
+      - releases/compatibility/**
+
+permissions:
+  contents: read
+
+concurrency:
+  group: compatibility-matrix-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  require-gh-token:
+    name: Require GitHub artifact token
+    runs-on: ubuntu-latest
+    steps:
+      - name: Fail closed without GH_TOKEN
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+        run: |
+          set -euo pipefail
+          if [[ -z "${GH_TOKEN}" ]]; then
+            echo "GH_TOKEN organization secret is required for compatibility matrix artifact verification." >&2
+            exit 1
+          fi
+
+  verify:
+    name: Verify matrix
+    needs: require-gh-token
+    uses: skenion/skenion-ci/.github/workflows/verify-compatibility-matrix.yml@v2
+    with:
+      matrix: ${{ github.event.inputs.matrix || 'releases/compatibility/0.45.json' }}
+      manifest-ref: ${{ github.sha }}
+    secrets:
+      GH_TOKEN: ${{ secrets.GH_TOKEN }}

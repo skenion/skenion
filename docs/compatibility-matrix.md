@@ -155,6 +155,10 @@ Contracts `0.45` is the first compatibility-matrix line for the corrected
 release model. The dangling 0.44 state must not be repaired with tag surgery,
 forced train rewrites, or local publishing.
 
+The active checked-in draft matrix is
+`releases/compatibility/0.45.json`. It remains unpromoted until Runtime,
+SDK, Studio, Examples, and Manual gates are verified from released artifacts.
+
 | Artifact group | Required matrix state |
 | --- | --- |
 | Contracts npm/crate | Contracts line and range, exact npm/crate versions, published from Release Please/GitHub Actions |

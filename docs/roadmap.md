@@ -243,4 +243,4 @@ Immediate foundation work:
 - desktop multi-window and runtime profile Manual pages
 - collaboration behavior Manual pages
 - marketplace/install/update Manual pages
-- release train and install artifact Manual pages
+- compatibility matrix and install artifact Manual pages

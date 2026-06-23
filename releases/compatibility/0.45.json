@@ -1,0 +1,373 @@
+{
+  "schema": "skenion.compatibility-matrix",
+  "schema-version": "0.1.0",
+  "id": "contracts-0.45",
+  "status": "draft",
+  "promoted": false,
+  "promotion-state": "draft",
+  "contracts-line": "0.45",
+  "contracts-range": ">=0.45.0 <0.46.0",
+  "owner-repository": "skenion/skenion",
+  "verification-workflow": ".github/workflows/verify-compatibility-matrix.yml",
+  "release-model": {
+    "component-release-authority": "repository-local Release Please",
+    "hub-authority": "compatibility matrix verification and promotion",
+    "component-versions-independent": true,
+    "hub-dispatches-release-please": false,
+    "hub-forces-release-as": false,
+    "registry-publishing-from-local-machine": false,
+    "github-artifact-verification-token": "GH_TOKEN"
+  },
+  "protocol-baselines": {
+    "graph": "0.1.0",
+    "project": "0.1.0",
+    "node": "0.1.0",
+    "extension": "0.1.0",
+    "runtime-http": "runtime-http.v0",
+    "runtime-collaboration": "v0"
+  },
+  "capability-set": {
+    "runtime": {
+      "session-addressing": true,
+      "event-replay": true,
+      "multi-window": true,
+      "connection-profiles": [
+        "local-managed",
+        "local-shared",
+        "remote"
+      ],
+      "collaboration": "server-authoritative-ot",
+      "operation-log": true,
+      "io-discovery": "raw-descriptor",
+      "auth-policy": "deferred"
+    },
+    "studio": {
+      "graph-editor": true,
+      "patch-library": true,
+      "subpatches": true,
+      "living-help": true,
+      "graph-clipboard": true,
+      "desktop-shell": "tauri",
+      "connection-profiles": [
+        "local-managed",
+        "local-shared",
+        "remote"
+      ]
+    },
+    "marketplace": {
+      "package-discovery": true,
+      "package-install": true,
+      "package-update": true,
+      "extension-packages": true
+    },
+    "manual": {
+      "versioned-paths": true,
+      "pages-deployment": true,
+      "latest-promotion-requires-matrix": true,
+      "patch-releases-use-major-minor-path": true
+    }
+  },
+  "components": {
+    "contracts": {
+      "line": "0.45",
+      "range": ">=0.45.0 <0.46.0",
+      "release": {
+        "repository": "skenion/skenion-contracts",
+        "tag": "skenion-contracts-v0.45.0",
+        "url": "https://github.com/skenion/skenion-contracts/releases/tag/skenion-contracts-v0.45.0",
+        "target-commit": "34fe5f19467fedac05e863f2c546d5cd8d23ac80",
+        "published-at": "2026-06-23T13:24:10Z",
+        "status": "verified"
+      },
+      "npm": {
+        "ecosystem": "npm",
+        "name": "@skenion/contracts",
+        "version": "0.45.0",
+        "registry": "https://registry.npmjs.org",
+        "url": "https://www.npmjs.com/package/@skenion/contracts/v/0.45.0",
+        "tarball": "https://registry.npmjs.org/@skenion/contracts/-/contracts-0.45.0.tgz",
+        "integrity": "sha512-8tS2t54fgTcNenGCXOtGAtRQ6vz1s0T2MoRvQwDZBexPmcOzfqfqF/D0y9rZf4o133l1dCbxq7vXGVKSH5kvbQ==",
+        "status": "verified"
+      },
+      "crate": {
+        "ecosystem": "crates.io",
+        "name": "skenion-contracts",
+        "version": "0.45.0",
+        "registry": "https://crates.io",
+        "url": "https://crates.io/crates/skenion-contracts/0.45.0",
+        "checksum": "16fc2554a2c82cfe3aee4dd2903164d3f6e0ec2183fd5c2f7f308a24b683511c",
+        "status": "verified"
+      }
+    },
+    "runtime": {
+      "contracts-line": "0.45",
+      "contracts-range": ">=0.45.0 <0.46.0",
+      "release": {
+        "repository": "skenion/skenion-runtime",
+        "tag": "skenion-runtime-v0.45.0",
+        "url": "https://github.com/skenion/skenion-runtime/releases/tag/skenion-runtime-v0.45.0",
+        "target-commit": "0ff7209de002ea4534ecdf5cf103c592275d51ac",
+        "published-at": "2026-06-23T14:20:28Z",
+        "status": "verified"
+      },
+      "binaries": {
+        "aarch64-apple-darwin": {
+          "id": "runtime-aarch64-apple-darwin",
+          "target": "aarch64-apple-darwin",
+          "support-tier": "release-blocking",
+          "kind": "runtime-binary",
+          "name": "skenion-runtime-v0.45.0-aarch64-apple-darwin.tar.gz",
+          "version": "0.45.0",
+          "source": {
+            "kind": "github-release-asset",
+            "repository": "skenion/skenion-runtime",
+            "tag": "skenion-runtime-v0.45.0",
+            "asset-name": "skenion-runtime-v0.45.0-aarch64-apple-darwin.tar.gz",
+            "url": "https://github.com/skenion/skenion-runtime/releases/download/skenion-runtime-v0.45.0/skenion-runtime-v0.45.0-aarch64-apple-darwin.tar.gz"
+          },
+          "checksum": {
+            "algorithm": "sha256",
+            "value": "af1c25758c2886168a05d88d6d9015d6b9f097b23d6f39f884108ea61d01d18f"
+          },
+          "size-bytes": 4691647,
+          "status": "verified"
+        },
+        "x86_64-apple-darwin": {
+          "id": "runtime-x86_64-apple-darwin",
+          "target": "x86_64-apple-darwin",
+          "support-tier": "release-blocking",
+          "kind": "runtime-binary",
+          "name": "skenion-runtime-v0.45.0-x86_64-apple-darwin.tar.gz",
+          "version": "0.45.0",
+          "source": {
+            "kind": "github-release-asset",
+            "repository": "skenion/skenion-runtime",
+            "tag": "skenion-runtime-v0.45.0",
+            "asset-name": "skenion-runtime-v0.45.0-x86_64-apple-darwin.tar.gz",
+            "url": "https://github.com/skenion/skenion-runtime/releases/download/skenion-runtime-v0.45.0/skenion-runtime-v0.45.0-x86_64-apple-darwin.tar.gz"
+          },
+          "checksum": {
+            "algorithm": "sha256",
+            "value": "baac52cf2021501beabb18b5be5cb0150cfd2a7e3d440a933191ec620e8128b0"
+          },
+          "size-bytes": 4901406,
+          "status": "verified"
+        },
+        "x86_64-pc-windows-msvc": {
+          "id": "runtime-x86_64-pc-windows-msvc",
+          "target": "x86_64-pc-windows-msvc",
+          "support-tier": "release-blocking",
+          "kind": "runtime-binary",
+          "name": "skenion-runtime-v0.45.0-x86_64-pc-windows-msvc.tar.gz",
+          "version": "0.45.0",
+          "source": {
+            "kind": "github-release-asset",
+            "repository": "skenion/skenion-runtime",
+            "tag": "skenion-runtime-v0.45.0",
+            "asset-name": "skenion-runtime-v0.45.0-x86_64-pc-windows-msvc.tar.gz",
+            "url": "https://github.com/skenion/skenion-runtime/releases/download/skenion-runtime-v0.45.0/skenion-runtime-v0.45.0-x86_64-pc-windows-msvc.tar.gz"
+          },
+          "checksum": {
+            "algorithm": "sha256",
+            "value": "59f8dce2d1a7ce63afe8ab482cb55aed57d11b74850e81c00853413864cd578b"
+          },
+          "size-bytes": 5105822,
+          "status": "verified"
+        },
+        "x86_64-unknown-linux-gnu": {
+          "id": "runtime-x86_64-unknown-linux-gnu",
+          "target": "x86_64-unknown-linux-gnu",
+          "support-tier": "release-blocking",
+          "kind": "runtime-binary",
+          "name": "skenion-runtime-v0.45.0-x86_64-unknown-linux-gnu.tar.gz",
+          "version": "0.45.0",
+          "source": {
+            "kind": "github-release-asset",
+            "repository": "skenion/skenion-runtime",
+            "tag": "skenion-runtime-v0.45.0",
+            "asset-name": "skenion-runtime-v0.45.0-x86_64-unknown-linux-gnu.tar.gz",
+            "url": "https://github.com/skenion/skenion-runtime/releases/download/skenion-runtime-v0.45.0/skenion-runtime-v0.45.0-x86_64-unknown-linux-gnu.tar.gz"
+          },
+          "checksum": {
+            "algorithm": "sha256",
+            "value": "4124d5e3b1637ce113ff36cb01ec5aeb5ed31bb21337e59f5752e5fba836d46e"
+          },
+          "size-bytes": 6566690,
+          "status": "verified"
+        },
+        "aarch64-pc-windows-msvc": {
+          "id": "runtime-aarch64-pc-windows-msvc",
+          "target": "aarch64-pc-windows-msvc",
+          "support-tier": "preview",
+          "kind": "runtime-binary",
+          "name": "skenion-runtime-v0.45.0-aarch64-pc-windows-msvc.tar.gz",
+          "version": "0.45.0",
+          "source": {
+            "kind": "github-release-asset",
+            "repository": "skenion/skenion-runtime",
+            "tag": "skenion-runtime-v0.45.0",
+            "asset-name": "skenion-runtime-v0.45.0-aarch64-pc-windows-msvc.tar.gz",
+            "url": "https://github.com/skenion/skenion-runtime/releases/download/skenion-runtime-v0.45.0/skenion-runtime-v0.45.0-aarch64-pc-windows-msvc.tar.gz"
+          },
+          "checksum": {
+            "algorithm": "sha256",
+            "value": "097818126bd11a3e43eb36b419b65f3a1d76a7c60dfbdf51b5360ff22274ccfc"
+          },
+          "size-bytes": 4761411,
+          "status": "verified"
+        },
+        "aarch64-unknown-linux-gnu": {
+          "id": "runtime-aarch64-unknown-linux-gnu",
+          "target": "aarch64-unknown-linux-gnu",
+          "support-tier": "preview",
+          "kind": "runtime-binary",
+          "name": "skenion-runtime-v0.45.0-aarch64-unknown-linux-gnu.tar.gz",
+          "version": "0.45.0",
+          "source": {
+            "kind": "github-release-asset",
+            "repository": "skenion/skenion-runtime",
+            "tag": "skenion-runtime-v0.45.0",
+            "asset-name": "skenion-runtime-v0.45.0-aarch64-unknown-linux-gnu.tar.gz",
+            "url": "https://github.com/skenion/skenion-runtime/releases/download/skenion-runtime-v0.45.0/skenion-runtime-v0.45.0-aarch64-unknown-linux-gnu.tar.gz"
+          },
+          "checksum": {
+            "algorithm": "sha256",
+            "value": "b1b51594caff13b0c4515097ae93a5935f886b1fb2827f9d26fc469465b16024"
+          },
+          "size-bytes": 6516656,
+          "status": "verified"
+        }
+      }
+    },
+    "sdk": {
+      "contracts-line": "0.45",
+      "contracts-range": ">=0.45.0 <0.46.0",
+      "release": {
+        "repository": "skenion/skenion-sdk",
+        "tag": "skenion-sdk-v0.45.0",
+        "url": "https://github.com/skenion/skenion-sdk/releases/tag/skenion-sdk-v0.45.0",
+        "target-commit": "87206ead1e9530d43fbd794bdbab80c632080710",
+        "published-at": "2026-06-23T14:42:15Z",
+        "status": "verified"
+      },
+      "npm": {
+        "ecosystem": "npm",
+        "name": "@skenion/sdk",
+        "version": "0.45.0",
+        "registry": "https://registry.npmjs.org",
+        "url": "https://www.npmjs.com/package/@skenion/sdk/v/0.45.0",
+        "tarball": "https://registry.npmjs.org/@skenion/sdk/-/sdk-0.45.0.tgz",
+        "integrity": "sha512-05DAAyqexoVsqujN7v8VnufJ/Ky7Sj6eICqt4TRGp5Nkls9uvqPaybS9/B0G5gkNsJzmjKU+6uPwomg5JgieRQ==",
+        "status": "verified"
+      }
+    },
+    "studio": {
+      "contracts-line": "0.45",
+      "contracts-range": ">=0.45.0 <0.46.0",
+      "version": "0.44.0",
+      "release": {
+        "repository": "skenion/skenion-studio",
+        "tag": "skenion-studio-v0.44.0",
+        "url": "https://github.com/skenion/skenion-studio/releases/tag/skenion-studio-v0.44.0",
+        "target-commit": "faa840a083bd9a46c76aaa1083235cf0a8af64a7",
+        "published-at": "2026-06-23T14:51:09Z",
+        "status": "verified"
+      },
+      "web": {
+        "status": "pending",
+        "reason": "No verified web/static artifact or deployment evidence has been recorded for this matrix."
+      },
+      "desktop-packages": [],
+      "runtime-sidecars": [],
+      "artifact-status": "pending",
+      "artifact-note": "The skenion-studio-v0.44.0 GitHub release exists, but GitHub reports no release assets."
+    },
+    "examples": {
+      "repository": "skenion/skenion-examples",
+      "ref": "main",
+      "commit": "1f1dd16cd9c7456be7da8f31ae71563ae12337a3",
+      "commit-url": "https://github.com/skenion/skenion-examples/commit/1f1dd16cd9c7456be7da8f31ae71563ae12337a3",
+      "ci": {
+        "status": "passed",
+        "check": "examples",
+        "url": "https://github.com/skenion/skenion-examples/actions/runs/28035361306/job/82987097709"
+      },
+      "conformance": {
+        "status": "pending",
+        "reason": "Main commit CI passed, but conformance against the released compatibility matrix artifacts has not been promoted."
+      }
+    },
+    "docs": {
+      "manual": {
+        "version": "0.45",
+        "path": "/manual/0.45/",
+        "pages-url": "https://skenion.github.io/skenion-docs/",
+        "pages-status": "pending",
+        "pages-deployed": false,
+        "promoted": false,
+        "reason": "Docs PR and GitHub Pages deployment evidence are pending."
+      }
+    }
+  },
+  "promotion-gates": {
+    "component-released": {
+      "status": "passed",
+      "evidence": [
+        "contracts npm/crate 0.45.0",
+        "skenion-runtime-v0.45.0 release",
+        "@skenion/sdk 0.45.0",
+        "skenion-studio-v0.44.0 release"
+      ]
+    },
+    "artifacts-collected": {
+      "status": "pending",
+      "reason": "Studio web/desktop artifacts and docs deployment evidence are not yet collected."
+    },
+    "checksums-verified": {
+      "status": "pending",
+      "reason": "Runtime asset checksums are recorded; full matrix verification must run through the hub workflow with GH_TOKEN before promotion."
+    },
+    "examples-conform": {
+      "status": "pending",
+      "reason": "Examples main CI passed, but released-artifact conformance is not promoted."
+    },
+    "docs-deployed": {
+      "status": "pending",
+      "reason": "Manual Pages deployment for the 0.45 matrix is pending."
+    },
+    "promoted": {
+      "status": "pending",
+      "reason": "The matrix remains draft/unpromoted until all release-blocking gates pass."
+    }
+  },
+  "release-gates": {
+    "contracts-registry": {
+      "status": "passed",
+      "required": true
+    },
+    "runtime-release-assets": {
+      "status": "passed",
+      "required": true
+    },
+    "sdk-registry": {
+      "status": "passed",
+      "required": true
+    },
+    "studio-web": {
+      "status": "pending",
+      "required": true
+    },
+    "studio-desktop": {
+      "status": "pending",
+      "required": true
+    },
+    "examples-conformance": {
+      "status": "pending",
+      "required": true
+    },
+    "docs-pages-deployment": {
+      "status": "pending",
+      "required": true
+    }
+  }
+}

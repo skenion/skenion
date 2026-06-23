@@ -134,7 +134,7 @@ Owns:
 
 - reusable GitHub Actions workflows
 - composite actions
-- Release Please wrappers
+- Release Please validation helpers
 - Rust CI templates
 - TypeScript CI templates
 - protocol lint and conformance templates
