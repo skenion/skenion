@@ -2,7 +2,14 @@
 
 This matrix records the current source-of-truth boundaries for graph, node, and
 runtime compatibility. It exists to keep `skenion-contracts`, `skenion-examples`,
-`skenion-studio`, and `skenion-runtime` on one lockstep product train.
+`skenion-studio`, and `skenion-runtime` aligned through verified compatibility
+matrices.
+
+Contracts v0 compatibility is rooted in the Contracts package/crate line, not
+in equal product versions. A v0 Contracts line is `0.minor`: supporting `0.45`
+means supporting `>=0.45.0 <0.46.0`. Patch releases inside a Contracts line must
+remain backward compatible. Breaking Contracts schema, wire, or public API
+changes require a new line such as `0.46.0`.
 
 skenion v0 has no legacy or deprecated compatibility mode. Each surface accepts
 only the current exact schema/protocol version listed here. Older graph,
@@ -137,19 +144,25 @@ working copy. Users can pan, zoom, select, move, edit, connect, delete, copy
 graph fragments, and promote/fork into a project-owned patch. The working copy
 must not save back to first-party or package help source.
 
-## Verified Release Train
+## Verified Compatibility Matrix
 
-This section must name one lockstep product version when a release train is
-ready. Do not record mismatched local worktree versions here.
+This section must name the promoted Contracts line and exact released artifacts
+when a compatibility matrix is ready. Do not record local worktree versions
+here. Component releases may be public but unpromoted until matrix verification
+passes.
 
-| Artifact group | Required train state |
+Contracts `0.45` is the first compatibility-matrix line for the corrected
+release model. The dangling 0.44 state must not be repaired with tag surgery,
+forced train rewrites, or local publishing.
+
+| Artifact group | Required matrix state |
 | --- | --- |
-| Contracts npm/crate | Same product version as the train, published from Release Please/GitHub Actions |
-| Runtime binaries | Same product version as the train, with multi-arch sidecar assets and checksums |
-| SDK npm | Same product version as the train |
-| Studio web/desktop | Same product version as the train, with Runtime sidecar compatibility verified |
-| Examples | Same product train tag/commit, current-version fixtures only |
-| Manual | Same product Manual version deployed to GitHub Pages |
+| Contracts npm/crate | Contracts line and range, exact npm/crate versions, published from Release Please/GitHub Actions |
+| Runtime binaries | Exact release tag, multi-arch sidecar assets, checksums, and supported Contracts line |
+| SDK npm | Exact npm version and supported Contracts range |
+| Studio web/desktop | Exact web/desktop versions, Runtime sidecar versions, and supported Contracts range |
+| Examples | Exact tag/commit, current-version fixtures only, conformance against released artifacts |
+| Manual | Exact Manual version/path deployed to GitHub Pages |
 
 ## Canonical Data Kinds
 

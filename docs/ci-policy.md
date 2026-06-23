@@ -45,17 +45,23 @@ Review the artifacts before merging changes that touch:
 ## Release Hygiene
 
 Do not use manual package version bumps to describe compatibility. During v0,
-the hub conductor dispatches Release Please with an explicit `release-as` for
-the lockstep train version. Release Please still owns version files,
-changelogs, tags, and GitHub releases after that dispatch.
+Release Please owns each repository's natural version, changelog, release PR,
+tag, and GitHub Release flow. The hub does not dispatch Release Please with
+forced `release-as` train versions; it verifies released artifacts and promotes
+compatibility matrices.
 
 - Use `fix(...)` when a compatibility, validation, CI gate, or graph UX hardening change should produce a patch release.
 - Use `feat(...)` when adding a product capability or public contract surface.
 - Use `test(...)`, `ci(...)`, or `docs(...)` only when no release note or version signal is needed.
 
 If a repository consumes a newly published contract surface, update the
-compatibility matrix, use the exact released train version, and add an explicit
-release note in the consuming repository.
+compatibility matrix, declare the supported Contracts `0.minor` line/range, and
+add an explicit release note in the consuming repository. Contracts `0.45` is
+the first compatibility-matrix line for the corrected release model.
+
+Component releases may be public but unpromoted until matrix verification
+passes. Do not repair the dangling 0.44 state with tag surgery, forced train
+rewrites, or local publish compensation.
 
 Publishing to npm, crates.io, GitHub Releases, or GitHub Pages must happen from
 GitHub Actions release workflows only. Local commands may run dry-run

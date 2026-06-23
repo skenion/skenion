@@ -2,8 +2,8 @@
 
 skenion uses multiple public repositories because the runtime, editor, protocol,
 SDK, examples, and CI rules have different ownership boundaries and stability
-requirements. During v0, released artifacts move together on one lockstep
-product train.
+requirements. During v0, repositories release on natural component versions and
+the hub promotes verified compatibility matrices.
 
 ## Immediate Repositories
 
@@ -15,9 +15,8 @@ Owns:
 
 - architecture notes
 - RFCs and ADRs
-- product release train conductor state
-- release train manifests
-- release ordering and completion reporting
+- compatibility matrix manifests
+- release evidence and promotion reporting
 - release policy
 - repository boundaries
 - compatibility policy
@@ -145,7 +144,8 @@ Use `skenion-ci` instead of an org-level `.github` repository so the automation
 scope stays product-specific.
 
 `skenion-ci` owns reusable workflow implementation. It does not own product
-train manifest state or decide release completion; the hub conductor does.
+compatibility state or decide release completion; the hub promotion process
+does.
 
 ## Repositories To Add Later
 

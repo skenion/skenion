@@ -22,7 +22,7 @@ family. The current baseline is:
 | M06.81 Graph 0.1 Active Consolidation | Current | Make the consolidated current `0.1` graph/project/patch-library documents the active editor/runtime/source-of-truth model and reject unsupported versions instead of preserving legacy import/migration paths. |
 | M06.82 Realtime Collaboration / CRDT-OT Sync v0 | Current | Runtime-authoritative OT/rebase collaboration, CRDT-compatible ids, presence, operation replay, and actor-scoped undo metadata. |
 | M06.85 Package Marketplace / Install UX v0 | Current | Public package/patch discovery, Stargazed ranking, install/update/remove UX, installed inventory, and package compatibility diagnostics. |
-| M06.9 Product Release Train / Multi-Arch Distribution v0 | Current | Release train manifest, Runtime multi-arch binary artifacts, desktop sidecar packaging, and Manual release gates. |
+| M06.9 Release Matrix / Multi-Arch Distribution v0 | Current | Compatibility matrix manifest, Runtime multi-arch binary artifacts, desktop sidecar packaging, and Manual release gates. |
 | M07 Native IO Convenience Objects v0 | Planned | `midiin`, `midiout`, serial/HID IO, and generic sensor IO as convenience objects composed from IO bindings and codecs. |
 | M08 Studio IO Binding UX v0 | Planned | Per-object device dropdowns, codec selection, raw monitor, and diagnostics without Runtime-global IO panels. |
 | M09 Audio Device Format / Input Backend v0 | Planned | Actual `audio.input` backend, same-device duplex routing, device format conversion, and input latency reporting. |
@@ -41,7 +41,7 @@ items must be treated as foundational contracts, not optional polish:
 4. Tauri desktop window/profile/sidecar substrate.
 5. Runtime-authoritative realtime collaboration.
 6. Package marketplace/install/update UX.
-7. Product release train manifest and Runtime multi-arch binary artifacts.
+7. Product compatibility matrix manifest and Runtime multi-arch binary artifacts.
 
 The implementation order is contract-first:
 
@@ -163,7 +163,7 @@ Immediate foundation work:
 - define session-addressed Runtime operations and event envelopes
 - define collaboration operation, presence, causality, and undo metadata
 - define package marketplace/install/update contracts
-- define release train manifest and Runtime artifact metadata
+- define compatibility matrix manifest and Runtime artifact metadata
 
 The TypeScript SDK and Rust runtime should consume this repository rather than
 copying schemas.
@@ -212,7 +212,7 @@ Immediate foundation work:
 - session-aware Runtime client helpers
 - collaboration operation builders and reconciliation helpers
 - package marketplace/install/update helpers
-- release train manifest validation and consumption helpers
+- compatibility matrix validation and consumption helpers
 
 The SDK must stay UI-framework agnostic.
 
@@ -227,7 +227,7 @@ Immediate foundation work:
 - graph fragment copy/paste fixtures
 - realtime collaboration convergence fixtures
 - package marketplace/install/update fixtures
-- released-artifact conformance against train manifests
+- released-artifact conformance against compatibility matrices
 
 Examples must not depend on unpublished private packages for release
 conformance.

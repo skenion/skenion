@@ -1,46 +1,45 @@
-# Release Train Manifests
+# Compatibility Matrix Manifests
 
-This directory contains product release train manifests owned by the
-`skenion/skenion` hub conductor.
+This directory contains product compatibility matrix manifests owned by the
+`skenion/skenion` hub.
 
-The hub is the source of truth for product state: train identity, component
-order, protocol baselines, artifact inventory, release gates, and release
+The hub is the source of truth for product promotion state: Contracts line,
+protocol baselines, artifact inventory, verification gates, and release
 completion reporting. The manifest shape is owned by the flat
 `skenion.release-train` schema in `skenion-contracts`; the hub must not invent a
 second manifest shape. Reusable workflow implementation belongs in
-`skenion/skenion-ci`; it should not own product train state.
+`skenion/skenion-ci`; it should not own product compatibility state.
 
 Each manifest must also record the release authority model in
 `release-authority`. The authority model is:
 
-- the checked-in hub manifest plus `.github/workflows/release-train.yml` is the
-  product train authority
-- Release Please may prepare release PRs, but it is not independent authority
-  for train tags, GitHub releases, artifacts, registry packages, or Manual
-  promotion
-- repository workflows must run from conductor-dispatched steps that identify
-  the manifest row and expected source commit for the component being released
-- `contracts`, `runtime`, `sdk`, and `studio` rows must include
-  `expected-source-commit` as a full 40-character Git commit SHA before publish
-  dispatch
+- Release Please owns each repository's natural version, changelog, release PR,
+  tag, and GitHub Release flow
+- the checked-in hub manifest plus verification evidence is the product
+  promotion authority
+- the hub verifies released artifacts and promotes compatibility matrices; it
+  does not dispatch Release Please with forced `release-as` train versions
+- component releases may be public but unpromoted until matrix verification
+  passes
 
-The product train state must use this order:
+The product promotion state must use this order:
 
 ```text
-prepared_pr -> merged_release_commit -> tag_exists -> github_release_exists -> artifacts_uploaded -> registry_package_exists -> docs_deployed -> verified
+component_released -> artifacts_collected -> checksums_verified -> examples_conform -> docs_deployed -> promoted
 ```
 
 State may only advance monotonically. A later state cannot be `passed` while an
 earlier state is `pending` or `failed`. A `waived` state must have a matching
 `release-authority.waivers.<state>` record with `reason`, `approved-by`, and
-`approved-at`. `verified: passed` additionally requires every required
+`approved-at`. `promoted: passed` additionally requires every required
 `release-gates` entry to be `passed` or explicitly `waived`.
 
 ## Lifecycle
 
 1. Create or update the draft manifest before release work starts.
-2. Prepare the train from the conductor workflow in dry-run mode.
-3. Release components in dependency order.
+2. Release components through their repository-local Release Please and release
+   workflows.
+3. Collect released artifact evidence in dependency order.
 4. Record released artifact names, URLs, checksums, tags, and deployment state.
 5. Verify every release gate from published artifacts, not local worktrees.
 6. Mark the manifest complete only after every blocking gate has passed.
@@ -54,22 +53,30 @@ The v0 component order is:
 5. Examples.
 6. Docs.
 
-Contracts are the train seed. Runtime, SDK, Studio, Examples, and Docs must
-consume the exact released train version from registries, release tags, GitHub
-Release assets, or this checked-in manifest. Release and publish jobs must not
-consume sibling branches, `main`, broad semver ranges, or stale hard-coded
-dependency tags.
+Contracts are the compatibility seed. Runtime, SDK, Studio, Examples, and Docs
+must declare the supported Contracts `0.minor` line/range and consume released
+registries, release tags, GitHub Release assets, or this checked-in manifest.
+Release and publish jobs must not consume sibling branches, `main`, or stale
+hard-coded dependency tags.
+
+Contracts `0.45` is the first compatibility-matrix line for the corrected
+release model. The dangling 0.44 state must not be repaired with tag surgery,
+forced train rewrites, or local publish compensation.
+
+Contracts package/crate compatibility uses the `0.minor` SemVer range for the
+declared line, but exact graph, project, extension, Runtime HTTP, and protocol
+discriminator fields remain exact current-version checks.
 
 ## Manifest Requirements
 
 Each manifest should use the Contracts release-train schema and include:
 
 - flat `schema`, `schema-version`, `train-id`, and `train-version` fields
-- `release-authority` with the hub conductor, Release Please role, repository
-  workflow guardrails, and explicit train state
-- lockstep component versions
-- `expected-source-commit` for each component that receives a Release Please
-  publish dispatch
+- `release-authority` with the hub promotion role, Release Please role,
+  repository workflow guardrails, and explicit promotion state
+- Contracts line and SemVer range
+- exact released component versions, tags, assets, and supported Contracts
+  ranges
 - current protocol baselines
 - `capability-set` with schema-approved Runtime, Studio, marketplace, and
   Manual capability areas
@@ -78,21 +85,19 @@ Each manifest should use the Contracts release-train schema and include:
 - release-blocking and preview target tiers
 - `release-gates` with pending, passed, failed, or waived state
 
-The first v0 train is `0.43.0` with `train-id: "0.43"`.
-
 ## Release Gates
 
-A train is not complete when main branch CI is green. It is complete only when
-the manifest verifies all blocking gates:
+A promoted matrix is not complete when main branch CI is green. It is complete
+only when the manifest verifies all blocking gates:
 
-- Contracts npm package and Rust crate published at the train version.
-- Runtime blocking-tier binary assets published at the train version.
+- Contracts npm package and Rust crate published for the Contracts line.
+- Runtime blocking-tier binary assets published with supported Contracts line
+  evidence.
 - Runtime binary checksums recorded and verified.
-- SDK npm package published at the train version.
-- Studio web/desktop artifacts published at the train version and verified
-  against Runtime sidecars.
+- SDK npm package published with supported Contracts range evidence.
+- Studio web/desktop artifacts published and verified against Runtime sidecars.
 - Examples conformance tag or commit verifies against released artifacts.
-- Manual metadata and GitHub Pages deployment match the train.
+- Manual metadata and GitHub Pages deployment match the promoted matrix.
 
 Required asset, checksum, and smoke gates may list only release-blocking target
 artifacts. Preview-tier target evidence must stay visible in non-required gates,

@@ -24,7 +24,7 @@ skenion starts as a multi-repository project:
 
 | Repository | Role |
 | --- | --- |
-| `skenion` | Project hub, product release train conductor, architecture, RFCs, ADRs, roadmap, governance |
+| `skenion` | Project hub, compatibility matrix promotion, architecture, RFCs, ADRs, roadmap, governance |
 | `skenion-docs` | Human-readable model docs for data delivery, processing, and object semantics |
 | `skenion-contracts` | Protobuf, JSON Schema, OpenAPI, generated packages, conformance tests |
 | `skenion-runtime` | Rust native runtime and CLI |
@@ -50,12 +50,11 @@ See [Roadmap](docs/roadmap.md) for the initial implementation order.
   state treated only as a derived view model.
 - Use Protobuf + Buf as the live TS/Rust control contract.
 - Use JSON Schema for persisted graph/project documents.
-- Use lockstep product SemVer for v0 release trains. The hub repository owns
-  conductor state and train manifests; `skenion-ci` owns reusable workflow
-  implementation.
-- Use Release Please for v0 through conductor-dispatched release PRs with an
-  explicit `release-as`, starting with product train `0.43.0`
-  (`train-id: "0.43"`).
+- Use natural component releases for v0. Release Please owns repository-local
+  versions, changelogs, release PRs, tags, and GitHub Releases; the hub verifies
+  and promotes compatibility matrices instead of forcing equal product versions.
+- Treat Contracts `0.45` as the first compatibility-matrix line. Component
+  releases may be public but unpromoted until matrix verification passes.
 - Publish importable library packages to registries only: `@skenion/contracts`,
   `skenion-contracts`, and `@skenion/sdk`. Runtime binaries, Studio web/desktop
   builds, examples, Manual pages, and `skenion-ci` are release assets, tags,

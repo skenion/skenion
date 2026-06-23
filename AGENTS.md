@@ -7,19 +7,27 @@ repo milestone, issue state, and org Project item when the work is part of a
 release train. Do not treat moving an org Project item as release completion;
 the release matrix and artifact gates remain authoritative.
 
-skenion v0 uses lockstep product SemVer across releasable repositories and
-artifacts. If the product train is `0.55`, every package, crate, app, Runtime
-sidecar asset, examples release marker, and Manual release marker in that train
-must use the same product version, using registry-compatible SemVer such as
-`0.55.0` where required.
-The hub repository `skenion/skenion` owns product train conductor state,
-release manifests, release ordering, and completion reporting. The
-`skenion/skenion-ci` repository owns reusable workflow implementation.
-The first v0 train was product version `0.43.0` with `train-id: "0.43"`.
-Post-0.43 conductor defaults currently target product version `0.44.0` with
-`train-id: "0.44"`.
-Train releases follow Contracts -> Runtime -> SDK -> Studio -> Examples ->
-Docs.
+skenion v0 release state is coordinated through natural component releases plus
+a promoted compatibility matrix. Release Please owns each repository's natural
+version, changelog, release PR, tag, and GitHub Release flow. The hub repository
+`skenion/skenion` verifies and promotes compatibility matrices; it is not the
+component release conductor and must not dispatch Release Please with forced
+`release-as` train versions. The `skenion/skenion-ci` repository owns reusable
+workflow implementation.
+
+Component releases may be public before they are promoted as a product
+compatible set. A release is product-ready only after the compatibility matrix
+verifies the Contracts line/range, Contracts npm/crate versions, Runtime
+version/tag/assets/checksums, SDK package version and supported Contracts range,
+Studio web/desktop versions and Runtime sidecars, Docs Manual version/path,
+protocol baselines, capabilities, and Examples conformance evidence. The
+dangling 0.44 release state must not be repaired with tag surgery, forced train
+rewrites, or local publish compensation. Contracts 0.45 is the first
+compatibility-matrix line for the corrected model.
+Contracts v0 compatibility is rooted in the Contracts package/crate `0.minor`
+line, such as `>=0.45.0 <0.46.0` for line `0.45`; exact graph, project,
+extension, Runtime HTTP, and protocol discriminator fields remain exact
+current-version checks.
 
 skenion v0 does not support legacy, deprecated, or import-only compatibility
 paths. Unsupported graph, project, node, operation, extension, package,
@@ -31,10 +39,10 @@ Remove v0.2 as a separate surface and keep the current content under the `0.1`
 label. Do not preserve the old v0.1 meaning as legacy compatibility.
 
 Release and publish workflows must run through Release Please and GitHub
-Actions only. During v0, Release Please PRs are conductor-dispatched with an
-explicit `release-as` matching the train version. Independent automatic
-per-repository Release Please authority is stale. Publish registry packages
-only for importable libraries: `@skenion/contracts`, `skenion-contracts`, and
+Actions only. Release Please is repository-local release authority for
+version-file, changelog, tag, and GitHub Release preparation; the hub promotes
+only verified compatibility matrices. Publish registry packages only for
+importable libraries: `@skenion/contracts`, `skenion-contracts`, and
 `@skenion/sdk`. Runtime binaries, Studio builds, examples, Manual pages, and
 `skenion-ci` are release assets, tags, deployments, or workflow refs. Do not
 publish npm packages, crates, Runtime binaries, Studio packages, or Manual

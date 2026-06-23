@@ -148,8 +148,11 @@ Required checks:
 
 ## Contract Change Severity
 
-During v0, contract changes feed the lockstep product train version. They do
-not give `skenion-contracts` independent release authority outside the train.
+During v0, contract changes feed the Contracts package/crate compatibility
+line. Release Please owns the natural `skenion-contracts` release, and
+downstream components declare the supported Contracts `0.minor` range in the
+compatibility matrix. Contracts `0.45` is the first compatibility-matrix line
+for the corrected release model.
 
 Patch:
 
