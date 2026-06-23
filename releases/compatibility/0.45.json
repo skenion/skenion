@@ -274,27 +274,330 @@
         "status": "verified"
       },
       "web": {
-        "status": "pending",
-        "reason": "No verified web/static artifact or deployment evidence has been recorded for this matrix."
+        "status": "passed",
+        "kind": "static-web-bundle",
+        "name": "skenion-studio-web-bundle-v0.44.0.tar.gz",
+        "version": "0.44.0",
+        "source": {
+          "kind": "github-release-asset",
+          "repository": "skenion/skenion-studio",
+          "tag": "skenion-studio-v0.44.0",
+          "asset-name": "skenion-studio-web-bundle-v0.44.0.tar.gz",
+          "url": "https://github.com/skenion/skenion-studio/releases/download/skenion-studio-v0.44.0/skenion-studio-web-bundle-v0.44.0.tar.gz"
+        },
+        "checksum": {
+          "algorithm": "sha256",
+          "value": "d72b1c49b80bbd30fcab7ef644968de2b44ddef41abcff764a5e8c33e4b9be9d"
+        },
+        "size-bytes": 360631,
+        "evidence": {
+          "workflow": "Studio Release Artifacts",
+          "run-id": 28041151169,
+          "url": "https://github.com/skenion/skenion-studio/actions/runs/28041151169",
+          "status": "passed"
+        }
       },
-      "desktop-packages": [],
-      "runtime-sidecars": [],
-      "artifact-status": "pending",
-      "artifact-note": "The skenion-studio-v0.44.0 GitHub release exists, but GitHub reports no release assets."
+      "desktop-manifest": {
+        "status": "passed",
+        "kind": "desktop-manifest",
+        "name": "skenion-studio-desktop-manifest-v0.44.0.json",
+        "source": {
+          "kind": "github-release-asset",
+          "repository": "skenion/skenion-studio",
+          "tag": "skenion-studio-v0.44.0",
+          "asset-name": "skenion-studio-desktop-manifest-v0.44.0.json",
+          "url": "https://github.com/skenion/skenion-studio/releases/download/skenion-studio-v0.44.0/skenion-studio-desktop-manifest-v0.44.0.json"
+        },
+        "checksum": {
+          "algorithm": "sha256",
+          "value": "974bc464b1dee85ba43c849704fd7360f636de9e56623ab495a740a1d28c3c9a"
+        },
+        "size-bytes": 12027
+      },
+      "release-artifacts-checksum": {
+        "status": "passed",
+        "kind": "release-artifacts-checksum",
+        "name": "skenion-studio-release-artifacts-v0.44.0.sha256",
+        "source": {
+          "kind": "github-release-asset",
+          "repository": "skenion/skenion-studio",
+          "tag": "skenion-studio-v0.44.0",
+          "asset-name": "skenion-studio-release-artifacts-v0.44.0.sha256",
+          "url": "https://github.com/skenion/skenion-studio/releases/download/skenion-studio-v0.44.0/skenion-studio-release-artifacts-v0.44.0.sha256"
+        },
+        "checksum": {
+          "algorithm": "sha256",
+          "value": "042cfdebbed2946a52c5b7d3626ddee6b8945bd33b7a6f196c1b6eb8f53a8a18"
+        },
+        "size-bytes": 218
+      },
+      "desktop-packages": [
+        {
+          "id": "studio-aarch64-apple-darwin",
+          "target": "aarch64-apple-darwin",
+          "support-tier": "release-blocking",
+          "kind": "studio-desktop-package",
+          "name": "skenion-studio-aarch64-apple-darwin.tar.gz",
+          "version": "0.44.0",
+          "source": {
+            "kind": "github-release-asset",
+            "repository": "skenion/skenion-studio",
+            "tag": "skenion-studio-v0.44.0",
+            "asset-name": "skenion-studio-aarch64-apple-darwin.tar.gz",
+            "url": "https://github.com/skenion/skenion-studio/releases/download/skenion-studio-v0.44.0/skenion-studio-aarch64-apple-darwin.tar.gz"
+          },
+          "checksum": {
+            "algorithm": "sha256",
+            "value": "cdaf52c404ff416c957ae6acf202540f001108876e9b6debcd9308d2934dc278"
+          },
+          "size-bytes": 16001019,
+          "status": "passed"
+        },
+        {
+          "id": "studio-x86_64-apple-darwin",
+          "target": "x86_64-apple-darwin",
+          "support-tier": "release-blocking",
+          "kind": "studio-desktop-package",
+          "name": "skenion-studio-x86_64-apple-darwin.tar.gz",
+          "version": "0.44.0",
+          "source": {
+            "kind": "github-release-asset",
+            "repository": "skenion/skenion-studio",
+            "tag": "skenion-studio-v0.44.0",
+            "asset-name": "skenion-studio-x86_64-apple-darwin.tar.gz",
+            "url": "https://github.com/skenion/skenion-studio/releases/download/skenion-studio-v0.44.0/skenion-studio-x86_64-apple-darwin.tar.gz"
+          },
+          "checksum": {
+            "algorithm": "sha256",
+            "value": "f56119efeb04f48252e26d81648e94e7691b50525d47212a04a825feab9d900f"
+          },
+          "size-bytes": 16572172,
+          "status": "passed"
+        },
+        {
+          "id": "studio-x86_64-pc-windows-msvc",
+          "target": "x86_64-pc-windows-msvc",
+          "support-tier": "release-blocking",
+          "kind": "studio-desktop-package",
+          "name": "skenion-studio-x86_64-pc-windows-msvc.zip",
+          "version": "0.44.0",
+          "source": {
+            "kind": "github-release-asset",
+            "repository": "skenion/skenion-studio",
+            "tag": "skenion-studio-v0.44.0",
+            "asset-name": "skenion-studio-x86_64-pc-windows-msvc.zip",
+            "url": "https://github.com/skenion/skenion-studio/releases/download/skenion-studio-v0.44.0/skenion-studio-x86_64-pc-windows-msvc.zip"
+          },
+          "checksum": {
+            "algorithm": "sha256",
+            "value": "6c0207d1d29693a483ae1254c6e11547a67393dfacd51f4da97e3d00f3606b98"
+          },
+          "size-bytes": 13771102,
+          "status": "passed"
+        },
+        {
+          "id": "studio-x86_64-unknown-linux-gnu",
+          "target": "x86_64-unknown-linux-gnu",
+          "support-tier": "release-blocking",
+          "kind": "studio-desktop-package",
+          "name": "skenion-studio-x86_64-unknown-linux-gnu.tar.gz",
+          "version": "0.44.0",
+          "source": {
+            "kind": "github-release-asset",
+            "repository": "skenion/skenion-studio",
+            "tag": "skenion-studio-v0.44.0",
+            "asset-name": "skenion-studio-x86_64-unknown-linux-gnu.tar.gz",
+            "url": "https://github.com/skenion/skenion-studio/releases/download/skenion-studio-v0.44.0/skenion-studio-x86_64-unknown-linux-gnu.tar.gz"
+          },
+          "checksum": {
+            "algorithm": "sha256",
+            "value": "dab5d78d4a0fc58392610a70d96234d07f605f63c8f6d465005ca6420fb819f7"
+          },
+          "size-bytes": 20045867,
+          "status": "passed"
+        },
+        {
+          "id": "studio-aarch64-pc-windows-msvc",
+          "target": "aarch64-pc-windows-msvc",
+          "support-tier": "preview",
+          "kind": "studio-desktop-package",
+          "name": "skenion-studio-aarch64-pc-windows-msvc.zip",
+          "version": "0.44.0",
+          "source": {
+            "kind": "github-release-asset",
+            "repository": "skenion/skenion-studio",
+            "tag": "skenion-studio-v0.44.0",
+            "asset-name": "skenion-studio-aarch64-pc-windows-msvc.zip",
+            "url": "https://github.com/skenion/skenion-studio/releases/download/skenion-studio-v0.44.0/skenion-studio-aarch64-pc-windows-msvc.zip"
+          },
+          "checksum": {
+            "algorithm": "sha256",
+            "value": "28c971b8fa1cbc84344d1fefb3970252507ce2e5ed9df39e240b5941752b0a52"
+          },
+          "size-bytes": 12653616,
+          "status": "passed"
+        },
+        {
+          "id": "studio-aarch64-unknown-linux-gnu",
+          "target": "aarch64-unknown-linux-gnu",
+          "support-tier": "preview",
+          "kind": "studio-desktop-package",
+          "name": "skenion-studio-aarch64-unknown-linux-gnu.tar.gz",
+          "version": "0.44.0",
+          "source": {
+            "kind": "github-release-asset",
+            "repository": "skenion/skenion-studio",
+            "tag": "skenion-studio-v0.44.0",
+            "asset-name": "skenion-studio-aarch64-unknown-linux-gnu.tar.gz",
+            "url": "https://github.com/skenion/skenion-studio/releases/download/skenion-studio-v0.44.0/skenion-studio-aarch64-unknown-linux-gnu.tar.gz"
+          },
+          "checksum": {
+            "algorithm": "sha256",
+            "value": "3acae7e696f4d6d92f8d120575cd9937cbc39e7535322e71a89cabbab6741820"
+          },
+          "size-bytes": 19910507,
+          "status": "passed"
+        }
+      ],
+      "runtime-sidecars": [
+        {
+          "id": "runtime-sidecar-aarch64-apple-darwin",
+          "target": "aarch64-apple-darwin",
+          "support-tier": "release-blocking",
+          "kind": "runtime-sidecar",
+          "name": "skenion-runtime-sidecar-aarch64-apple-darwin.tar.gz",
+          "source": {
+            "kind": "github-release-asset",
+            "repository": "skenion/skenion-studio",
+            "tag": "skenion-studio-v0.44.0",
+            "asset-name": "skenion-runtime-sidecar-aarch64-apple-darwin.tar.gz",
+            "url": "https://github.com/skenion/skenion-studio/releases/download/skenion-studio-v0.44.0/skenion-runtime-sidecar-aarch64-apple-darwin.tar.gz"
+          },
+          "checksum": {
+            "algorithm": "sha256",
+            "value": "467aaab089b28b2bc9f4bca7ecf3383baec5ebdeb7e39f3392f2da60ebb19a45"
+          },
+          "size-bytes": 4691645,
+          "status": "passed"
+        },
+        {
+          "id": "runtime-sidecar-x86_64-apple-darwin",
+          "target": "x86_64-apple-darwin",
+          "support-tier": "release-blocking",
+          "kind": "runtime-sidecar",
+          "name": "skenion-runtime-sidecar-x86_64-apple-darwin.tar.gz",
+          "source": {
+            "kind": "github-release-asset",
+            "repository": "skenion/skenion-studio",
+            "tag": "skenion-studio-v0.44.0",
+            "asset-name": "skenion-runtime-sidecar-x86_64-apple-darwin.tar.gz",
+            "url": "https://github.com/skenion/skenion-studio/releases/download/skenion-studio-v0.44.0/skenion-runtime-sidecar-x86_64-apple-darwin.tar.gz"
+          },
+          "checksum": {
+            "algorithm": "sha256",
+            "value": "389d84f5a2583f310902db542936dc3f2480f9abc77aaca2d041cf7c03bd4dc5"
+          },
+          "size-bytes": 4901412,
+          "status": "passed"
+        },
+        {
+          "id": "runtime-sidecar-x86_64-pc-windows-msvc",
+          "target": "x86_64-pc-windows-msvc",
+          "support-tier": "release-blocking",
+          "kind": "runtime-sidecar",
+          "name": "skenion-runtime-sidecar-x86_64-pc-windows-msvc.zip",
+          "source": {
+            "kind": "github-release-asset",
+            "repository": "skenion/skenion-studio",
+            "tag": "skenion-studio-v0.44.0",
+            "asset-name": "skenion-runtime-sidecar-x86_64-pc-windows-msvc.zip",
+            "url": "https://github.com/skenion/skenion-studio/releases/download/skenion-studio-v0.44.0/skenion-runtime-sidecar-x86_64-pc-windows-msvc.zip"
+          },
+          "checksum": {
+            "algorithm": "sha256",
+            "value": "43d0f1f6fd89a5e307698ef77d61f5c46e1c651d9748794e2399a4937e3d7ee6"
+          },
+          "size-bytes": 5266312,
+          "status": "passed"
+        },
+        {
+          "id": "runtime-sidecar-x86_64-unknown-linux-gnu",
+          "target": "x86_64-unknown-linux-gnu",
+          "support-tier": "release-blocking",
+          "kind": "runtime-sidecar",
+          "name": "skenion-runtime-sidecar-x86_64-unknown-linux-gnu.tar.gz",
+          "source": {
+            "kind": "github-release-asset",
+            "repository": "skenion/skenion-studio",
+            "tag": "skenion-studio-v0.44.0",
+            "asset-name": "skenion-runtime-sidecar-x86_64-unknown-linux-gnu.tar.gz",
+            "url": "https://github.com/skenion/skenion-studio/releases/download/skenion-studio-v0.44.0/skenion-runtime-sidecar-x86_64-unknown-linux-gnu.tar.gz"
+          },
+          "checksum": {
+            "algorithm": "sha256",
+            "value": "83e70216a597778195dbf0752e89ddf37b2afd6b1e8065fa3fb8eb78886638b6"
+          },
+          "size-bytes": 6566753,
+          "status": "passed"
+        },
+        {
+          "id": "runtime-sidecar-aarch64-pc-windows-msvc",
+          "target": "aarch64-pc-windows-msvc",
+          "support-tier": "preview",
+          "kind": "runtime-sidecar",
+          "name": "skenion-runtime-sidecar-aarch64-pc-windows-msvc.zip",
+          "source": {
+            "kind": "github-release-asset",
+            "repository": "skenion/skenion-studio",
+            "tag": "skenion-studio-v0.44.0",
+            "asset-name": "skenion-runtime-sidecar-aarch64-pc-windows-msvc.zip",
+            "url": "https://github.com/skenion/skenion-studio/releases/download/skenion-studio-v0.44.0/skenion-runtime-sidecar-aarch64-pc-windows-msvc.zip"
+          },
+          "checksum": {
+            "algorithm": "sha256",
+            "value": "931d08cf52d4b6851572b13b2272e30142260cefd99e918f6a83528aeba3cd74"
+          },
+          "size-bytes": 4971502,
+          "status": "passed"
+        },
+        {
+          "id": "runtime-sidecar-aarch64-unknown-linux-gnu",
+          "target": "aarch64-unknown-linux-gnu",
+          "support-tier": "preview",
+          "kind": "runtime-sidecar",
+          "name": "skenion-runtime-sidecar-aarch64-unknown-linux-gnu.tar.gz",
+          "source": {
+            "kind": "github-release-asset",
+            "repository": "skenion/skenion-studio",
+            "tag": "skenion-studio-v0.44.0",
+            "asset-name": "skenion-runtime-sidecar-aarch64-unknown-linux-gnu.tar.gz",
+            "url": "https://github.com/skenion/skenion-studio/releases/download/skenion-studio-v0.44.0/skenion-runtime-sidecar-aarch64-unknown-linux-gnu.tar.gz"
+          },
+          "checksum": {
+            "algorithm": "sha256",
+            "value": "f4518bf9244689226d1a99fcf408dbb1a11915b6f9fc1a55dae75af77be53e06"
+          },
+          "size-bytes": 6516659,
+          "status": "passed"
+        }
+      ],
+      "artifact-status": "passed",
+      "artifact-note": "Studio web, desktop package, runtime sidecar, desktop manifest, and release checksum assets are recorded from the skenion-studio-v0.44.0 GitHub release. Desktop packages are unsigned internal-preview desktop artifacts only; no macOS notarization or Windows Authenticode/public release completion is claimed."
     },
     "examples": {
       "repository": "skenion/skenion-examples",
       "ref": "main",
-      "commit": "1f1dd16cd9c7456be7da8f31ae71563ae12337a3",
-      "commit-url": "https://github.com/skenion/skenion-examples/commit/1f1dd16cd9c7456be7da8f31ae71563ae12337a3",
+      "commit": "ee58ed8960d675ed11edc56b5f22e404789caf82",
+      "commit-url": "https://github.com/skenion/skenion-examples/commit/ee58ed8960d675ed11edc56b5f22e404789caf82",
       "ci": {
         "status": "passed",
+        "workflow": "CI",
         "check": "examples",
-        "url": "https://github.com/skenion/skenion-examples/actions/runs/28035361306/job/82987097709"
+        "url": "https://github.com/skenion/skenion-examples/actions/runs/28041883226/job/83009946984"
       },
       "conformance": {
         "status": "pending",
-        "reason": "Main commit CI passed, but conformance against the released compatibility matrix artifacts has not been promoted."
+        "reason": "Main commit CI passed; released-artifact conformance must be rerun against this updated matrix ref."
       }
     },
     "docs": {
@@ -304,12 +607,12 @@
         "pages-url": "https://skenion.github.io/skenion-docs/",
         "source": {
           "repository": "skenion/skenion-docs",
-          "commit": "23e12e7ed9321f8060e2e5619e991cd405fab4b6",
-          "commit-url": "https://github.com/skenion/skenion-docs/commit/23e12e7ed9321f8060e2e5619e991cd405fab4b6",
+          "commit": "3eab4f7f78b375e3a784a226f03188ced4138071",
+          "commit-url": "https://github.com/skenion/skenion-docs/commit/3eab4f7f78b375e3a784a226f03188ced4138071",
           "ci": {
             "status": "passed",
             "workflow": "CI",
-            "url": "https://github.com/skenion/skenion-docs/actions/runs/28037170218"
+            "url": "https://github.com/skenion/skenion-docs/actions/runs/28041783199"
           }
         },
         "pages-status": "pending",
@@ -330,8 +633,14 @@
       ]
     },
     "artifacts-collected": {
-      "status": "pending",
-      "reason": "Studio web/desktop artifacts and docs deployment evidence are not yet collected."
+      "status": "passed",
+      "evidence": [
+        "skenion-studio-web-bundle-v0.44.0.tar.gz",
+        "skenion-studio-desktop-manifest-v0.44.0.json",
+        "skenion-studio-release-artifacts-v0.44.0.sha256",
+        "six Studio desktop packages",
+        "six Runtime sidecar packages"
+      ]
     },
     "checksums-verified": {
       "status": "pending",
@@ -364,12 +673,22 @@
       "required": true
     },
     "studio-web": {
-      "status": "pending",
-      "required": true
+      "status": "passed",
+      "required": true,
+      "evidence": [
+        "https://github.com/skenion/skenion-studio/actions/runs/28041151169",
+        "https://github.com/skenion/skenion-studio/releases/download/skenion-studio-v0.44.0/skenion-studio-web-bundle-v0.44.0.tar.gz"
+      ]
     },
     "studio-desktop": {
-      "status": "pending",
-      "required": true
+      "status": "passed",
+      "required": true,
+      "evidence": [
+        "https://github.com/skenion/skenion-studio/actions/runs/28042729246",
+        "https://github.com/skenion/skenion-studio/releases/download/skenion-studio-v0.44.0/skenion-studio-desktop-manifest-v0.44.0.json",
+        "https://github.com/skenion/skenion-studio/releases/download/skenion-studio-v0.44.0/skenion-studio-release-artifacts-v0.44.0.sha256",
+        "unsigned internal-preview desktop artifacts only; no macOS notarization or Windows Authenticode/public release completion is claimed"
+      ]
     },
     "examples-conformance": {
       "status": "pending",
