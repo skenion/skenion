@@ -25,8 +25,9 @@ This supersedes the prior policy that repository versions were independent
 SemVer streams and that v0 could keep legacy import, migration, default-alias,
 or deprecated compatibility paths.
 
-The first v0 train defaults to product version `0.43.0` with
-`train-id: "0.43"`.
+The first v0 train was product version `0.43.0` with `train-id: "0.43"`.
+Post-0.43 release work should use the next checked-in draft train manifest;
+the conductor default currently points at `0.44.0` with `train-id: "0.44"`.
 
 ## Product Release Train
 
