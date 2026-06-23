@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="assets/brand/skenion-logo-marketing.svg" alt="skenion" width="180" />
+</p>
+
 # skenion
 
 skenion is an open-source interactive artwork platform.
