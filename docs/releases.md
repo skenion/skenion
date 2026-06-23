@@ -26,7 +26,7 @@ SemVer streams and that v0 could keep legacy import, migration, default-alias,
 or deprecated compatibility paths.
 
 The first v0 train defaults to product version `0.43.0` with
-`trainId: "0.43"`.
+`train-id: "0.43"`.
 
 ## Product Release Train
 
@@ -42,7 +42,7 @@ record:
 - Examples tag or commit used for conformance
 - Manual version and GitHub Pages deployment
 - exact graph, node, runtime-wire, extension, and manifest protocol baselines
-- `capabilitySet` covering protocol surfaces plus required Runtime, Studio,
+- `capability-set` covering protocol surfaces plus required Runtime, Studio,
   package/marketplace, and Manual capabilities
 
 `skenion/skenion` is the conductor and product state owner. It owns train

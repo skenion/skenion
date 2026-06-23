@@ -51,7 +51,7 @@ See [Roadmap](docs/roadmap.md) for the initial implementation order.
   implementation.
 - Use Release Please for v0 through conductor-dispatched release PRs with an
   explicit `release-as`, starting with product train `0.43.0`
-  (`trainId: "0.43"`).
+  (`train-id: "0.43"`).
 - Publish importable library packages to registries only: `@skenion/contracts`,
   `skenion-contracts`, and `@skenion/sdk`. Runtime binaries, Studio web/desktop
   builds, examples, Manual pages, and `skenion-ci` are release assets, tags,
