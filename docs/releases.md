@@ -227,6 +227,9 @@ jobs:
 Publish workflows should use minimal permissions and GitHub environments for
 manual approval where appropriate.
 
-The hub conductor workflow may prepare and validate a train locally before
-`skenion-ci@v1` exists. Publish and verification modes should call the pinned
-workflow library once the corresponding `@v1` reusable workflows are available.
+The hub conductor workflow is pinned to `skenion/skenion-ci@v1` for manifest
+validation, Release Please dispatch, and artifact verification. It checks that
+the tag exposes the current kebab-case release-train validator before
+dispatching. If `@v1` is missing or still points at an older manifest surface,
+the conductor must fail clearly instead of falling back to `main`, sibling
+branches, or an unpinned workflow ref.

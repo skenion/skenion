@@ -8,3 +8,8 @@ build/
 .env
 .env.*
 !.env.example
+
+# Generated release-train validation output
+.skenion-train/
+.skenion-ci/
+.caller/

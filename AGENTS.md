@@ -15,7 +15,7 @@ must use the same product version, using registry-compatible SemVer such as
 The hub repository `skenion/skenion` owns product train conductor state,
 release manifests, release ordering, and completion reporting. The
 `skenion/skenion-ci` repository owns reusable workflow implementation.
-The first v0 train default is product version `0.43.0` with `trainId: "0.43"`.
+The first v0 train default is product version `0.43.0` with `train-id: "0.43"`.
 Train releases follow Contracts -> Runtime -> SDK -> Studio -> Examples ->
 Docs.
 
