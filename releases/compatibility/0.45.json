@@ -273,9 +273,10 @@
         "published-at": "2026-06-23T14:51:09Z",
         "status": "verified"
       },
-      "web": {
+      "web-bundle": {
+        "id": "studio-web-bundle",
         "status": "passed",
-        "kind": "static-web-bundle",
+        "kind": "studio-web-bundle",
         "name": "skenion-studio-web-bundle-v0.44.0.tar.gz",
         "version": "0.44.0",
         "source": {
@@ -464,8 +465,9 @@
           "id": "runtime-sidecar-aarch64-apple-darwin",
           "target": "aarch64-apple-darwin",
           "support-tier": "release-blocking",
-          "kind": "runtime-sidecar",
+          "kind": "studio-runtime-sidecar",
           "name": "skenion-runtime-sidecar-aarch64-apple-darwin.tar.gz",
+          "version": "0.44.0",
           "source": {
             "kind": "github-release-asset",
             "repository": "skenion/skenion-studio",
@@ -484,8 +486,9 @@
           "id": "runtime-sidecar-x86_64-apple-darwin",
           "target": "x86_64-apple-darwin",
           "support-tier": "release-blocking",
-          "kind": "runtime-sidecar",
+          "kind": "studio-runtime-sidecar",
           "name": "skenion-runtime-sidecar-x86_64-apple-darwin.tar.gz",
+          "version": "0.44.0",
           "source": {
             "kind": "github-release-asset",
             "repository": "skenion/skenion-studio",
@@ -504,8 +507,9 @@
           "id": "runtime-sidecar-x86_64-pc-windows-msvc",
           "target": "x86_64-pc-windows-msvc",
           "support-tier": "release-blocking",
-          "kind": "runtime-sidecar",
+          "kind": "studio-runtime-sidecar",
           "name": "skenion-runtime-sidecar-x86_64-pc-windows-msvc.zip",
+          "version": "0.44.0",
           "source": {
             "kind": "github-release-asset",
             "repository": "skenion/skenion-studio",
@@ -524,8 +528,9 @@
           "id": "runtime-sidecar-x86_64-unknown-linux-gnu",
           "target": "x86_64-unknown-linux-gnu",
           "support-tier": "release-blocking",
-          "kind": "runtime-sidecar",
+          "kind": "studio-runtime-sidecar",
           "name": "skenion-runtime-sidecar-x86_64-unknown-linux-gnu.tar.gz",
+          "version": "0.44.0",
           "source": {
             "kind": "github-release-asset",
             "repository": "skenion/skenion-studio",
@@ -544,8 +549,9 @@
           "id": "runtime-sidecar-aarch64-pc-windows-msvc",
           "target": "aarch64-pc-windows-msvc",
           "support-tier": "preview",
-          "kind": "runtime-sidecar",
+          "kind": "studio-runtime-sidecar",
           "name": "skenion-runtime-sidecar-aarch64-pc-windows-msvc.zip",
+          "version": "0.44.0",
           "source": {
             "kind": "github-release-asset",
             "repository": "skenion/skenion-studio",
@@ -564,8 +570,9 @@
           "id": "runtime-sidecar-aarch64-unknown-linux-gnu",
           "target": "aarch64-unknown-linux-gnu",
           "support-tier": "preview",
-          "kind": "runtime-sidecar",
+          "kind": "studio-runtime-sidecar",
           "name": "skenion-runtime-sidecar-aarch64-unknown-linux-gnu.tar.gz",
+          "version": "0.44.0",
           "source": {
             "kind": "github-release-asset",
             "repository": "skenion/skenion-studio",
