@@ -2,9 +2,9 @@
   "schema": "skenion.compatibility-matrix",
   "schema-version": "0.1.0",
   "id": "contracts-0.45",
-  "status": "promotion-candidate",
-  "promoted": false,
-  "promotion-state": "promotion-candidate",
+  "status": "promoted",
+  "promoted": true,
+  "promotion-state": "promoted",
   "contracts-line": "0.45",
   "contracts-range": ">=0.45.0 <0.46.0",
   "owner-repository": "skenion/skenion",
@@ -634,10 +634,28 @@
             "url": "https://github.com/skenion/skenion-docs/actions/runs/28041783199"
           }
         },
-        "pages-status": "pending",
-        "pages-deployed": false,
-        "promoted": false,
-        "reason": "GitHub Pages deployment evidence is pending."
+        "pages-status": "passed",
+        "pages-deployed": true,
+        "promoted": true,
+        "deployment": {
+          "status": "passed",
+          "workflow": "Deploy Manual Pages",
+          "run-id": 28045953183,
+          "run-url": "https://github.com/skenion/skenion-docs/actions/runs/28045953183",
+          "run-conclusion": "success",
+          "docs-head-sha": "3eab4f7f78b375e3a784a226f03188ced4138071",
+          "manifest-ref": "71450c8e4cc4209db698c8ca5206c06fa1a1c71d",
+          "resolve-job-url": "https://github.com/skenion/skenion-docs/actions/runs/28045953183/job/83023985315",
+          "matrix-verifier-job-url": "https://github.com/skenion/skenion-docs/actions/runs/28045953183/job/83024022118",
+          "build-manual-job-url": "https://github.com/skenion/skenion-docs/actions/runs/28045953183/job/83024072025",
+          "deploy-pages-job-url": "https://github.com/skenion/skenion-docs/actions/runs/28045953183/job/83024257957",
+          "github-pages-deployment-id": 5170238289,
+          "pages-url": "https://skenion.github.io/skenion-docs/manual/0.45/",
+          "http-status": 200,
+          "created-at": "2026-06-23T17:55:56Z",
+          "updated-at": "2026-06-23T17:57:36Z"
+        },
+        "reason": "GitHub Pages deployment passed and https://skenion.github.io/skenion-docs/manual/0.45/ returned HTTP 200."
       }
     }
   },
@@ -662,20 +680,32 @@
       ]
     },
     "checksums-verified": {
-      "status": "pending",
-      "reason": "Runtime asset checksums are recorded; full matrix verification must run through the hub workflow with GH_TOKEN before promotion."
+      "status": "passed",
+      "evidence": [
+        "Hub compatibility matrix verifier passed with GH_TOKEN for the promoted matrix."
+      ]
     },
     "examples-conform": {
-      "status": "pending",
-      "reason": "Examples main CI passed, but released-artifact conformance is not promoted."
+      "status": "passed",
+      "evidence": [
+        "https://github.com/skenion/skenion-examples/actions/runs/28045363706",
+        "https://github.com/skenion/skenion-examples/actions/runs/28045363706/job/83021917258"
+      ]
     },
     "docs-deployed": {
-      "status": "pending",
-      "reason": "Manual Pages deployment for the 0.45 matrix is pending."
+      "status": "passed",
+      "evidence": [
+        "https://github.com/skenion/skenion-docs/actions/runs/28045953183",
+        "https://github.com/skenion/skenion-docs/actions/runs/28045953183/job/83024257957",
+        "https://skenion.github.io/skenion-docs/manual/0.45/"
+      ]
     },
     "promoted": {
-      "status": "pending",
-      "reason": "The matrix remains draft/unpromoted until all release-blocking gates pass."
+      "status": "passed",
+      "evidence": [
+        "All required release gates are passed for Contracts line 0.45.",
+        "Manual Pages deployment evidence is recorded."
+      ]
     }
   },
   "release-gates": {
@@ -725,12 +755,26 @@
       ]
     },
     "docs-pages-deployment": {
-      "status": "pending",
+      "status": "passed",
       "required": true,
       "id": "docs-pages-deployment",
       "manual-version": "0.45.0",
       "manual-path": "/manual/0.45/",
-      "pages-url": "https://skenion.github.io/skenion-docs/manual/0.45/"
+      "pages-url": "https://skenion.github.io/skenion-docs/manual/0.45/",
+      "evidence-url": "https://github.com/skenion/skenion-docs/actions/runs/28045953183",
+      "evidence": [
+        "https://github.com/skenion/skenion-docs/actions/runs/28045953183",
+        "https://github.com/skenion/skenion-docs/actions/runs/28045953183/job/83023985315",
+        "https://github.com/skenion/skenion-docs/actions/runs/28045953183/job/83024022118",
+        "https://github.com/skenion/skenion-docs/actions/runs/28045953183/job/83024072025",
+        "https://github.com/skenion/skenion-docs/actions/runs/28045953183/job/83024257957",
+        "https://skenion.github.io/skenion-docs/manual/0.45/"
+      ],
+      "deployment-id": 5170238289,
+      "manifest-ref": "71450c8e4cc4209db698c8ca5206c06fa1a1c71d",
+      "docs-head-sha": "3eab4f7f78b375e3a784a226f03188ced4138071",
+      "created-at": "2026-06-23T17:55:56Z",
+      "updated-at": "2026-06-23T17:57:36Z"
     }
   }
 }
