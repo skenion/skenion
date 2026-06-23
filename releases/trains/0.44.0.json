@@ -3,6 +3,45 @@
   "schema-version": "0.1.0",
   "train-id": "0.44",
   "train-version": "0.44.0",
+  "release-authority": {
+    "model": "hub-conductor-manifest",
+    "owner-repository": "skenion/skenion",
+    "conductor-workflow": ".github/workflows/release-train.yml",
+    "tracking-issue": "skenion/skenion#60",
+    "release-please": {
+      "role": "prepare-release-pr",
+      "independent-train-authority": false,
+      "may-publish-tags": false,
+      "may-publish-github-releases": false,
+      "may-publish-artifacts": false,
+      "may-publish-registry-packages": false
+    },
+    "repository-workflows": {
+      "require-conductor-dispatch": true,
+      "require-manifest-row": true,
+      "require-expected-source-commit": true
+    },
+    "state-order": [
+      "prepared_pr",
+      "merged_release_commit",
+      "tag_exists",
+      "github_release_exists",
+      "artifacts_uploaded",
+      "registry_package_exists",
+      "docs_deployed",
+      "verified"
+    ],
+    "state": {
+      "prepared_pr": "pending",
+      "merged_release_commit": "pending",
+      "tag_exists": "pending",
+      "github_release_exists": "pending",
+      "artifacts_uploaded": "pending",
+      "registry_package_exists": "pending",
+      "docs_deployed": "pending",
+      "verified": "pending"
+    }
+  },
   "protocol-baselines": {
     "graph": "0.1",
     "project": "0.1",
@@ -62,6 +101,7 @@
   },
   "components": {
     "contracts": {
+      "expected-source-commit": "81805f83e6dfa6d23d86a277a0abd144abd8e3b5",
       "npm": {
         "ecosystem": "npm",
         "name": "@skenion/contracts",
@@ -76,6 +116,7 @@
       }
     },
     "runtime": {
+      "expected-source-commit": "2b1691e73a3ebd47d15d48ae7fbbf30c0fe21e97",
       "binaries": {
         "aarch64-apple-darwin": {
           "id": "runtime-aarch64-apple-darwin",
@@ -200,6 +241,7 @@
       }
     },
     "sdk": {
+      "expected-source-commit": "e3c6908724adaad8689ee663fe619c9f0366a595",
       "npm": {
         "ecosystem": "npm",
         "name": "@skenion/sdk",
@@ -208,6 +250,7 @@
       }
     },
     "studio": {
+      "expected-source-commit": "a4b09db4bf4965944b0b9dc1ade013606e76f377",
       "desktop-packages": {
         "aarch64-apple-darwin": {
           "id": "studio-desktop-aarch64-apple-darwin",
@@ -535,9 +578,7 @@
           "runtime-aarch64-apple-darwin",
           "runtime-x86_64-apple-darwin",
           "runtime-x86_64-pc-windows-msvc",
-          "runtime-aarch64-pc-windows-msvc",
-          "runtime-x86_64-unknown-linux-gnu",
-          "runtime-aarch64-unknown-linux-gnu"
+          "runtime-x86_64-unknown-linux-gnu"
         ],
         "evidence-url": null
       },
@@ -551,17 +592,39 @@
           "studio-desktop-aarch64-apple-darwin",
           "studio-desktop-x86_64-apple-darwin",
           "studio-desktop-x86_64-pc-windows-msvc",
-          "studio-desktop-aarch64-pc-windows-msvc",
           "studio-desktop-x86_64-unknown-linux-gnu",
-          "studio-desktop-aarch64-unknown-linux-gnu",
           "studio-web-bundle",
           "studio-runtime-sidecar-aarch64-apple-darwin",
           "studio-runtime-sidecar-x86_64-apple-darwin",
           "studio-runtime-sidecar-x86_64-pc-windows-msvc",
-          "studio-runtime-sidecar-aarch64-pc-windows-msvc",
-          "studio-runtime-sidecar-x86_64-unknown-linux-gnu",
-          "studio-runtime-sidecar-aarch64-unknown-linux-gnu"
+          "studio-runtime-sidecar-x86_64-unknown-linux-gnu"
         ]
+      },
+      "runtime-preview": {
+        "id": "runtime-preview-release-assets",
+        "status": "pending",
+        "required": false,
+        "repository": "skenion/skenion-runtime",
+        "tag": "skenion-runtime-v0.44.0",
+        "artifact-ids": [
+          "runtime-aarch64-pc-windows-msvc",
+          "runtime-aarch64-unknown-linux-gnu"
+        ],
+        "evidence-url": null
+      },
+      "studio-preview": {
+        "id": "studio-preview-release-assets",
+        "status": "pending",
+        "required": false,
+        "repository": "skenion/skenion-studio",
+        "tag": "skenion-studio-v0.44.0",
+        "artifact-ids": [
+          "studio-desktop-aarch64-pc-windows-msvc",
+          "studio-desktop-aarch64-unknown-linux-gnu",
+          "studio-runtime-sidecar-aarch64-pc-windows-msvc",
+          "studio-runtime-sidecar-aarch64-unknown-linux-gnu"
+        ],
+        "evidence-url": null
       }
     },
     "checksum-verification": {
@@ -572,22 +635,16 @@
         "runtime-aarch64-apple-darwin",
         "runtime-x86_64-apple-darwin",
         "runtime-x86_64-pc-windows-msvc",
-        "runtime-aarch64-pc-windows-msvc",
         "runtime-x86_64-unknown-linux-gnu",
-        "runtime-aarch64-unknown-linux-gnu",
         "studio-desktop-aarch64-apple-darwin",
         "studio-desktop-x86_64-apple-darwin",
         "studio-desktop-x86_64-pc-windows-msvc",
-        "studio-desktop-aarch64-pc-windows-msvc",
         "studio-desktop-x86_64-unknown-linux-gnu",
-        "studio-desktop-aarch64-unknown-linux-gnu",
         "studio-web-bundle",
         "studio-runtime-sidecar-aarch64-apple-darwin",
         "studio-runtime-sidecar-x86_64-apple-darwin",
         "studio-runtime-sidecar-x86_64-pc-windows-msvc",
-        "studio-runtime-sidecar-aarch64-pc-windows-msvc",
-        "studio-runtime-sidecar-x86_64-unknown-linux-gnu",
-        "studio-runtime-sidecar-aarch64-unknown-linux-gnu"
+        "studio-runtime-sidecar-x86_64-unknown-linux-gnu"
       ],
       "expected-checksums": {
         "runtime-aarch64-apple-darwin": {
@@ -602,15 +659,7 @@
           "algorithm": "sha256",
           "value": null
         },
-        "runtime-aarch64-pc-windows-msvc": {
-          "algorithm": "sha256",
-          "value": null
-        },
         "runtime-x86_64-unknown-linux-gnu": {
-          "algorithm": "sha256",
-          "value": null
-        },
-        "runtime-aarch64-unknown-linux-gnu": {
           "algorithm": "sha256",
           "value": null
         }
@@ -645,7 +694,7 @@
       "aarch64-pc-windows-msvc": {
         "id": "runtime-smoke-aarch64-pc-windows-msvc",
         "status": "pending",
-        "required": true,
+        "required": false,
         "target": "aarch64-pc-windows-msvc",
         "artifact-id": "runtime-aarch64-pc-windows-msvc",
         "evidence-url": null
@@ -661,7 +710,7 @@
       "aarch64-unknown-linux-gnu": {
         "id": "runtime-smoke-aarch64-unknown-linux-gnu",
         "status": "pending",
-        "required": true,
+        "required": false,
         "target": "aarch64-unknown-linux-gnu",
         "artifact-id": "runtime-aarch64-unknown-linux-gnu",
         "evidence-url": null
@@ -698,7 +747,7 @@
       "aarch64-pc-windows-msvc": {
         "id": "studio-smoke-aarch64-pc-windows-msvc",
         "status": "pending",
-        "required": true,
+        "required": false,
         "target": "aarch64-pc-windows-msvc",
         "desktop-package-artifact-id": "studio-desktop-aarch64-pc-windows-msvc",
         "runtime-sidecar-artifact-id": "studio-runtime-sidecar-aarch64-pc-windows-msvc",
@@ -716,7 +765,7 @@
       "aarch64-unknown-linux-gnu": {
         "id": "studio-smoke-aarch64-unknown-linux-gnu",
         "status": "pending",
-        "required": true,
+        "required": false,
         "target": "aarch64-unknown-linux-gnu",
         "desktop-package-artifact-id": "studio-desktop-aarch64-unknown-linux-gnu",
         "runtime-sidecar-artifact-id": "studio-runtime-sidecar-aarch64-unknown-linux-gnu",
@@ -738,6 +787,30 @@
       "manual-version": "0.44.0",
       "manual-path": "/manual/0.44/",
       "pages-url": "https://skenion.github.io/skenion-docs/manual/0.44/"
+    },
+    "preview-checksum-verification": {
+      "id": "preview-artifact-checksums",
+      "status": "pending",
+      "required": false,
+      "artifact-ids": [
+        "runtime-aarch64-pc-windows-msvc",
+        "runtime-aarch64-unknown-linux-gnu",
+        "studio-desktop-aarch64-pc-windows-msvc",
+        "studio-desktop-aarch64-unknown-linux-gnu",
+        "studio-runtime-sidecar-aarch64-pc-windows-msvc",
+        "studio-runtime-sidecar-aarch64-unknown-linux-gnu"
+      ],
+      "expected-checksums": {
+        "runtime-aarch64-pc-windows-msvc": {
+          "algorithm": "sha256",
+          "value": null
+        },
+        "runtime-aarch64-unknown-linux-gnu": {
+          "algorithm": "sha256",
+          "value": null
+        }
+      },
+      "evidence-url": null
     }
   }
 }

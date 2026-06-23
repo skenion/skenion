@@ -52,6 +52,25 @@ state, and completion reporting. `skenion/skenion-ci` owns reusable
 workflow implementation and should expose pinned `workflow_call` entrypoints
 for conductor use.
 
+The checked-in train manifest plus the hub conductor workflow is the product
+release authority. Every manifest must make this state machine explicit:
+
+```text
+prepared_pr -> merged_release_commit -> tag_exists -> github_release_exists -> artifacts_uploaded -> registry_package_exists -> docs_deployed -> verified
+```
+
+Repository release workflows execute conductor-dispatched steps against the
+manifest row for their component and the expected source commit. A repository
+workflow may produce the tag, GitHub release, registry package, artifact, or
+deployment for that component only as evidence for the manifest state; it does
+not own the product train state.
+
+The authority state must move monotonically. A later state cannot be marked
+`passed` while an earlier state is `pending` or `failed`; any `waived` authority
+state needs a matching waiver record with a reason, approver, and timestamp.
+`verified: passed` is valid only when every required release gate is `passed` or
+explicitly `waived`.
+
 Do not close a product release milestone unless every releasable repository and
 artifact in the train has published the same product version and passed the
 release train gates.
@@ -103,22 +122,26 @@ through the package marketplace flow.
 
 ## Release Please
 
-Every releasable repository should use Release Please for version files,
-changelogs, tags, and GitHub releases. During v0, Release Please PRs are
-conductor-dispatched from `skenion/skenion` with an explicit
-`release-as` matching the train version. Automatic independent per-repository
-release authority is stale for v0 product trains.
+Every releasable repository should use Release Please to prepare version-file
+and changelog release PRs. During v0, Release Please PRs are
+conductor-dispatched from `skenion/skenion` with an explicit `release-as`
+matching the train version. Automatic independent per-repository release
+authority is stale for v0 product trains.
 
-Release Please owns:
+Release Please owns preparation of:
 
 - release PRs
 - changelog updates
 - version file updates
-- GitHub release creation
-- tags
 
-Package publishing should be separate and should run only after Release Please
-reports that a release was created.
+Release Please must not independently own product train tags, GitHub releases,
+artifact uploads, registry package publication, or Manual promotion. Those
+steps are repository-local execution details authorized by the hub manifest and
+conductor workflow, then recorded as explicit train state.
+
+Package publishing should be separate and should run only after the relevant
+release commit, tag, GitHub release, and artifact gates exist for the manifest
+row.
 
 Do not merge or publish a Release Please PR that bumps a package, app, artifact,
 or Manual version away from the current product train version. A repository with

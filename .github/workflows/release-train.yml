@@ -43,6 +43,10 @@ jobs:
       train_id: ${{ steps.validate.outputs.train_id }}
       train_version: ${{ steps.validate.outputs.train_version }}
       manifest_ref: ${{ steps.validate.outputs.manifest_ref }}
+      contracts_source_commit: ${{ steps.validate.outputs.contracts_source_commit }}
+      runtime_source_commit: ${{ steps.validate.outputs.runtime_source_commit }}
+      sdk_source_commit: ${{ steps.validate.outputs.sdk_source_commit }}
+      studio_source_commit: ${{ steps.validate.outputs.studio_source_commit }}
     steps:
       - name: Check out conductor state
         uses: actions/checkout@v4
@@ -97,11 +101,24 @@ jobs:
             "schema-version",
             "train-id",
             "train-version",
+            "release-authority",
             "protocol-baselines",
             "capability-set",
             "components",
             "release-gates",
           ];
+          const authorityStates = [
+            "prepared_pr",
+            "merged_release_commit",
+            "tag_exists",
+            "github_release_exists",
+            "artifacts_uploaded",
+            "registry_package_exists",
+            "docs_deployed",
+            "verified",
+          ];
+          const gateStatuses = new Set(["pending", "passed", "failed", "waived"]);
+          const dispatchComponents = ["contracts", "runtime", "sdk", "studio"];
           const legacyFieldNames = new Set([
             "schemaVersion",
             "trainId",
@@ -203,6 +220,18 @@ jobs:
             return object[field];
           }
 
+          function requireBoolean(value, expected, label) {
+            if (value !== expected) {
+              fail(`${label} must be ${expected}`);
+            }
+          }
+
+          function requireArrayEquals(value, expected, label) {
+            if (!Array.isArray(value) || value.length !== expected.length || value.some((item, index) => item !== expected[index])) {
+              fail(`${label} must be ${expected.join(" -> ")}`);
+            }
+          }
+
           function assertNoLegacyKeys(value, path = []) {
             if (Array.isArray(value)) {
               value.forEach((item, index) => assertNoLegacyKeys(item, [...path, String(index)]));
@@ -221,6 +250,133 @@ jobs:
                 fail(`${pathLabel([...path, key])} uses a legacy camelCase field; use the kebab-case release-train schema`);
               }
               assertNoLegacyKeys(child, [...path, key]);
+            }
+          }
+
+          function validateReleaseAuthority(value) {
+            const authority = requireObject(value, "manifest.release-authority");
+            requireEquals(authority.model, "hub-conductor-manifest", "manifest.release-authority.model");
+            requireEquals(authority["owner-repository"], "skenion/skenion", "manifest.release-authority.owner-repository");
+            requireEquals(authority["conductor-workflow"], ".github/workflows/release-train.yml", "manifest.release-authority.conductor-workflow");
+
+            if (
+              Object.hasOwn(authority, "tracking-issue") &&
+              !/^skenion\/skenion#[1-9][0-9]*$/.test(String(authority["tracking-issue"]))
+            ) {
+              fail("manifest.release-authority.tracking-issue must be in skenion/skenion#123 form");
+            }
+
+            const releasePlease = requireObject(authority["release-please"], "manifest.release-authority.release-please");
+            requireEquals(releasePlease.role, "prepare-release-pr", "manifest.release-authority.release-please.role");
+            for (const field of [
+              "independent-train-authority",
+              "may-publish-tags",
+              "may-publish-github-releases",
+              "may-publish-artifacts",
+              "may-publish-registry-packages",
+            ]) {
+              requireBoolean(releasePlease[field], false, `manifest.release-authority.release-please.${field}`);
+            }
+
+            const repoWorkflows = requireObject(authority["repository-workflows"], "manifest.release-authority.repository-workflows");
+            for (const field of [
+              "require-conductor-dispatch",
+              "require-manifest-row",
+              "require-expected-source-commit",
+            ]) {
+              requireBoolean(repoWorkflows[field], true, `manifest.release-authority.repository-workflows.${field}`);
+            }
+
+            requireArrayEquals(authority["state-order"], authorityStates, "manifest.release-authority.state-order");
+            const state = requireObject(authority.state, "manifest.release-authority.state");
+            for (const key of Object.keys(state)) {
+              if (!authorityStates.includes(key)) {
+                fail(`manifest.release-authority.state includes unsupported state ${key}`);
+              }
+            }
+            for (const key of authorityStates) {
+              if (!gateStatuses.has(state[key])) {
+                fail(`manifest.release-authority.state.${key} must be one of ${[...gateStatuses].join(", ")}`);
+              }
+            }
+
+            let incompleteState = null;
+            for (const key of authorityStates) {
+              const status = state[key];
+              if ((status === "passed" || status === "waived") && incompleteState) {
+                fail(`manifest.release-authority.state.${key} cannot be ${status} while ${incompleteState} is incomplete`);
+              }
+              if (status === "pending" || status === "failed") {
+                incompleteState ??= key;
+              }
+              if (status === "waived") {
+                const waiver = requireObject(authority.waivers?.[key], `manifest.release-authority.waivers.${key}`);
+                requireString(waiver.reason, `manifest.release-authority.waivers.${key}.reason`);
+                requireString(waiver["approved-by"], `manifest.release-authority.waivers.${key}.approved-by`);
+                requireString(waiver["approved-at"], `manifest.release-authority.waivers.${key}.approved-at`);
+              }
+            }
+
+            validateStateGateGroup(
+              state.registry_package_exists,
+              "manifest.release-authority.state.registry_package_exists",
+              releaseGateStatuses(["registry-packages"])
+            );
+            validateStateGateGroup(
+              state.artifacts_uploaded,
+              "manifest.release-authority.state.artifacts_uploaded",
+              releaseGateStatuses(["github-release-assets", "checksum-verification"])
+            );
+            validateStateGateGroup(
+              state.docs_deployed,
+              "manifest.release-authority.state.docs_deployed",
+              releaseGateStatuses(["docs-pages-deployment"])
+            );
+            validateStateGateGroup(
+              state.verified,
+              "manifest.release-authority.state.verified",
+              releaseGateStatuses()
+            );
+          }
+
+          function releaseGateStatuses(topLevelNames) {
+            const releaseGates = requireObject(manifest["release-gates"], "manifest.release-gates");
+            const names = topLevelNames ?? Object.keys(releaseGates);
+            return names.flatMap((name) => collectReleaseGateStatuses(releaseGates[name], `manifest.release-gates.${name}`));
+          }
+
+          function collectReleaseGateStatuses(value, label) {
+            if (!value || typeof value !== "object" || Array.isArray(value)) {
+              return [];
+            }
+            const current = Object.hasOwn(value, "status") || Object.hasOwn(value, "required")
+              ? [{ label, status: value.status, required: value.required === true }]
+              : [];
+            return [
+              ...current,
+              ...Object.entries(value).flatMap(([key, child]) => collectReleaseGateStatuses(child, `${label}.${key}`)),
+            ];
+          }
+
+          function validateStateGateGroup(status, label, gates) {
+            if (status !== "passed" && status !== "waived") {
+              return;
+            }
+            for (const gate of gates) {
+              if (gate.required && gate.status !== "passed" && gate.status !== "waived") {
+                fail(`${label} cannot be ${status} while required ${gate.label} is ${gate.status ?? "missing"}`);
+              }
+            }
+          }
+
+          function expectedSourceCommit(component) {
+            return String(component?.["expected-source-commit"] ?? component?.["source-commit"] ?? component?.commit ?? "").trim();
+          }
+
+          function requireCommitSha(value, label) {
+            requireString(value, label);
+            if (!/^[a-fA-F0-9]{40}$/.test(value)) {
+              fail(`${label} must be a 40-character git commit SHA`);
             }
           }
 
@@ -252,6 +408,7 @@ jobs:
           requireEquals(manifest["train-id"], trainId, "manifest.train-id");
           requireEquals(manifest["train-version"], trainVersion, "manifest.train-version");
           requireSemver(manifest["train-version"], "manifest.train-version");
+          validateReleaseAuthority(manifest["release-authority"]);
 
           requireObject(manifest["protocol-baselines"], "manifest.protocol-baselines");
           requireObject(manifest["capability-set"], "manifest.capability-set");
@@ -264,6 +421,13 @@ jobs:
 
           for (const component of expectedComponents) {
             requireObject(manifest.components[component], `manifest.components.${component}`);
+          }
+
+          for (const component of dispatchComponents) {
+            requireCommitSha(
+              expectedSourceCommit(manifest.components[component]),
+              `manifest.components.${component}.expected-source-commit`
+            );
           }
 
           validateRegistryPackage(manifest.components.contracts.npm, "manifest.components.contracts.npm", "npm", "@skenion/contracts");
@@ -324,6 +488,12 @@ jobs:
             echo "train_id=${train_id}"
             echo "train_version=${TRAIN_VERSION}"
             echo "manifest_ref=${MANIFEST_REF}"
+            for component in contracts runtime sdk studio; do
+              commit="$(
+                COMPONENT="${component}" node -e 'const fs = require("fs"); const manifest = JSON.parse(fs.readFileSync(process.env.MANIFEST_REF, "utf8")); const row = manifest.components[process.env.COMPONENT]; console.log(row["expected-source-commit"] ?? row["source-commit"] ?? row.commit ?? "");'
+              )"
+              echo "${component}_source_commit=${commit}"
+            done
           } >> "${GITHUB_OUTPUT}"
 
   workflow-library:
@@ -358,6 +528,14 @@ jobs:
 
           if [[ -z "${reason}" ]] && ! grep -q '"schema-version"' "${tmp_dir}/manifest.mjs"; then
             reason="skenion/skenion-ci@${SKENION_CI_REF} does not yet support the kebab-case release train manifest. Retag v1 after the kebab-case validator lands in skenion-ci."
+          fi
+
+          if [[ -z "${reason}" ]] && ! grep -q 'release-authority' "${tmp_dir}/manifest.mjs"; then
+            reason="skenion/skenion-ci@${SKENION_CI_REF} does not yet support release-authority state validation. Retag v1 after the authority-aware validator lands in skenion-ci."
+          fi
+
+          if [[ -z "${reason}" ]] && ! grep -q 'releaseDispatchContext' "${tmp_dir}/manifest.mjs"; then
+            reason="skenion/skenion-ci@${SKENION_CI_REF} does not yet support source-commit and component/repository dispatch guardrails. Retag v1 after the dispatch-context validator lands in skenion-ci."
           fi
 
           if [[ -n "${reason}" ]]; then
@@ -411,6 +589,7 @@ jobs:
             echo "- Manifest: ${MANIFEST_REF}"
             echo "- Conductor: skenion/skenion"
             echo "- Workflow library: skenion/skenion-ci@${SKENION_CI_REF}"
+            echo "- Authority: checked-in hub manifest plus conductor workflow"
             echo
             echo "Release order:"
             echo "1. Contracts"
@@ -422,6 +601,8 @@ jobs:
             echo
             echo "Prepare mode validates the checked-in manifest and summarizes the plan."
             echo "Publish mode dispatches train Release Please PR workflows for Contracts, Runtime, SDK, and Studio."
+            echo "Release Please may prepare release PRs, but it is not independent product-train authority for tags, GitHub releases, artifacts, registry packages, or Docs promotion."
+            echo "Manifest state order: prepared_pr -> merged_release_commit -> tag_exists -> github_release_exists -> artifacts_uploaded -> registry_package_exists -> docs_deployed -> verified."
             echo "Examples conformance and Docs Pages promotion are post-release gates handled during verify/release completion."
             echo "Verify mode is a separate post-release gate after release PRs are merged and artifacts exist."
             if [[ "${WORKFLOW_LIBRARY_READY}" != "true" ]]; then
@@ -464,6 +645,10 @@ jobs:
     with:
       target-repo: skenion/skenion-contracts
       train-version: ${{ needs.validate.outputs.train_version }}
+      component: contracts
+      manifest: ${{ needs.validate.outputs.manifest_ref }}
+      manifest-ref: ${{ github.sha }}
+      expected-source-commit: ${{ needs.validate.outputs.contracts_source_commit }}
       mode: publish
       dry-run: false
     secrets: inherit
@@ -480,6 +665,10 @@ jobs:
     with:
       target-repo: skenion/skenion-runtime
       train-version: ${{ needs.validate.outputs.train_version }}
+      component: runtime
+      manifest: ${{ needs.validate.outputs.manifest_ref }}
+      manifest-ref: ${{ github.sha }}
+      expected-source-commit: ${{ needs.validate.outputs.runtime_source_commit }}
       mode: publish
       dry-run: false
     secrets: inherit
@@ -496,6 +685,10 @@ jobs:
     with:
       target-repo: skenion/skenion-sdk
       train-version: ${{ needs.validate.outputs.train_version }}
+      component: sdk
+      manifest: ${{ needs.validate.outputs.manifest_ref }}
+      manifest-ref: ${{ github.sha }}
+      expected-source-commit: ${{ needs.validate.outputs.sdk_source_commit }}
       mode: publish
       dry-run: false
     secrets: inherit
@@ -512,6 +705,10 @@ jobs:
     with:
       target-repo: skenion/skenion-studio
       train-version: ${{ needs.validate.outputs.train_version }}
+      component: studio
+      manifest: ${{ needs.validate.outputs.manifest_ref }}
+      manifest-ref: ${{ github.sha }}
+      expected-source-commit: ${{ needs.validate.outputs.studio_source_commit }}
       mode: publish
       dry-run: false
     secrets: inherit
