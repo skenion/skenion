@@ -603,8 +603,20 @@
         "url": "https://github.com/skenion/skenion-examples/actions/runs/28041883226/job/83009946984"
       },
       "conformance": {
-        "status": "pending",
-        "reason": "Main commit CI passed; released-artifact conformance must be rerun against this updated matrix ref."
+        "status": "passed",
+        "workflow": "Release Examples Compatibility",
+        "mode": "publish",
+        "run-id": 28045363706,
+        "run-url": "https://github.com/skenion/skenion-examples/actions/runs/28045363706",
+        "job-url": "https://github.com/skenion/skenion-examples/actions/runs/28045363706/job/83021917258",
+        "run-conclusion": "success",
+        "workflow-head-sha": "f279bda9299e2fd1d200f2e6ca384e282a49f9d3",
+        "matrix-ref": "45670327cce9f26d5bae207fea20d01c6e4bd8e9",
+        "target-commit": "ee58ed8960d675ed11edc56b5f22e404789caf82",
+        "runtime-target": "x86_64-unknown-linux-gnu",
+        "tag": "skenion-examples-v0.45.0",
+        "annotated-tag-object": "4e517242cbf955a7069224fef1edaf33ce123a65",
+        "peeled-tag-commit": "ee58ed8960d675ed11edc56b5f22e404789caf82"
       }
     },
     "docs": {
@@ -698,8 +710,19 @@
       ]
     },
     "examples-conformance": {
-      "status": "pending",
-      "required": true
+      "status": "passed",
+      "required": true,
+      "repository": "skenion/skenion-examples",
+      "ref": "skenion-examples-v0.45.0",
+      "tag": "skenion-examples-v0.45.0",
+      "version": "0.45.0",
+      "target-commit": "ee58ed8960d675ed11edc56b5f22e404789caf82",
+      "runtime-target": "x86_64-unknown-linux-gnu",
+      "matrix-ref": "45670327cce9f26d5bae207fea20d01c6e4bd8e9",
+      "evidence": [
+        "https://github.com/skenion/skenion-examples/actions/runs/28045363706",
+        "https://github.com/skenion/skenion-examples/actions/runs/28045363706/job/83021917258"
+      ]
     },
     "docs-pages-deployment": {
       "status": "pending",
