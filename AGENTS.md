@@ -48,6 +48,13 @@ importable libraries: `@skenion/contracts`, `skenion-contracts`, and
 publish npm packages, crates, Runtime binaries, Studio packages, or Manual
 releases from a local machine.
 
+GitHub Actions workflows that need cross-repository or release automation
+credentials must use the organization Actions secret `GH_TOKEN`. Do not create
+separate Release Please credentials, release-train credentials, or default
+Actions-token fallbacks for release, compatibility-matrix,
+artifact-verification, or promotion workflows; missing `GH_TOKEN` must fail
+closed with a clear diagnostic.
+
 Runtime IO must remain node/object-level behavior. Do not add Runtime-global
 MIDI, Runtime-global clock source, or Runtime-owned semantic IO start/stop UI.
 Runtime IO discovery may expose raw device descriptors and binding config for
