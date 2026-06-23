@@ -48,6 +48,17 @@ importable libraries: `@skenion/contracts`, `skenion-contracts`, and
 publish npm packages, crates, Runtime binaries, Studio packages, or Manual
 releases from a local machine.
 
+All release-state writes must happen inside GitHub Actions as well. Do not
+create, edit, delete, promote, demote, or repair GitHub Releases, release
+assets, tags, prerelease/draft flags, release notes, compatibility matrices,
+Manual promotion state, npm packages, or crates from a local shell. This
+includes `gh release edit`, `gh release upload`, `gh release delete`, manual tag
+mutation, local registry publish, or ad hoc release metadata patches with a
+locally exported token. Local commands may inspect state, run dry-run checks,
+create normal code PRs, or trigger approved `workflow_dispatch` jobs; the
+actual release mutation must run in CI with reviewed workflow code and
+auditable logs.
+
 GitHub Actions workflows that need cross-repository or release automation
 credentials must use the organization Actions secret `GH_TOKEN`. Do not create
 separate Release Please credentials, release-train credentials, or default
