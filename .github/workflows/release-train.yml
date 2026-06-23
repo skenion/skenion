@@ -31,6 +31,9 @@ concurrency:
   group: release-train-${{ inputs.train_version }}
   cancel-in-progress: false
 
+env:
+  SKENION_CI_REF: v1
+
 jobs:
   validate:
     name: Validate train inputs
@@ -88,33 +91,82 @@ jobs:
           const trainId = process.env.EXPECTED_TRAIN_ID;
           const manifest = JSON.parse(fs.readFileSync(manifestRef, "utf8"));
 
-          const expectedTargets = [
-            "aarch64-apple-darwin",
-            "x86_64-apple-darwin",
-            "x86_64-pc-windows-msvc",
-            "aarch64-pc-windows-msvc",
-            "x86_64-unknown-linux-gnu",
-            "aarch64-unknown-linux-gnu"
+          const expectedComponents = ["contracts", "runtime", "sdk", "studio", "examples", "docs"];
+          const requiredTopLevel = [
+            "schema",
+            "schema-version",
+            "train-id",
+            "train-version",
+            "protocol-baselines",
+            "capability-set",
+            "components",
+            "release-gates",
           ];
-          const releaseBlockingTargets = new Set([
-            "aarch64-apple-darwin",
-            "x86_64-apple-darwin",
-            "x86_64-pc-windows-msvc",
-            "x86_64-unknown-linux-gnu"
+          const legacyFieldNames = new Set([
+            "schemaVersion",
+            "trainId",
+            "trainVersion",
+            "protocolBaselines",
+            "capabilitySet",
+            "protocolSurfaces",
+            "runtimeHttp",
+            "runtimeCollaboration",
+            "sessionAddressing",
+            "eventReplay",
+            "multiWindow",
+            "connectionProfiles",
+            "operationLog",
+            "ioDiscovery",
+            "authPolicy",
+            "graphEditor",
+            "patchLibrary",
+            "livingHelp",
+            "graphClipboard",
+            "desktopShell",
+            "packageDiscovery",
+            "packageInstall",
+            "packageUpdate",
+            "extensionPackages",
+            "versionedPaths",
+            "pagesDeployment",
+            "latestPromotionRequiresMatrix",
+            "patchReleasesUseMajorMinorPath",
+            "supportTier",
+            "assetName",
+            "sizeBytes",
+            "desktopPackages",
+            "runtimeSidecars",
+            "releaseGates",
+            "registryPackages",
+            "contractsNpm",
+            "contractsCrate",
+            "sdkNpm",
+            "runtimeCrate",
+            "studioWeb",
+            "studioDesktop",
+            "githubReleaseAssets",
+            "checksumVerification",
+            "artifactIds",
+            "expectedChecksums",
+            "runtimeSmoke",
+            "studioPackageSmoke",
+            "examplesConformance",
+            "docsPagesDeployment",
+            "evidenceUrl",
+            "pagesUrl",
+            "manualVersion",
+            "manualPath",
+            "desktopPackageArtifactId",
+            "runtimeSidecarArtifactId",
           ]);
-          const expectedProtocol = {
-            graph: "0.1",
-            project: "0.1",
-            node: "0.1",
-            extension: "0.1",
-            runtimeHttp: "v0",
-            runtimeCollaboration: "v0"
-          };
-          const expectedProfiles = ["local-managed", "local-shared", "remote"];
 
           function fail(message) {
             console.error(message);
             process.exit(1);
+          }
+
+          function pathLabel(path) {
+            return path.length === 0 ? "manifest" : `manifest.${path.join(".")}`;
           }
 
           function requireObject(value, label) {
@@ -131,38 +183,11 @@ jobs:
             return value;
           }
 
-          function requireBoolean(value, label) {
-            if (typeof value !== "boolean") {
-              fail(`${label} must be a boolean`);
+          function requireSemver(value, label) {
+            requireString(value, label);
+            if (!/^(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)$/.test(value)) {
+              fail(`${label} must be registry-compatible SemVer`);
             }
-            return value;
-          }
-
-          function requireStatus(value, label) {
-            if (!["pending", "passed", "failed", "waived"].includes(value)) {
-              fail(`${label} must be pending, passed, failed, or waived`);
-            }
-            return value;
-          }
-
-          function requireAllowedKeys(value, required, optional, label) {
-            const object = requireObject(value, label);
-            const allowed = new Set([...required, ...optional]);
-            for (const key of required) {
-              if (!Object.hasOwn(object, key)) {
-                fail(`${label}.${key} is required`);
-              }
-            }
-            for (const key of Object.keys(object)) {
-              if (!allowed.has(key)) {
-                fail(`${label}.${key} is not part of the release-train v0.1 schema`);
-              }
-            }
-            return object;
-          }
-
-          function requireExactFields(value, fields, label) {
-            return requireAllowedKeys(value, fields, [], label);
           }
 
           function requireEquals(actual, expected, label) {
@@ -171,458 +196,127 @@ jobs:
             }
           }
 
-          function requireNullableString(value, label) {
-            if (value !== null) {
-              requireString(value, label);
+          function requireField(object, field, label) {
+            if (!Object.hasOwn(object, field)) {
+              fail(`${label}.${field} is required`);
+            }
+            return object[field];
+          }
+
+          function assertNoLegacyKeys(value, path = []) {
+            if (Array.isArray(value)) {
+              value.forEach((item, index) => assertNoLegacyKeys(item, [...path, String(index)]));
+              return;
+            }
+
+            if (!value || typeof value !== "object") {
+              if (typeof value === "string" && value.includes("echovisionlab")) {
+                fail(`${pathLabel(path)} contains stale echovisionlab repository text`);
+              }
+              return;
+            }
+
+            for (const [key, child] of Object.entries(value)) {
+              if (legacyFieldNames.has(key)) {
+                fail(`${pathLabel([...path, key])} uses a legacy camelCase field; use the kebab-case release-train schema`);
+              }
+              assertNoLegacyKeys(child, [...path, key]);
             }
           }
 
-          function requireSemver(value, label) {
-            requireString(value, label);
-            if (!/^(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)$/.test(value)) {
-              fail(`${label} must be registry-compatible SemVer`);
-            }
-          }
-
-          function requireSha256OrNull(value, label) {
-            if (value !== null && !/^[a-fA-F0-9]{64}$/.test(value)) {
-              fail(`${label} must be null or a 64 character sha256 hex digest`);
-            }
-          }
-
-          function requireProfiles(value, label) {
-            if (!Array.isArray(value)) {
-              fail(`${label} must be an array`);
-            }
-            const unique = [...new Set(value)].sort();
-            if (JSON.stringify(unique) !== JSON.stringify([...expectedProfiles].sort())) {
-              fail(`${label} must include local-managed, local-shared, and remote`);
-            }
-          }
-
-          function supportTierForTarget(target) {
-            return releaseBlockingTargets.has(target) ? "release-blocking" : "preview";
-          }
-
-          function validateProtocol(value, label) {
-            const protocol = requireExactFields(value, Object.keys(expectedProtocol), label);
-            for (const [key, expected] of Object.entries(expectedProtocol)) {
-              requireEquals(protocol[key], expected, `${label}.${key}`);
+          function assertNoField(object, field, label, reason) {
+            if (object && typeof object === "object" && Object.hasOwn(object, field)) {
+              fail(`${label}.${field} is not valid for the current v0 release train: ${reason}`);
             }
           }
 
           function validateRegistryPackage(value, label, ecosystem, name) {
-            const pkg = requireAllowedKeys(value, ["ecosystem", "name", "version"], ["url"], label);
+            const pkg = requireObject(value, label);
             requireEquals(pkg.ecosystem, ecosystem, `${label}.ecosystem`);
             requireEquals(pkg.name, name, `${label}.name`);
             requireEquals(pkg.version, trainVersion, `${label}.version`);
-            if (Object.hasOwn(pkg, "url")) {
-              requireNullableString(pkg.url, `${label}.url`);
-            }
-            return pkg;
-          }
-
-          function validateChecksum(value, label) {
-            const checksum = requireExactFields(value, ["algorithm", "value"], label);
-            requireEquals(checksum.algorithm, "sha256", `${label}.algorithm`);
-            requireSha256OrNull(checksum.value, `${label}.value`);
-            return checksum;
-          }
-
-          function validateArtifactSource(value, label) {
-            const source = requireObject(value, label);
-            requireString(source.kind, `${label}.kind`);
-            if (source.kind === "github-release-asset") {
-              requireExactFields(source, ["kind", "repository", "tag", "assetName", "url"], label);
-              requireString(source.repository, `${label}.repository`);
-              requireString(source.tag, `${label}.tag`);
-              requireString(source.assetName, `${label}.assetName`);
-              requireNullableString(source.url, `${label}.url`);
-            } else if (source.kind === "url") {
-              requireExactFields(source, ["kind", "url"], label);
-              requireString(source.url, `${label}.url`);
-            } else {
-              fail(`${label}.kind must be github-release-asset or url`);
+            if (Object.hasOwn(pkg, "url") && pkg.url !== null) {
+              requireString(pkg.url, `${label}.url`);
             }
           }
 
-          function validateArtifactMap(value, label, expectedKind) {
-            const artifacts = requireExactFields(value, expectedTargets, label);
-            const idsByTarget = {};
+          requireObject(manifest, "manifest");
+          assertNoLegacyKeys(manifest);
 
-            for (const target of expectedTargets) {
-              const artifact = requireExactFields(
-                artifacts[target],
-                ["id", "target", "supportTier", "kind", "name", "version", "source", "checksum", "sizeBytes"],
-                `${label}.${target}`
-              );
-              requireString(artifact.id, `${label}.${target}.id`);
-              requireEquals(artifact.target, target, `${label}.${target}.target`);
-              requireEquals(
-                artifact.supportTier,
-                supportTierForTarget(target),
-                `${label}.${target}.supportTier`
-              );
-              requireEquals(artifact.kind, expectedKind, `${label}.${target}.kind`);
-              requireString(artifact.name, `${label}.${target}.name`);
-              requireEquals(artifact.version, trainVersion, `${label}.${target}.version`);
-              validateArtifactSource(artifact.source, `${label}.${target}.source`);
-              validateChecksum(artifact.checksum, `${label}.${target}.checksum`);
-              if (artifact.sizeBytes !== null && (!Number.isInteger(artifact.sizeBytes) || artifact.sizeBytes < 0)) {
-                fail(`${label}.${target}.sizeBytes must be null or a non-negative integer`);
-              }
-              idsByTarget[target] = artifact.id;
-            }
-
-            return idsByTarget;
+          for (const field of requiredTopLevel) {
+            requireField(manifest, field, "manifest");
           }
 
-          function validateArtifact(value, label, expectedKind) {
-            const artifact = requireExactFields(
-              value,
-              ["id", "kind", "name", "version", "source", "checksum", "sizeBytes"],
-              label
-            );
-            requireString(artifact.id, `${label}.id`);
-            requireEquals(artifact.kind, expectedKind, `${label}.kind`);
-            requireString(artifact.name, `${label}.name`);
-            requireEquals(artifact.version, trainVersion, `${label}.version`);
-            validateArtifactSource(artifact.source, `${label}.source`);
-            validateChecksum(artifact.checksum, `${label}.checksum`);
-            if (artifact.sizeBytes !== null && (!Number.isInteger(artifact.sizeBytes) || artifact.sizeBytes < 0)) {
-              fail(`${label}.sizeBytes must be null or a non-negative integer`);
-            }
-            return artifact.id;
-          }
-
-          function validateRegistryGate(value, label, componentPackage) {
-            const gate = requireAllowedKeys(value, ["id", "status", "required", "package"], ["evidenceUrl"], label);
-            requireString(gate.id, `${label}.id`);
-            requireStatus(gate.status, `${label}.status`);
-            requireBoolean(gate.required, `${label}.required`);
-            const gatePackage = validateRegistryPackage(
-              gate.package,
-              `${label}.package`,
-              componentPackage.ecosystem,
-              componentPackage.name
-            );
-            requireEquals(gatePackage.version, componentPackage.version, `${label}.package.version`);
-            if (Object.hasOwn(gate, "evidenceUrl")) {
-              requireString(gate.evidenceUrl, `${label}.evidenceUrl`);
-            }
-          }
-
-          function validateArtifactCollectionGate(value, label, expectedIds) {
-            const gate = requireAllowedKeys(
-              value,
-              ["id", "status", "required", "repository", "tag", "artifactIds"],
-              ["evidenceUrl"],
-              label
-            );
-            requireString(gate.id, `${label}.id`);
-            requireStatus(gate.status, `${label}.status`);
-            requireBoolean(gate.required, `${label}.required`);
-            requireString(gate.repository, `${label}.repository`);
-            requireString(gate.tag, `${label}.tag`);
-            if (!Array.isArray(gate.artifactIds) || gate.artifactIds.length === 0) {
-              fail(`${label}.artifactIds must be a non-empty array`);
-            }
-            const actual = [...new Set(gate.artifactIds)].sort();
-            const expected = [...expectedIds].sort();
-            if (JSON.stringify(actual) !== JSON.stringify(expected)) {
-              fail(`${label}.artifactIds must match the component artifact ids`);
-            }
-            if (Object.hasOwn(gate, "evidenceUrl")) {
-              requireString(gate.evidenceUrl, `${label}.evidenceUrl`);
-            }
-          }
-
-          function validateTargetSmokeGate(value, label, target, expectedFields, expectedIds) {
-            const gate = requireAllowedKeys(value, expectedFields, ["evidenceUrl"], label);
-            requireString(gate.id, `${label}.id`);
-            requireStatus(gate.status, `${label}.status`);
-            requireBoolean(gate.required, `${label}.required`);
-            requireEquals(gate.target, target, `${label}.target`);
-            for (const [field, expectedId] of Object.entries(expectedIds)) {
-              requireEquals(gate[field], expectedId, `${label}.${field}`);
-            }
-            if (Object.hasOwn(gate, "evidenceUrl")) {
-              requireString(gate.evidenceUrl, `${label}.evidenceUrl`);
-            }
-          }
-
-          requireExactFields(manifest, [
-            "schema",
-            "schemaVersion",
-            "trainId",
-            "trainVersion",
-            "protocolBaselines",
-            "capabilitySet",
-            "components",
-            "releaseGates"
-          ], "manifest");
           requireEquals(manifest.schema, "skenion.release-train", "manifest.schema");
-          requireEquals(manifest.schemaVersion, "0.1.0", "manifest.schemaVersion");
-          requireEquals(manifest.trainId, trainId, "manifest.trainId");
-          requireEquals(manifest.trainVersion, trainVersion, "manifest.trainVersion");
-          requireSemver(manifest.trainVersion, "manifest.trainVersion");
+          requireEquals(manifest["schema-version"], "0.1.0", "manifest.schema-version");
+          requireEquals(manifest["train-id"], trainId, "manifest.train-id");
+          requireEquals(manifest["train-version"], trainVersion, "manifest.train-version");
+          requireSemver(manifest["train-version"], "manifest.train-version");
 
-          validateProtocol(manifest.protocolBaselines, "protocolBaselines");
+          requireObject(manifest["protocol-baselines"], "manifest.protocol-baselines");
+          requireObject(manifest["capability-set"], "manifest.capability-set");
+          requireObject(manifest.components, "manifest.components");
+          requireObject(manifest["release-gates"], "manifest.release-gates");
 
-          const capabilitySet = requireExactFields(
-            manifest.capabilitySet,
-            ["protocolSurfaces", "runtime", "studio", "marketplace", "manual"],
-            "capabilitySet"
-          );
-          validateProtocol(capabilitySet.protocolSurfaces, "capabilitySet.protocolSurfaces");
-
-          const runtimeCapabilities = requireExactFields(
-            capabilitySet.runtime,
-            [
-              "sessionAddressing",
-              "eventReplay",
-              "multiWindow",
-              "connectionProfiles",
-              "collaboration",
-              "operationLog",
-              "ioDiscovery",
-              "authPolicy"
-            ],
-            "capabilitySet.runtime"
-          );
-          for (const key of ["sessionAddressing", "eventReplay", "multiWindow", "operationLog"]) {
-            requireEquals(runtimeCapabilities[key], true, `capabilitySet.runtime.${key}`);
-          }
-          requireProfiles(runtimeCapabilities.connectionProfiles, "capabilitySet.runtime.connectionProfiles");
-          requireEquals(runtimeCapabilities.collaboration, "server-authoritative-ot", "capabilitySet.runtime.collaboration");
-          requireEquals(runtimeCapabilities.ioDiscovery, "raw-descriptor", "capabilitySet.runtime.ioDiscovery");
-          requireEquals(runtimeCapabilities.authPolicy, "deferred", "capabilitySet.runtime.authPolicy");
-
-          const studioCapabilities = requireExactFields(
-            capabilitySet.studio,
-            ["graphEditor", "patchLibrary", "subpatches", "livingHelp", "graphClipboard", "desktopShell", "connectionProfiles"],
-            "capabilitySet.studio"
-          );
-          for (const key of ["graphEditor", "patchLibrary", "subpatches", "livingHelp", "graphClipboard"]) {
-            requireEquals(studioCapabilities[key], true, `capabilitySet.studio.${key}`);
-          }
-          requireEquals(studioCapabilities.desktopShell, "tauri", "capabilitySet.studio.desktopShell");
-          requireProfiles(studioCapabilities.connectionProfiles, "capabilitySet.studio.connectionProfiles");
-
-          const marketplace = requireExactFields(
-            capabilitySet.marketplace,
-            ["packageDiscovery", "packageInstall", "packageUpdate", "extensionPackages"],
-            "capabilitySet.marketplace"
-          );
-          for (const key of ["packageDiscovery", "packageInstall", "packageUpdate", "extensionPackages"]) {
-            requireEquals(marketplace[key], true, `capabilitySet.marketplace.${key}`);
+          if (Array.isArray(manifest.components)) {
+            fail("manifest.components must use the current object shape, not an array");
           }
 
-          const manualCapabilities = requireExactFields(
-            capabilitySet.manual,
-            ["versionedPaths", "pagesDeployment", "latestPromotionRequiresMatrix", "patchReleasesUseMajorMinorPath"],
-            "capabilitySet.manual"
-          );
-          for (const key of ["versionedPaths", "pagesDeployment", "latestPromotionRequiresMatrix", "patchReleasesUseMajorMinorPath"]) {
-            requireEquals(manualCapabilities[key], true, `capabilitySet.manual.${key}`);
+          for (const component of expectedComponents) {
+            requireObject(manifest.components[component], `manifest.components.${component}`);
           }
 
-          const components = requireExactFields(
-            manifest.components,
-            ["contracts", "runtime", "sdk", "studio", "examples", "docs"],
-            "components"
-          );
-          const contracts = requireExactFields(components.contracts, ["npm", "crate"], "components.contracts");
-          const contractsNpm = validateRegistryPackage(contracts.npm, "components.contracts.npm", "npm", "@skenion/contracts");
-          const contractsCrate = validateRegistryPackage(contracts.crate, "components.contracts.crate", "crates.io", "skenion-contracts");
+          validateRegistryPackage(manifest.components.contracts.npm, "manifest.components.contracts.npm", "npm", "@skenion/contracts");
+          validateRegistryPackage(manifest.components.contracts.crate, "manifest.components.contracts.crate", "crates.io", "skenion-contracts");
+          validateRegistryPackage(manifest.components.sdk.npm, "manifest.components.sdk.npm", "npm", "@skenion/sdk");
 
-          const runtime = requireExactFields(components.runtime, ["binaries"], "components.runtime");
-          const runtimeIdsByTarget = validateArtifactMap(runtime.binaries, "components.runtime.binaries", "runtime-binary");
-
-          const sdk = requireExactFields(components.sdk, ["npm"], "components.sdk");
-          const sdkNpm = validateRegistryPackage(sdk.npm, "components.sdk.npm", "npm", "@skenion/sdk");
-
-          const studio = requireExactFields(
-            components.studio,
-            ["desktopPackages", "runtimeSidecars", "web-bundle"],
-            "components.studio"
+          assertNoField(
+            manifest.components.runtime,
+            "crate",
+            "manifest.components.runtime",
+            "Runtime is distributed as GitHub Release binaries, not a crates.io package"
           );
-          const studioDesktopIdsByTarget = validateArtifactMap(
-            studio.desktopPackages,
-            "components.studio.desktopPackages",
-            "studio-desktop-package"
+          assertNoField(
+            manifest.components.studio,
+            "web",
+            "manifest.components.studio",
+            "Studio web is a web/static artifact, not an npm package"
           );
-          const studioSidecarIdsByTarget = validateArtifactMap(
-            studio.runtimeSidecars,
-            "components.studio.runtimeSidecars",
-            "studio-runtime-sidecar"
-          );
-          const studioWebBundleId = validateArtifact(
-            studio["web-bundle"],
-            'components.studio["web-bundle"]',
-            "studio-web-bundle"
+          assertNoField(
+            manifest.components.studio,
+            "desktop",
+            "manifest.components.studio",
+            "Studio desktop is a GitHub Release artifact, not an npm package"
           );
 
-          const examples = requireAllowedKeys(components.examples, ["repository", "version", "tag"], ["commit"], "components.examples");
-          requireString(examples.repository, "components.examples.repository");
-          requireEquals(examples.version, trainVersion, "components.examples.version");
-          requireString(examples.tag, "components.examples.tag");
-          if (Object.hasOwn(examples, "commit")) {
-            requireString(examples.commit, "components.examples.commit");
+          requireObject(manifest.components.runtime.binaries, "manifest.components.runtime.binaries");
+          requireObject(manifest.components.studio["desktop-packages"], "manifest.components.studio.desktop-packages");
+          requireObject(manifest.components.studio["runtime-sidecars"], "manifest.components.studio.runtime-sidecars");
+          requireObject(manifest.components.studio["web-bundle"], "manifest.components.studio.web-bundle");
+
+          requireString(manifest.components.examples.repository, "manifest.components.examples.repository");
+          requireEquals(manifest.components.examples.version, trainVersion, "manifest.components.examples.version");
+          requireString(manifest.components.examples.tag, "manifest.components.examples.tag");
+
+          const manual = requireObject(manifest.components.docs.manual, "manifest.components.docs.manual");
+          requireEquals(manual.version, trainVersion, "manifest.components.docs.manual.version");
+          requireEquals(manual.path, `/manual/${trainId}/`, "manifest.components.docs.manual.path");
+          requireString(manual["pages-url"], "manifest.components.docs.manual.pages-url");
+
+          const registryGates = requireObject(manifest["release-gates"]["registry-packages"], "manifest.release-gates.registry-packages");
+          for (const gate of ["contracts-npm", "contracts-crate", "sdk-npm"]) {
+            requireObject(registryGates[gate], `manifest.release-gates.registry-packages.${gate}`);
           }
-
-          const docs = requireExactFields(components.docs, ["manual"], "components.docs");
-          const docsManual = requireExactFields(docs.manual, ["version", "path", "pagesUrl"], "components.docs.manual");
-          requireEquals(docsManual.version, trainVersion, "components.docs.manual.version");
-          requireEquals(docsManual.path, `/manual/${trainId}/`, "components.docs.manual.path");
-          requireString(docsManual.pagesUrl, "components.docs.manual.pagesUrl");
-
-          const allArtifactIds = [
-            ...Object.values(runtimeIdsByTarget),
-            ...Object.values(studioDesktopIdsByTarget),
-            studioWebBundleId,
-            ...Object.values(studioSidecarIdsByTarget)
-          ];
-          if (new Set(allArtifactIds).size !== allArtifactIds.length) {
-            fail("artifact ids must be unique across Runtime and Studio artifacts");
-          }
-
-          const releaseGates = requireExactFields(
-            manifest.releaseGates,
-            [
-              "registryPackages",
-              "githubReleaseAssets",
-              "checksumVerification",
-              "runtimeSmoke",
-              "studioPackageSmoke",
-              "examplesConformance",
-              "docsPagesDeployment"
-            ],
-            "releaseGates"
-          );
-
-          const registryPackages = requireExactFields(
-            releaseGates.registryPackages,
-            ["contractsNpm", "contractsCrate", "sdkNpm"],
-            "releaseGates.registryPackages"
-          );
-          validateRegistryGate(registryPackages.contractsNpm, "releaseGates.registryPackages.contractsNpm", contractsNpm);
-          validateRegistryGate(registryPackages.contractsCrate, "releaseGates.registryPackages.contractsCrate", contractsCrate);
-          validateRegistryGate(registryPackages.sdkNpm, "releaseGates.registryPackages.sdkNpm", sdkNpm);
-
-          const githubReleaseAssets = requireExactFields(
-            releaseGates.githubReleaseAssets,
-            ["runtime", "studio"],
-            "releaseGates.githubReleaseAssets"
-          );
-          validateArtifactCollectionGate(
-            githubReleaseAssets.runtime,
-            "releaseGates.githubReleaseAssets.runtime",
-            Object.values(runtimeIdsByTarget)
-          );
-          validateArtifactCollectionGate(
-            githubReleaseAssets.studio,
-            "releaseGates.githubReleaseAssets.studio",
-            [
-              ...Object.values(studioDesktopIdsByTarget),
-              studioWebBundleId,
-              ...Object.values(studioSidecarIdsByTarget)
-            ]
-          );
-
-          const checksumGate = requireAllowedKeys(
-            releaseGates.checksumVerification,
-            ["id", "status", "required", "artifactIds"],
-            ["expectedChecksums", "evidenceUrl"],
-            "releaseGates.checksumVerification"
-          );
-          requireString(checksumGate.id, "releaseGates.checksumVerification.id");
-          requireStatus(checksumGate.status, "releaseGates.checksumVerification.status");
-          requireBoolean(checksumGate.required, "releaseGates.checksumVerification.required");
-          if (!Array.isArray(checksumGate.artifactIds) || checksumGate.artifactIds.length === 0) {
-            fail("releaseGates.checksumVerification.artifactIds must be a non-empty array");
-          }
-          const checksumIds = [...new Set(checksumGate.artifactIds)].sort();
-          if (JSON.stringify(checksumIds) !== JSON.stringify([...allArtifactIds].sort())) {
-            fail("releaseGates.checksumVerification.artifactIds must include every artifact id");
-          }
-          if (Object.hasOwn(checksumGate, "expectedChecksums")) {
-            const expectedChecksums = requireObject(
-              checksumGate.expectedChecksums,
-              "releaseGates.checksumVerification.expectedChecksums"
-            );
-            for (const [artifactId, checksum] of Object.entries(expectedChecksums)) {
-              if (!allArtifactIds.includes(artifactId)) {
-                fail(`releaseGates.checksumVerification.expectedChecksums references unknown artifact ${artifactId}`);
-              }
-              validateChecksum(checksum, `releaseGates.checksumVerification.expectedChecksums.${artifactId}`);
-            }
-          }
-          if (Object.hasOwn(checksumGate, "evidenceUrl")) {
-            requireString(checksumGate.evidenceUrl, "releaseGates.checksumVerification.evidenceUrl");
-          }
-
-          const runtimeSmoke = requireExactFields(releaseGates.runtimeSmoke, expectedTargets, "releaseGates.runtimeSmoke");
-          const studioPackageSmoke = requireExactFields(
-            releaseGates.studioPackageSmoke,
-            expectedTargets,
-            "releaseGates.studioPackageSmoke"
-          );
-          for (const target of expectedTargets) {
-            validateTargetSmokeGate(
-              runtimeSmoke[target],
-              `releaseGates.runtimeSmoke.${target}`,
-              target,
-              ["id", "status", "required", "target", "artifactId"],
-              { artifactId: runtimeIdsByTarget[target] }
-            );
-            validateTargetSmokeGate(
-              studioPackageSmoke[target],
-              `releaseGates.studioPackageSmoke.${target}`,
-              target,
-              ["id", "status", "required", "target", "desktopPackageArtifactId", "runtimeSidecarArtifactId"],
-              {
-                desktopPackageArtifactId: studioDesktopIdsByTarget[target],
-                runtimeSidecarArtifactId: studioSidecarIdsByTarget[target]
-              }
+          for (const gate of ["runtime-crate", "studio-web", "studio-desktop"]) {
+            assertNoField(
+              registryGates,
+              gate,
+              "manifest.release-gates.registry-packages",
+              "only importable libraries publish registry packages in the current train"
             );
           }
 
-          const examplesConformance = requireAllowedKeys(
-            releaseGates.examplesConformance,
-            ["id", "status", "required", "repository", "ref", "version"],
-            ["evidenceUrl"],
-            "releaseGates.examplesConformance"
-          );
-          requireString(examplesConformance.id, "releaseGates.examplesConformance.id");
-          requireStatus(examplesConformance.status, "releaseGates.examplesConformance.status");
-          requireBoolean(examplesConformance.required, "releaseGates.examplesConformance.required");
-          requireEquals(
-            examplesConformance.repository,
-            examples.repository,
-            "releaseGates.examplesConformance.repository"
-          );
-          requireEquals(examplesConformance.ref, examples.tag, "releaseGates.examplesConformance.ref");
-          requireEquals(examplesConformance.version, trainVersion, "releaseGates.examplesConformance.version");
-          if (Object.hasOwn(examplesConformance, "evidenceUrl")) {
-            requireString(examplesConformance.evidenceUrl, "releaseGates.examplesConformance.evidenceUrl");
-          }
-
-          const docsPagesDeployment = requireAllowedKeys(
-            releaseGates.docsPagesDeployment,
-            ["id", "status", "required", "manualVersion", "manualPath", "pagesUrl"],
-            ["evidenceUrl"],
-            "releaseGates.docsPagesDeployment"
-          );
-          requireString(docsPagesDeployment.id, "releaseGates.docsPagesDeployment.id");
-          requireStatus(docsPagesDeployment.status, "releaseGates.docsPagesDeployment.status");
-          requireBoolean(docsPagesDeployment.required, "releaseGates.docsPagesDeployment.required");
-          requireEquals(docsPagesDeployment.manualVersion, trainVersion, "releaseGates.docsPagesDeployment.manualVersion");
-          requireEquals(docsPagesDeployment.manualPath, docsManual.path, "releaseGates.docsPagesDeployment.manualPath");
-          requireEquals(docsPagesDeployment.pagesUrl, docsManual.pagesUrl, "releaseGates.docsPagesDeployment.pagesUrl");
-          if (Object.hasOwn(docsPagesDeployment, "evidenceUrl")) {
-            requireString(docsPagesDeployment.evidenceUrl, "releaseGates.docsPagesDeployment.evidenceUrl");
-          }
+          console.log(`Validated kebab-case conductor manifest ${manifestRef} for train ${trainId} (${trainVersion}).`);
           NODE
 
           {
@@ -632,9 +326,56 @@ jobs:
             echo "manifest_ref=${MANIFEST_REF}"
           } >> "${GITHUB_OUTPUT}"
 
+  workflow-library:
+    name: Check skenion-ci reusable workflows
+    runs-on: ubuntu-latest
+    outputs:
+      ready: ${{ steps.check.outputs.ready }}
+      reason: ${{ steps.check.outputs.reason }}
+    steps:
+      - name: Check skenion-ci v1 compatibility
+        id: check
+        env:
+          SKENION_CI_REF: ${{ env.SKENION_CI_REF }}
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          base_url="https://raw.githubusercontent.com/skenion/skenion-ci/${SKENION_CI_REF}"
+          tmp_dir="$(mktemp -d)"
+          reason=""
+
+          for workflow in validate-train-manifest.yml dispatch-release-please.yml verify-release-artifacts.yml; do
+            if ! curl -fsSL "${base_url}/.github/workflows/${workflow}" -o "${tmp_dir}/${workflow}"; then
+              reason="skenion/skenion-ci@${SKENION_CI_REF} does not expose .github/workflows/${workflow}; publish the v1 reusable workflow tag before running the conductor."
+              break
+            fi
+          done
+
+          if [[ -z "${reason}" ]] && ! curl -fsSL "${base_url}/scripts/lib/manifest.mjs" -o "${tmp_dir}/manifest.mjs"; then
+            reason="skenion/skenion-ci@${SKENION_CI_REF} does not expose scripts/lib/manifest.mjs; publish the v1 reusable workflow tag before running the conductor."
+          fi
+
+          if [[ -z "${reason}" ]] && ! grep -q '"schema-version"' "${tmp_dir}/manifest.mjs"; then
+            reason="skenion/skenion-ci@${SKENION_CI_REF} does not yet support the kebab-case release train manifest. Retag v1 after the kebab-case validator lands in skenion-ci."
+          fi
+
+          if [[ -n "${reason}" ]]; then
+            echo "ready=false" >> "${GITHUB_OUTPUT}"
+            echo "reason=${reason}" >> "${GITHUB_OUTPUT}"
+            echo "::warning::${reason}"
+            exit 0
+          fi
+
+          echo "ready=true" >> "${GITHUB_OUTPUT}"
+          echo "reason=skenion/skenion-ci@${SKENION_CI_REF} is ready for the current kebab-case conductor manifest." >> "${GITHUB_OUTPUT}"
+
   validate-manifest:
     name: Validate train manifest
-    needs: validate
+    if: ${{ needs.workflow-library.outputs.ready == 'true' }}
+    needs:
+      - validate
+      - workflow-library
     uses: skenion/skenion-ci/.github/workflows/validate-train-manifest.yml@v1
     with:
       manifest: ${{ needs.validate.outputs.manifest_ref }}
@@ -645,8 +386,10 @@ jobs:
   plan:
     name: Prepare train plan
     runs-on: ubuntu-latest
+    if: ${{ always() && needs.validate.result == 'success' && needs.workflow-library.result == 'success' && (needs.workflow-library.outputs.ready != 'true' || needs.validate-manifest.result == 'success') }}
     needs:
       - validate
+      - workflow-library
       - validate-manifest
     steps:
       - name: Summarize conductor plan
@@ -655,6 +398,8 @@ jobs:
           TRAIN_ID: ${{ needs.validate.outputs.train_id }}
           TRAIN_VERSION: ${{ needs.validate.outputs.train_version }}
           MANIFEST_REF: ${{ needs.validate.outputs.manifest_ref }}
+          WORKFLOW_LIBRARY_READY: ${{ needs.workflow-library.outputs.ready }}
+          WORKFLOW_LIBRARY_REASON: ${{ needs.workflow-library.outputs.reason }}
         shell: bash
         run: |
           set -euo pipefail
@@ -665,7 +410,7 @@ jobs:
             echo "- Train id: ${TRAIN_ID}"
             echo "- Manifest: ${MANIFEST_REF}"
             echo "- Conductor: skenion/skenion"
-            echo "- Workflow library: skenion/skenion-ci@v1"
+            echo "- Workflow library: skenion/skenion-ci@${SKENION_CI_REF}"
             echo
             echo "Release order:"
             echo "1. Contracts"
@@ -675,17 +420,44 @@ jobs:
             echo "5. Examples"
             echo "6. Docs"
             echo
-            echo "Prepare mode validates and summarizes without dispatching."
-            echo "Publish mode dispatches train Release Please PR workflows for releasable repos: Contracts, Runtime, SDK, and Studio."
-            echo "Examples conformance and Docs Pages promotion are post-release gates handled after released artifacts exist during verify/release completion, not Release Please PR dispatch."
+            echo "Prepare mode validates the checked-in manifest and summarizes the plan."
+            echo "Publish mode dispatches train Release Please PR workflows for Contracts, Runtime, SDK, and Studio."
+            echo "Examples conformance and Docs Pages promotion are post-release gates handled during verify/release completion."
             echo "Verify mode is a separate post-release gate after release PRs are merged and artifacts exist."
+            if [[ "${WORKFLOW_LIBRARY_READY}" != "true" ]]; then
+              echo
+              echo "### Blocked"
+              echo
+              echo "${WORKFLOW_LIBRARY_REASON}"
+              echo
+              echo "This conductor remains pinned to skenion/skenion-ci@${SKENION_CI_REF}; publish or retag that reusable workflow library before running prepare/publish/verify."
+            fi
           } >> "${GITHUB_STEP_SUMMARY}"
+
+  workflow-library-unavailable:
+    name: Fail when skenion-ci v1 is unavailable
+    if: ${{ needs.workflow-library.outputs.ready != 'true' }}
+    runs-on: ubuntu-latest
+    needs:
+      - validate
+      - workflow-library
+      - plan
+    steps:
+      - name: Report blocked reusable workflow library
+        env:
+          WORKFLOW_LIBRARY_REASON: ${{ needs.workflow-library.outputs.reason }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          echo "::error::${WORKFLOW_LIBRARY_REASON}"
+          exit 1
 
   publish-contracts:
     name: Dispatch Contracts release
-    if: ${{ needs.validate.outputs.mode == 'publish' }}
+    if: ${{ needs.workflow-library.outputs.ready == 'true' && needs.validate.outputs.mode == 'publish' }}
     needs:
       - validate
+      - workflow-library
       - validate-manifest
       - plan
     uses: skenion/skenion-ci/.github/workflows/dispatch-release-please.yml@v1
@@ -698,9 +470,10 @@ jobs:
 
   publish-runtime:
     name: Dispatch Runtime release
-    if: ${{ needs.validate.outputs.mode == 'publish' }}
+    if: ${{ needs.workflow-library.outputs.ready == 'true' && needs.validate.outputs.mode == 'publish' }}
     needs:
       - validate
+      - workflow-library
       - validate-manifest
       - publish-contracts
     uses: skenion/skenion-ci/.github/workflows/dispatch-release-please.yml@v1
@@ -713,9 +486,10 @@ jobs:
 
   publish-sdk:
     name: Dispatch SDK release
-    if: ${{ needs.validate.outputs.mode == 'publish' }}
+    if: ${{ needs.workflow-library.outputs.ready == 'true' && needs.validate.outputs.mode == 'publish' }}
     needs:
       - validate
+      - workflow-library
       - validate-manifest
       - publish-runtime
     uses: skenion/skenion-ci/.github/workflows/dispatch-release-please.yml@v1
@@ -728,9 +502,10 @@ jobs:
 
   publish-studio:
     name: Dispatch Studio release
-    if: ${{ needs.validate.outputs.mode == 'publish' }}
+    if: ${{ needs.workflow-library.outputs.ready == 'true' && needs.validate.outputs.mode == 'publish' }}
     needs:
       - validate
+      - workflow-library
       - validate-manifest
       - publish-sdk
     uses: skenion/skenion-ci/.github/workflows/dispatch-release-please.yml@v1
@@ -743,9 +518,10 @@ jobs:
 
   verify:
     name: Verify release train
-    if: ${{ needs.validate.outputs.mode == 'verify' }}
+    if: ${{ needs.workflow-library.outputs.ready == 'true' && needs.validate.outputs.mode == 'verify' }}
     needs:
       - validate
+      - workflow-library
       - validate-manifest
       - plan
     uses: skenion/skenion-ci/.github/workflows/verify-release-artifacts.yml@v1
