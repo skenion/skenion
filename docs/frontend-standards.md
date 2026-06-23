@@ -37,7 +37,7 @@ scripts, or tests.
 
 ## Canvas Boundary
 
-Skenion Graph `0.1` is the consolidated current saved graph/project format for
+skenion Graph `0.1` is the consolidated current saved graph/project format for
 subpatches, patch libraries, live help, graph fragments, collaboration, package
 installation, and Runtime targets. Unsupported schema versions are rejected
 with diagnostics rather than opened through legacy import/migration paths.
@@ -45,11 +45,11 @@ React Flow nodes and edges are derived view-model state.
 
 The Studio implementation must keep an explicit translation layer:
 
-- `toReactFlowViewModel()` maps Skenion graph documents, patch definitions, and
+- `toReactFlowViewModel()` maps skenion graph documents, patch definitions, and
   node definitions into canvas nodes, handles, and edges.
 - Studio command builders map canvas gestures into Runtime operation envelopes,
   such as move, connect, edit params, and `pasteGraphFragment`.
-- edge validation calls the Skenion graph validator before committing a
+- edge validation calls the skenion graph validator before committing a
   connection.
 
 The canvas must follow the current `0.1` port model:

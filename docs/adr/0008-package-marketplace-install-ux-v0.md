@@ -6,7 +6,7 @@ Accepted
 
 ## Context
 
-Patchers and packages are part of Skenion's product model. Users need to
+Patchers and packages are part of skenion's product model. Users need to
 publish reusable patch libraries and other users need to discover, install,
 update, and use them. Deferring package install/update UX would leave extension
 and patch-library contracts without a real product path.

@@ -6,18 +6,17 @@ Accepted
 
 ## Context
 
-Skenion is a multi-repository product. Contracts, Runtime, SDK, Studio,
+skenion is a multi-repository product. Contracts, Runtime, SDK, Studio,
 examples, and docs do not all share the same implementation cadence, but v0
 users need one clear product version that names the artifacts that work
 together.
 
-Runtime is also both a Rust crate and an executable product binary. Tauri
-Desktop `local-managed` mode cannot bundle a crates.io package directly; it
-needs OS/arch-specific Runtime binaries.
+Runtime is an executable product binary in v0. Tauri Desktop `local-managed`
+mode needs OS/arch-specific Runtime binaries that can be bundled as sidecars.
 
 ## Decision
 
-Skenion v0 repositories and artifacts use lockstep product SemVer. If the
+skenion v0 repositories and artifacts use lockstep product SemVer. If the
 product train is `0.43.0`, every releasable package, crate, app, Runtime
 sidecar asset, Examples release marker, and Manual release marker in that train
 must use `0.43.0` or the matching major/minor Manual path.
@@ -28,24 +27,23 @@ The manifest is the product compatibility unit and release completion record.
 The manifest schema is owned by `skenion-contracts`.
 
 Product train manifest instances are owned by the hub conductor repository,
-`echovisionlab/skenion`, under:
+`skenion/skenion`, under:
 
 ```text
 releases/trains/<train-id>.json
 ```
 
 Reusable release workflow implementation is owned by
-`echovisionlab/skenion-ci`. The hub conductor workflow dispatches the train and
+`skenion/skenion-ci`. The hub conductor workflow dispatches the train and
 records product state; reusable workflow details stay in `skenion-ci`.
 
 The release train manifest must include:
 
 - product train id
 - Contracts npm/crate versions
-- Runtime crate version
 - Runtime binary artifacts by target, with checksums
 - SDK npm version
-- Studio web/desktop version
+- Studio web/static and desktop artifact version
 - Examples tag or commit
 - Manual version and deploy status
 - protocol baselines
@@ -71,8 +69,8 @@ Release Please remains the version/changelog/release mechanism, but v0 Release
 Please PRs are conductor-dispatched with explicit `release-as`. Automatic
 independent per-repository release authority is stale for v0 trains.
 
-Runtime release workflows must publish multi-arch binary assets in addition to
-the Rust crate.
+Runtime release workflows must publish multi-arch binary assets. Runtime
+product distribution is GitHub Release assets, not a registry package.
 
 Runtime binary release asset names use:
 
@@ -113,4 +111,6 @@ completion.
 
 Registry publishing must run only from GitHub Actions release workflows. Local
 machines may run dry-run verification, but must never publish npm packages,
-crates, Runtime binaries, Studio packages, or Manual releases.
+crates, Runtime binaries, Studio packages, or Manual releases. Registry packages
+are only for importable libraries; product binaries, Studio builds, Examples,
+Manual, and CI surfaces are release assets, tags, deployments, or workflow refs.

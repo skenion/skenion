@@ -277,6 +277,24 @@ jobs:
             return idsByTarget;
           }
 
+          function validateArtifact(value, label, expectedKind) {
+            const artifact = requireExactFields(
+              value,
+              ["id", "kind", "name", "version", "source", "checksum", "sizeBytes"],
+              label
+            );
+            requireString(artifact.id, `${label}.id`);
+            requireEquals(artifact.kind, expectedKind, `${label}.kind`);
+            requireString(artifact.name, `${label}.name`);
+            requireEquals(artifact.version, trainVersion, `${label}.version`);
+            validateArtifactSource(artifact.source, `${label}.source`);
+            validateChecksum(artifact.checksum, `${label}.checksum`);
+            if (artifact.sizeBytes !== null && (!Number.isInteger(artifact.sizeBytes) || artifact.sizeBytes < 0)) {
+              fail(`${label}.sizeBytes must be null or a non-negative integer`);
+            }
+            return artifact.id;
+          }
+
           function validateRegistryGate(value, label, componentPackage) {
             const gate = requireAllowedKeys(value, ["id", "status", "required", "package"], ["evidenceUrl"], label);
             requireString(gate.id, `${label}.id`);
@@ -418,8 +436,7 @@ jobs:
           const contractsNpm = validateRegistryPackage(contracts.npm, "components.contracts.npm", "npm", "@skenion/contracts");
           const contractsCrate = validateRegistryPackage(contracts.crate, "components.contracts.crate", "crates.io", "skenion-contracts");
 
-          const runtime = requireExactFields(components.runtime, ["crate", "binaries"], "components.runtime");
-          const runtimeCrate = validateRegistryPackage(runtime.crate, "components.runtime.crate", "crates.io", "skenion-runtime");
+          const runtime = requireExactFields(components.runtime, ["binaries"], "components.runtime");
           const runtimeIdsByTarget = validateArtifactMap(runtime.binaries, "components.runtime.binaries", "runtime-binary");
 
           const sdk = requireExactFields(components.sdk, ["npm"], "components.sdk");
@@ -427,11 +444,9 @@ jobs:
 
           const studio = requireExactFields(
             components.studio,
-            ["web", "desktop", "desktopPackages", "runtimeSidecars"],
+            ["desktopPackages", "runtimeSidecars", "web-bundle"],
             "components.studio"
           );
-          const studioWeb = validateRegistryPackage(studio.web, "components.studio.web", "npm", "@skenion/studio-web");
-          const studioDesktop = validateRegistryPackage(studio.desktop, "components.studio.desktop", "npm", "@skenion/studio-desktop");
           const studioDesktopIdsByTarget = validateArtifactMap(
             studio.desktopPackages,
             "components.studio.desktopPackages",
@@ -441,6 +456,11 @@ jobs:
             studio.runtimeSidecars,
             "components.studio.runtimeSidecars",
             "studio-runtime-sidecar"
+          );
+          const studioWebBundleId = validateArtifact(
+            studio["web-bundle"],
+            'components.studio["web-bundle"]',
+            "studio-web-bundle"
           );
 
           const examples = requireAllowedKeys(components.examples, ["repository", "version", "tag"], ["commit"], "components.examples");
@@ -460,6 +480,7 @@ jobs:
           const allArtifactIds = [
             ...Object.values(runtimeIdsByTarget),
             ...Object.values(studioDesktopIdsByTarget),
+            studioWebBundleId,
             ...Object.values(studioSidecarIdsByTarget)
           ];
           if (new Set(allArtifactIds).size !== allArtifactIds.length) {
@@ -482,15 +503,12 @@ jobs:
 
           const registryPackages = requireExactFields(
             releaseGates.registryPackages,
-            ["contractsNpm", "contractsCrate", "runtimeCrate", "sdkNpm", "studioWeb", "studioDesktop"],
+            ["contractsNpm", "contractsCrate", "sdkNpm"],
             "releaseGates.registryPackages"
           );
           validateRegistryGate(registryPackages.contractsNpm, "releaseGates.registryPackages.contractsNpm", contractsNpm);
           validateRegistryGate(registryPackages.contractsCrate, "releaseGates.registryPackages.contractsCrate", contractsCrate);
-          validateRegistryGate(registryPackages.runtimeCrate, "releaseGates.registryPackages.runtimeCrate", runtimeCrate);
           validateRegistryGate(registryPackages.sdkNpm, "releaseGates.registryPackages.sdkNpm", sdkNpm);
-          validateRegistryGate(registryPackages.studioWeb, "releaseGates.registryPackages.studioWeb", studioWeb);
-          validateRegistryGate(registryPackages.studioDesktop, "releaseGates.registryPackages.studioDesktop", studioDesktop);
 
           const githubReleaseAssets = requireExactFields(
             releaseGates.githubReleaseAssets,
@@ -505,7 +523,11 @@ jobs:
           validateArtifactCollectionGate(
             githubReleaseAssets.studio,
             "releaseGates.githubReleaseAssets.studio",
-            [...Object.values(studioDesktopIdsByTarget), ...Object.values(studioSidecarIdsByTarget)]
+            [
+              ...Object.values(studioDesktopIdsByTarget),
+              studioWebBundleId,
+              ...Object.values(studioSidecarIdsByTarget)
+            ]
           );
 
           const checksumGate = requireAllowedKeys(
@@ -613,7 +635,7 @@ jobs:
   validate-manifest:
     name: Validate train manifest
     needs: validate
-    uses: echovisionlab/skenion-ci/.github/workflows/validate-train-manifest.yml@v1
+    uses: skenion/skenion-ci/.github/workflows/validate-train-manifest.yml@v1
     with:
       manifest: ${{ needs.validate.outputs.manifest_ref }}
       manifest-ref: ${{ github.sha }}
@@ -642,8 +664,8 @@ jobs:
             echo "- Mode: ${MODE}"
             echo "- Train id: ${TRAIN_ID}"
             echo "- Manifest: ${MANIFEST_REF}"
-            echo "- Conductor: echovisionlab/skenion"
-            echo "- Workflow library: echovisionlab/skenion-ci@v1"
+            echo "- Conductor: skenion/skenion"
+            echo "- Workflow library: skenion/skenion-ci@v1"
             echo
             echo "Release order:"
             echo "1. Contracts"
@@ -654,7 +676,7 @@ jobs:
             echo "6. Docs"
             echo
             echo "Prepare mode validates and summarizes without dispatching."
-            echo "Publish mode dispatches train Release Please PR workflows for releasable package/application repos: Contracts, Runtime, SDK, and Studio."
+            echo "Publish mode dispatches train Release Please PR workflows for releasable repos: Contracts, Runtime, SDK, and Studio."
             echo "Examples conformance and Docs Pages promotion are post-release gates handled after released artifacts exist during verify/release completion, not Release Please PR dispatch."
             echo "Verify mode is a separate post-release gate after release PRs are merged and artifacts exist."
           } >> "${GITHUB_STEP_SUMMARY}"
@@ -666,9 +688,9 @@ jobs:
       - validate
       - validate-manifest
       - plan
-    uses: echovisionlab/skenion-ci/.github/workflows/dispatch-release-please.yml@v1
+    uses: skenion/skenion-ci/.github/workflows/dispatch-release-please.yml@v1
     with:
-      target-repo: echovisionlab/skenion-contracts
+      target-repo: skenion/skenion-contracts
       train-version: ${{ needs.validate.outputs.train_version }}
       mode: publish
       dry-run: false
@@ -681,9 +703,9 @@ jobs:
       - validate
       - validate-manifest
       - publish-contracts
-    uses: echovisionlab/skenion-ci/.github/workflows/dispatch-release-please.yml@v1
+    uses: skenion/skenion-ci/.github/workflows/dispatch-release-please.yml@v1
     with:
-      target-repo: echovisionlab/skenion-runtime
+      target-repo: skenion/skenion-runtime
       train-version: ${{ needs.validate.outputs.train_version }}
       mode: publish
       dry-run: false
@@ -696,9 +718,9 @@ jobs:
       - validate
       - validate-manifest
       - publish-runtime
-    uses: echovisionlab/skenion-ci/.github/workflows/dispatch-release-please.yml@v1
+    uses: skenion/skenion-ci/.github/workflows/dispatch-release-please.yml@v1
     with:
-      target-repo: echovisionlab/skenion-sdk
+      target-repo: skenion/skenion-sdk
       train-version: ${{ needs.validate.outputs.train_version }}
       mode: publish
       dry-run: false
@@ -711,9 +733,9 @@ jobs:
       - validate
       - validate-manifest
       - publish-sdk
-    uses: echovisionlab/skenion-ci/.github/workflows/dispatch-release-please.yml@v1
+    uses: skenion/skenion-ci/.github/workflows/dispatch-release-please.yml@v1
     with:
-      target-repo: echovisionlab/skenion-studio
+      target-repo: skenion/skenion-studio
       train-version: ${{ needs.validate.outputs.train_version }}
       mode: publish
       dry-run: false
@@ -726,7 +748,7 @@ jobs:
       - validate
       - validate-manifest
       - plan
-    uses: echovisionlab/skenion-ci/.github/workflows/verify-release-artifacts.yml@v1
+    uses: skenion/skenion-ci/.github/workflows/verify-release-artifacts.yml@v1
     with:
       manifest: ${{ needs.validate.outputs.manifest_ref }}
       manifest-ref: ${{ github.sha }}

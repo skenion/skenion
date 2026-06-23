@@ -6,7 +6,7 @@ Accepted
 
 ## Context
 
-Skenion Studio remains a React/Vite web client. The desktop product needs native
+skenion Studio remains a React/Vite web client. The desktop product needs native
 window management, local Runtime sidecar lifecycle, shared clipboard bridging,
 and connection profiles for local and remote Runtime targets.
 

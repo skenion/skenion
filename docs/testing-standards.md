@@ -1,6 +1,6 @@
 # Testing Standards
 
-Skenion packages use 100% test coverage as a release rule. This is a quality
+skenion packages use 100% test coverage as a release rule. This is a quality
 bar, not a request to write low-value tests only to satisfy a number.
 
 ## Coverage Rule

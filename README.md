@@ -1,6 +1,6 @@
-# Skenion
+# skenion
 
-Skenion is an open-source interactive artwork platform by EchoVisionLab.
+skenion is an open-source interactive artwork platform.
 
 The core design is simple:
 
@@ -10,14 +10,13 @@ Rust renders.
 The preview shows the Rust runtime's real output.
 ```
 
-Skenion is not a browser-only clone of TouchDesigner. The browser is the editor,
-controller, and viewer. A native Rust runtime owns graph compilation,
-scheduling, rendering, output, plugin execution, preview generation, and runtime
-telemetry.
+skenion pairs a web Studio for editing, control, and preview with a native Rust
+runtime that owns graph compilation, scheduling, rendering, output, plugin
+execution, preview generation, and runtime telemetry.
 
 ## Repository Family
 
-Skenion starts as a multi-repository project:
+skenion starts as a multi-repository project:
 
 | Repository | Role |
 | --- | --- |
@@ -34,7 +33,7 @@ See [Repository Map](docs/repository-map.md) for ownership boundaries.
 See [Compatibility Matrix](docs/compatibility-matrix.md) for graph/node/runtime
 source-of-truth rules.
 Human-readable delivery and processing model docs live in
-[`skenion-docs`](https://github.com/echovisionlab/skenion-docs); machine
+[`skenion-docs`](https://github.com/skenion/skenion-docs); machine
 contracts remain in `skenion-contracts`.
 See [Local Demo](docs/local-demo.md) for the current Runtime + Studio learning
 flow.
@@ -53,7 +52,11 @@ See [Roadmap](docs/roadmap.md) for the initial implementation order.
 - Use Release Please for v0 through conductor-dispatched release PRs with an
   explicit `release-as`, starting with product train `0.43.0`
   (`trainId: "0.43"`).
-- Publish npm packages, crates, Runtime binaries, Studio desktop packages, and
+- Publish importable library packages to registries only: `@skenion/contracts`,
+  `skenion-contracts`, and `@skenion/sdk`. Runtime binaries, Studio web/desktop
+  builds, examples, Manual pages, and `skenion-ci` are release assets, tags,
+  deployments, or workflow refs.
+- Publish registry packages, Runtime binaries, Studio desktop packages, and
   Manual releases through GitHub Actions only, never from a local machine.
 - Use Tauri as the desktop shell for Studio; Tauri coordinates windows,
   sidecars, runtime profiles, and clipboard bridging while Runtime remains the
@@ -75,8 +78,8 @@ contracts, release rules, and the MVP runtime/editor protocol.
 
 ## License And Credit
 
-Skenion is licensed under the Apache License, Version 2.0.
+skenion is licensed under the Apache License, Version 2.0.
 
 Redistributions must preserve copyright, license, and NOTICE information as
-required by Apache-2.0. If Skenion helps your artwork, research, publication,
-installation, or tool, please credit Skenion and EchoVisionLab.
+required by Apache-2.0. If skenion helps your artwork, research, publication,
+installation, or tool, please credit skenion and its contributors.

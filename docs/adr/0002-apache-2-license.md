@@ -6,16 +6,16 @@ Accepted.
 
 ## Context
 
-Skenion is intended to grow as an open-source interactive artwork platform. Its
+skenion is intended to grow as an open-source interactive artwork platform. Its
 value depends on adoption across runtime users, editor contributors, protocol
 consumers, SDK users, artists, researchers, and installation teams.
 
 The project also needs credit preservation so downstream users and derivative
-tools keep attribution to Skenion and EchoVisionLab.
+tools keep attribution to skenion and its contributors.
 
 ## Decision
 
-Use the Apache License, Version 2.0 as the default license for Skenion
+Use the Apache License, Version 2.0 as the default license for skenion
 repositories.
 
 Each repository should include:
@@ -28,9 +28,9 @@ Each repository should include:
 Credit preservation should rely on the Apache-2.0 license and NOTICE mechanism.
 The project may request citation and visible credit in documentation, examples,
 publications, and artwork presentations, but should avoid custom source-license
-terms that make Skenion non-standard or non-open-source.
+terms that make skenion non-standard or non-open-source.
 
-Skenion names and marks are protected separately through trademark policy.
+skenion names and marks are protected separately through trademark policy.
 
 ## Consequences
 
@@ -51,7 +51,7 @@ Costs:
 
 ## Follow-Ups
 
-- Add license files to all Skenion repositories.
+- Add license files to all skenion repositories.
 - Add package-level SPDX identifiers during source scaffolding.
 - Define asset-specific licenses in `skenion-examples`.
 - Add third-party notice handling once dependencies are introduced.

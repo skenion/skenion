@@ -1,6 +1,6 @@
-# Skenion CI Policy
+# skenion CI Policy
 
-Skenion is a multi-repository project. A green check in one repository is not enough when a change affects contracts, builtin nodes, compatibility fixtures, Runtime planning, or Studio graph UX.
+skenion is a multi-repository project. A green check in one repository is not enough when a change affects contracts, builtin nodes, compatibility fixtures, Runtime planning, or Studio graph UX.
 
 ## Required Local Gates
 

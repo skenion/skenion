@@ -6,7 +6,7 @@ Accepted
 
 ## Context
 
-Skenion Studio needs a visual node editor, inspector panels, runtime
+skenion Studio needs a visual node editor, inspector panels, runtime
 connection UX, and preview surfaces. Those UI pieces depend on a stable contract
 for node definitions, port types, lifecycle hooks, and validation behavior.
 

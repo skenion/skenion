@@ -76,12 +76,6 @@
       }
     },
     "runtime": {
-      "crate": {
-        "ecosystem": "crates.io",
-        "name": "skenion-runtime",
-        "version": "0.43.0",
-        "url": "https://crates.io/crates/skenion-runtime/0.43.0"
-      },
       "binaries": {
         "aarch64-apple-darwin": {
           "id": "runtime-aarch64-apple-darwin",
@@ -92,10 +86,10 @@
           "version": "0.43.0",
           "source": {
             "kind": "github-release-asset",
-            "repository": "echovisionlab/Skenion-runtime",
+            "repository": "skenion/skenion-runtime",
             "tag": "skenion-runtime-v0.43.0",
             "assetName": "skenion-runtime-v0.43.0-aarch64-apple-darwin.tar.gz",
-            "url": "https://github.com/echovisionlab/skenion-runtime/releases/download/skenion-runtime-v0.43.0/skenion-runtime-v0.43.0-aarch64-apple-darwin.tar.gz"
+            "url": "https://github.com/skenion/skenion-runtime/releases/download/skenion-runtime-v0.43.0/skenion-runtime-v0.43.0-aarch64-apple-darwin.tar.gz"
           },
           "checksum": {
             "algorithm": "sha256",
@@ -112,10 +106,10 @@
           "version": "0.43.0",
           "source": {
             "kind": "github-release-asset",
-            "repository": "echovisionlab/Skenion-runtime",
+            "repository": "skenion/skenion-runtime",
             "tag": "skenion-runtime-v0.43.0",
             "assetName": "skenion-runtime-v0.43.0-x86_64-apple-darwin.tar.gz",
-            "url": "https://github.com/echovisionlab/skenion-runtime/releases/download/skenion-runtime-v0.43.0/skenion-runtime-v0.43.0-x86_64-apple-darwin.tar.gz"
+            "url": "https://github.com/skenion/skenion-runtime/releases/download/skenion-runtime-v0.43.0/skenion-runtime-v0.43.0-x86_64-apple-darwin.tar.gz"
           },
           "checksum": {
             "algorithm": "sha256",
@@ -132,10 +126,10 @@
           "version": "0.43.0",
           "source": {
             "kind": "github-release-asset",
-            "repository": "echovisionlab/Skenion-runtime",
+            "repository": "skenion/skenion-runtime",
             "tag": "skenion-runtime-v0.43.0",
             "assetName": "skenion-runtime-v0.43.0-x86_64-pc-windows-msvc.tar.gz",
-            "url": "https://github.com/echovisionlab/skenion-runtime/releases/download/skenion-runtime-v0.43.0/skenion-runtime-v0.43.0-x86_64-pc-windows-msvc.tar.gz"
+            "url": "https://github.com/skenion/skenion-runtime/releases/download/skenion-runtime-v0.43.0/skenion-runtime-v0.43.0-x86_64-pc-windows-msvc.tar.gz"
           },
           "checksum": {
             "algorithm": "sha256",
@@ -152,10 +146,10 @@
           "version": "0.43.0",
           "source": {
             "kind": "github-release-asset",
-            "repository": "echovisionlab/Skenion-runtime",
+            "repository": "skenion/skenion-runtime",
             "tag": "skenion-runtime-v0.43.0",
             "assetName": "skenion-runtime-v0.43.0-aarch64-pc-windows-msvc.tar.gz",
-            "url": "https://github.com/echovisionlab/skenion-runtime/releases/download/skenion-runtime-v0.43.0/skenion-runtime-v0.43.0-aarch64-pc-windows-msvc.tar.gz"
+            "url": "https://github.com/skenion/skenion-runtime/releases/download/skenion-runtime-v0.43.0/skenion-runtime-v0.43.0-aarch64-pc-windows-msvc.tar.gz"
           },
           "checksum": {
             "algorithm": "sha256",
@@ -172,10 +166,10 @@
           "version": "0.43.0",
           "source": {
             "kind": "github-release-asset",
-            "repository": "echovisionlab/Skenion-runtime",
+            "repository": "skenion/skenion-runtime",
             "tag": "skenion-runtime-v0.43.0",
             "assetName": "skenion-runtime-v0.43.0-x86_64-unknown-linux-gnu.tar.gz",
-            "url": "https://github.com/echovisionlab/skenion-runtime/releases/download/skenion-runtime-v0.43.0/skenion-runtime-v0.43.0-x86_64-unknown-linux-gnu.tar.gz"
+            "url": "https://github.com/skenion/skenion-runtime/releases/download/skenion-runtime-v0.43.0/skenion-runtime-v0.43.0-x86_64-unknown-linux-gnu.tar.gz"
           },
           "checksum": {
             "algorithm": "sha256",
@@ -192,10 +186,10 @@
           "version": "0.43.0",
           "source": {
             "kind": "github-release-asset",
-            "repository": "echovisionlab/Skenion-runtime",
+            "repository": "skenion/skenion-runtime",
             "tag": "skenion-runtime-v0.43.0",
             "assetName": "skenion-runtime-v0.43.0-aarch64-unknown-linux-gnu.tar.gz",
-            "url": "https://github.com/echovisionlab/skenion-runtime/releases/download/skenion-runtime-v0.43.0/skenion-runtime-v0.43.0-aarch64-unknown-linux-gnu.tar.gz"
+            "url": "https://github.com/skenion/skenion-runtime/releases/download/skenion-runtime-v0.43.0/skenion-runtime-v0.43.0-aarch64-unknown-linux-gnu.tar.gz"
           },
           "checksum": {
             "algorithm": "sha256",
@@ -214,31 +208,19 @@
       }
     },
     "studio": {
-      "web": {
-        "ecosystem": "npm",
-        "name": "@skenion/studio-web",
-        "version": "0.43.0",
-        "url": "https://www.npmjs.com/package/@skenion/studio-web/v/0.43.0"
-      },
-      "desktop": {
-        "ecosystem": "npm",
-        "name": "@skenion/studio-desktop",
-        "version": "0.43.0",
-        "url": "https://www.npmjs.com/package/@skenion/studio-desktop/v/0.43.0"
-      },
       "desktopPackages": {
         "aarch64-apple-darwin": {
           "id": "studio-desktop-aarch64-apple-darwin",
           "target": "aarch64-apple-darwin",
           "supportTier": "release-blocking",
           "kind": "studio-desktop-package",
-          "name": "Skenion-Studio-aarch64-apple-darwin.dmg",
+          "name": "skenion-studio-aarch64-apple-darwin.tar.gz",
           "version": "0.43.0",
           "source": {
             "kind": "github-release-asset",
-            "repository": "echovisionlab/Skenion-studio",
+            "repository": "skenion/skenion-studio",
             "tag": "skenion-studio-v0.43.0",
-            "assetName": "Skenion-Studio-aarch64-apple-darwin.dmg",
+            "assetName": "skenion-studio-aarch64-apple-darwin.tar.gz",
             "url": null
           },
           "checksum": {
@@ -252,13 +234,13 @@
           "target": "x86_64-apple-darwin",
           "supportTier": "release-blocking",
           "kind": "studio-desktop-package",
-          "name": "Skenion-Studio-x86_64-apple-darwin.dmg",
+          "name": "skenion-studio-x86_64-apple-darwin.tar.gz",
           "version": "0.43.0",
           "source": {
             "kind": "github-release-asset",
-            "repository": "echovisionlab/Skenion-studio",
+            "repository": "skenion/skenion-studio",
             "tag": "skenion-studio-v0.43.0",
-            "assetName": "Skenion-Studio-x86_64-apple-darwin.dmg",
+            "assetName": "skenion-studio-x86_64-apple-darwin.tar.gz",
             "url": null
           },
           "checksum": {
@@ -272,13 +254,13 @@
           "target": "x86_64-pc-windows-msvc",
           "supportTier": "release-blocking",
           "kind": "studio-desktop-package",
-          "name": "Skenion-Studio-x86_64-pc-windows-msvc.msi",
+          "name": "skenion-studio-x86_64-pc-windows-msvc.zip",
           "version": "0.43.0",
           "source": {
             "kind": "github-release-asset",
-            "repository": "echovisionlab/Skenion-studio",
+            "repository": "skenion/skenion-studio",
             "tag": "skenion-studio-v0.43.0",
-            "assetName": "Skenion-Studio-x86_64-pc-windows-msvc.msi",
+            "assetName": "skenion-studio-x86_64-pc-windows-msvc.zip",
             "url": null
           },
           "checksum": {
@@ -292,13 +274,13 @@
           "target": "aarch64-pc-windows-msvc",
           "supportTier": "preview",
           "kind": "studio-desktop-package",
-          "name": "Skenion-Studio-aarch64-pc-windows-msvc.msi",
+          "name": "skenion-studio-aarch64-pc-windows-msvc.zip",
           "version": "0.43.0",
           "source": {
             "kind": "github-release-asset",
-            "repository": "echovisionlab/Skenion-studio",
+            "repository": "skenion/skenion-studio",
             "tag": "skenion-studio-v0.43.0",
-            "assetName": "Skenion-Studio-aarch64-pc-windows-msvc.msi",
+            "assetName": "skenion-studio-aarch64-pc-windows-msvc.zip",
             "url": null
           },
           "checksum": {
@@ -312,13 +294,13 @@
           "target": "x86_64-unknown-linux-gnu",
           "supportTier": "release-blocking",
           "kind": "studio-desktop-package",
-          "name": "Skenion-Studio-x86_64-unknown-linux-gnu.AppImage",
+          "name": "skenion-studio-x86_64-unknown-linux-gnu.tar.gz",
           "version": "0.43.0",
           "source": {
             "kind": "github-release-asset",
-            "repository": "echovisionlab/Skenion-studio",
+            "repository": "skenion/skenion-studio",
             "tag": "skenion-studio-v0.43.0",
-            "assetName": "Skenion-Studio-x86_64-unknown-linux-gnu.AppImage",
+            "assetName": "skenion-studio-x86_64-unknown-linux-gnu.tar.gz",
             "url": null
           },
           "checksum": {
@@ -332,13 +314,13 @@
           "target": "aarch64-unknown-linux-gnu",
           "supportTier": "preview",
           "kind": "studio-desktop-package",
-          "name": "Skenion-Studio-aarch64-unknown-linux-gnu.AppImage",
+          "name": "skenion-studio-aarch64-unknown-linux-gnu.tar.gz",
           "version": "0.43.0",
           "source": {
             "kind": "github-release-asset",
-            "repository": "echovisionlab/Skenion-studio",
+            "repository": "skenion/skenion-studio",
             "tag": "skenion-studio-v0.43.0",
-            "assetName": "Skenion-Studio-aarch64-unknown-linux-gnu.AppImage",
+            "assetName": "skenion-studio-aarch64-unknown-linux-gnu.tar.gz",
             "url": null
           },
           "checksum": {
@@ -358,7 +340,7 @@
           "version": "0.43.0",
           "source": {
             "kind": "github-release-asset",
-            "repository": "echovisionlab/Skenion-studio",
+            "repository": "skenion/skenion-studio",
             "tag": "skenion-studio-v0.43.0",
             "assetName": "skenion-runtime-sidecar-aarch64-apple-darwin.tar.gz",
             "url": null
@@ -378,7 +360,7 @@
           "version": "0.43.0",
           "source": {
             "kind": "github-release-asset",
-            "repository": "echovisionlab/Skenion-studio",
+            "repository": "skenion/skenion-studio",
             "tag": "skenion-studio-v0.43.0",
             "assetName": "skenion-runtime-sidecar-x86_64-apple-darwin.tar.gz",
             "url": null
@@ -398,7 +380,7 @@
           "version": "0.43.0",
           "source": {
             "kind": "github-release-asset",
-            "repository": "echovisionlab/Skenion-studio",
+            "repository": "skenion/skenion-studio",
             "tag": "skenion-studio-v0.43.0",
             "assetName": "skenion-runtime-sidecar-x86_64-pc-windows-msvc.zip",
             "url": null
@@ -418,7 +400,7 @@
           "version": "0.43.0",
           "source": {
             "kind": "github-release-asset",
-            "repository": "echovisionlab/Skenion-studio",
+            "repository": "skenion/skenion-studio",
             "tag": "skenion-studio-v0.43.0",
             "assetName": "skenion-runtime-sidecar-aarch64-pc-windows-msvc.zip",
             "url": null
@@ -438,7 +420,7 @@
           "version": "0.43.0",
           "source": {
             "kind": "github-release-asset",
-            "repository": "echovisionlab/Skenion-studio",
+            "repository": "skenion/skenion-studio",
             "tag": "skenion-studio-v0.43.0",
             "assetName": "skenion-runtime-sidecar-x86_64-unknown-linux-gnu.tar.gz",
             "url": null
@@ -458,7 +440,7 @@
           "version": "0.43.0",
           "source": {
             "kind": "github-release-asset",
-            "repository": "echovisionlab/Skenion-studio",
+            "repository": "skenion/skenion-studio",
             "tag": "skenion-studio-v0.43.0",
             "assetName": "skenion-runtime-sidecar-aarch64-unknown-linux-gnu.tar.gz",
             "url": null
@@ -469,10 +451,28 @@
           },
           "sizeBytes": null
         }
+      },
+      "web-bundle": {
+        "id": "studio-web-bundle",
+        "kind": "studio-web-bundle",
+        "name": "skenion-studio-web-bundle-v0.43.0.tar.gz",
+        "version": "0.43.0",
+        "source": {
+          "kind": "github-release-asset",
+          "repository": "skenion/skenion-studio",
+          "tag": "skenion-studio-v0.43.0",
+          "assetName": "skenion-studio-web-bundle-v0.43.0.tar.gz",
+          "url": null
+        },
+        "checksum": {
+          "algorithm": "sha256",
+          "value": null
+        },
+        "sizeBytes": null
       }
     },
     "examples": {
-      "repository": "echovisionlab/Skenion-examples",
+      "repository": "skenion/skenion-examples",
       "version": "0.43.0",
       "tag": "skenion-examples-v0.43.0",
       "commit": "dcd11fdd3aba0b1acf29697d777f3a02deaf3b78"
@@ -481,7 +481,7 @@
       "manual": {
         "version": "0.43.0",
         "path": "/manual/0.43/",
-        "pagesUrl": "https://echovisionlab.github.io/Skenion-docs/manual/0.43/"
+        "pagesUrl": "https://skenion.github.io/skenion-docs/manual/0.43/"
       }
     }
   },
@@ -511,18 +511,6 @@
         },
         "evidenceUrl": "https://crates.io/crates/skenion-contracts/0.43.0"
       },
-      "runtimeCrate": {
-        "id": "runtime-crate-exists",
-        "status": "passed",
-        "required": true,
-        "package": {
-          "ecosystem": "crates.io",
-          "name": "skenion-runtime",
-          "version": "0.43.0",
-          "url": "https://crates.io/crates/skenion-runtime/0.43.0"
-        },
-        "evidenceUrl": "https://github.com/echovisionlab/skenion-runtime/actions/runs/27966157953"
-      },
       "sdkNpm": {
         "id": "sdk-npm-exists",
         "status": "passed",
@@ -534,30 +522,6 @@
           "url": "https://www.npmjs.com/package/@skenion/sdk/v/0.43.0"
         },
         "evidenceUrl": "https://registry.npmjs.org/@skenion/sdk/0.43.0"
-      },
-      "studioWeb": {
-        "id": "studio-web-package-exists",
-        "status": "passed",
-        "required": true,
-        "package": {
-          "ecosystem": "npm",
-          "name": "@skenion/studio-web",
-          "version": "0.43.0",
-          "url": "https://www.npmjs.com/package/@skenion/studio-web/v/0.43.0"
-        },
-        "evidenceUrl": "https://github.com/echovisionlab/skenion-studio/actions/runs/27972699206"
-      },
-      "studioDesktop": {
-        "id": "studio-desktop-package-exists",
-        "status": "passed",
-        "required": true,
-        "package": {
-          "ecosystem": "npm",
-          "name": "@skenion/studio-desktop",
-          "version": "0.43.0",
-          "url": "https://www.npmjs.com/package/@skenion/studio-desktop/v/0.43.0"
-        },
-        "evidenceUrl": "https://github.com/echovisionlab/skenion-studio/actions/runs/27972699206"
       }
     },
     "githubReleaseAssets": {
@@ -565,7 +529,7 @@
         "id": "runtime-release-assets",
         "status": "passed",
         "required": true,
-        "repository": "echovisionlab/Skenion-runtime",
+        "repository": "skenion/skenion-runtime",
         "tag": "skenion-runtime-v0.43.0",
         "artifactIds": [
           "runtime-aarch64-apple-darwin",
@@ -575,13 +539,13 @@
           "runtime-x86_64-unknown-linux-gnu",
           "runtime-aarch64-unknown-linux-gnu"
         ],
-        "evidenceUrl": "https://github.com/echovisionlab/skenion-runtime/releases/tag/skenion-runtime-v0.43.0"
+        "evidenceUrl": "https://github.com/skenion/skenion-runtime/releases/tag/skenion-runtime-v0.43.0"
       },
       "studio": {
         "id": "studio-release-assets",
         "status": "pending",
         "required": true,
-        "repository": "echovisionlab/Skenion-studio",
+        "repository": "skenion/skenion-studio",
         "tag": "skenion-studio-v0.43.0",
         "artifactIds": [
           "studio-desktop-aarch64-apple-darwin",
@@ -590,6 +554,7 @@
           "studio-desktop-aarch64-pc-windows-msvc",
           "studio-desktop-x86_64-unknown-linux-gnu",
           "studio-desktop-aarch64-unknown-linux-gnu",
+          "studio-web-bundle",
           "studio-runtime-sidecar-aarch64-apple-darwin",
           "studio-runtime-sidecar-x86_64-apple-darwin",
           "studio-runtime-sidecar-x86_64-pc-windows-msvc",
@@ -616,6 +581,7 @@
         "studio-desktop-aarch64-pc-windows-msvc",
         "studio-desktop-x86_64-unknown-linux-gnu",
         "studio-desktop-aarch64-unknown-linux-gnu",
+        "studio-web-bundle",
         "studio-runtime-sidecar-aarch64-apple-darwin",
         "studio-runtime-sidecar-x86_64-apple-darwin",
         "studio-runtime-sidecar-x86_64-pc-windows-msvc",
@@ -649,7 +615,7 @@
           "value": "e59813ff4c5e4a459d18182d41da6c863567cc5d80d69c484bf7f6e76c1d0ecc"
         }
       },
-      "evidenceUrl": "https://github.com/echovisionlab/skenion-runtime/releases/tag/skenion-runtime-v0.43.0"
+      "evidenceUrl": "https://github.com/skenion/skenion-runtime/releases/tag/skenion-runtime-v0.43.0"
     },
     "runtimeSmoke": {
       "aarch64-apple-darwin": {
@@ -658,7 +624,7 @@
         "required": true,
         "target": "aarch64-apple-darwin",
         "artifactId": "runtime-aarch64-apple-darwin",
-        "evidenceUrl": "https://github.com/echovisionlab/skenion-runtime/actions/runs/27966157953/job/82760449137"
+        "evidenceUrl": "https://github.com/skenion/skenion-runtime/actions/runs/27966157953/job/82760449137"
       },
       "x86_64-apple-darwin": {
         "id": "runtime-smoke-x86_64-apple-darwin",
@@ -666,7 +632,7 @@
         "required": true,
         "target": "x86_64-apple-darwin",
         "artifactId": "runtime-x86_64-apple-darwin",
-        "evidenceUrl": "https://github.com/echovisionlab/skenion-runtime/actions/runs/27966157953/job/82760449042"
+        "evidenceUrl": "https://github.com/skenion/skenion-runtime/actions/runs/27966157953/job/82760449042"
       },
       "x86_64-pc-windows-msvc": {
         "id": "runtime-smoke-x86_64-pc-windows-msvc",
@@ -674,7 +640,7 @@
         "required": true,
         "target": "x86_64-pc-windows-msvc",
         "artifactId": "runtime-x86_64-pc-windows-msvc",
-        "evidenceUrl": "https://github.com/echovisionlab/skenion-runtime/actions/runs/27966157953/job/82760449029"
+        "evidenceUrl": "https://github.com/skenion/skenion-runtime/actions/runs/27966157953/job/82760449029"
       },
       "aarch64-pc-windows-msvc": {
         "id": "runtime-smoke-aarch64-pc-windows-msvc",
@@ -682,7 +648,7 @@
         "required": true,
         "target": "aarch64-pc-windows-msvc",
         "artifactId": "runtime-aarch64-pc-windows-msvc",
-        "evidenceUrl": "https://github.com/echovisionlab/skenion-runtime/actions/runs/27966157953/job/82760449028"
+        "evidenceUrl": "https://github.com/skenion/skenion-runtime/actions/runs/27966157953/job/82760449028"
       },
       "x86_64-unknown-linux-gnu": {
         "id": "runtime-smoke-x86_64-unknown-linux-gnu",
@@ -690,7 +656,7 @@
         "required": true,
         "target": "x86_64-unknown-linux-gnu",
         "artifactId": "runtime-x86_64-unknown-linux-gnu",
-        "evidenceUrl": "https://github.com/echovisionlab/skenion-runtime/actions/runs/27966157953/job/82760449025"
+        "evidenceUrl": "https://github.com/skenion/skenion-runtime/actions/runs/27966157953/job/82760449025"
       },
       "aarch64-unknown-linux-gnu": {
         "id": "runtime-smoke-aarch64-unknown-linux-gnu",
@@ -698,7 +664,7 @@
         "required": true,
         "target": "aarch64-unknown-linux-gnu",
         "artifactId": "runtime-aarch64-unknown-linux-gnu",
-        "evidenceUrl": "https://github.com/echovisionlab/skenion-runtime/actions/runs/27966157953/job/82760448982"
+        "evidenceUrl": "https://github.com/skenion/skenion-runtime/actions/runs/27966157953/job/82760448982"
       }
     },
     "studioPackageSmoke": {
@@ -709,7 +675,7 @@
         "target": "aarch64-apple-darwin",
         "desktopPackageArtifactId": "studio-desktop-aarch64-apple-darwin",
         "runtimeSidecarArtifactId": "studio-runtime-sidecar-aarch64-apple-darwin",
-        "evidenceUrl": "https://github.com/echovisionlab/skenion-studio/actions/runs/27974258954/job/82787904603"
+        "evidenceUrl": "https://github.com/skenion/skenion-studio/actions/runs/27974258954/job/82787904603"
       },
       "x86_64-apple-darwin": {
         "id": "studio-smoke-x86_64-apple-darwin",
@@ -718,7 +684,7 @@
         "target": "x86_64-apple-darwin",
         "desktopPackageArtifactId": "studio-desktop-x86_64-apple-darwin",
         "runtimeSidecarArtifactId": "studio-runtime-sidecar-x86_64-apple-darwin",
-        "evidenceUrl": "https://github.com/echovisionlab/skenion-studio/actions/runs/27974258954/job/82787904621"
+        "evidenceUrl": "https://github.com/skenion/skenion-studio/actions/runs/27974258954/job/82787904621"
       },
       "x86_64-pc-windows-msvc": {
         "id": "studio-smoke-x86_64-pc-windows-msvc",
@@ -727,7 +693,7 @@
         "target": "x86_64-pc-windows-msvc",
         "desktopPackageArtifactId": "studio-desktop-x86_64-pc-windows-msvc",
         "runtimeSidecarArtifactId": "studio-runtime-sidecar-x86_64-pc-windows-msvc",
-        "evidenceUrl": "https://github.com/echovisionlab/skenion-studio/actions/runs/27974258954/job/82787904639"
+        "evidenceUrl": "https://github.com/skenion/skenion-studio/actions/runs/27974258954/job/82787904639"
       },
       "aarch64-pc-windows-msvc": {
         "id": "studio-smoke-aarch64-pc-windows-msvc",
@@ -736,7 +702,7 @@
         "target": "aarch64-pc-windows-msvc",
         "desktopPackageArtifactId": "studio-desktop-aarch64-pc-windows-msvc",
         "runtimeSidecarArtifactId": "studio-runtime-sidecar-aarch64-pc-windows-msvc",
-        "evidenceUrl": "https://github.com/echovisionlab/skenion-studio/actions/runs/27974258954/job/82787904673"
+        "evidenceUrl": "https://github.com/skenion/skenion-studio/actions/runs/27974258954/job/82787904673"
       },
       "x86_64-unknown-linux-gnu": {
         "id": "studio-smoke-x86_64-unknown-linux-gnu",
@@ -745,7 +711,7 @@
         "target": "x86_64-unknown-linux-gnu",
         "desktopPackageArtifactId": "studio-desktop-x86_64-unknown-linux-gnu",
         "runtimeSidecarArtifactId": "studio-runtime-sidecar-x86_64-unknown-linux-gnu",
-        "evidenceUrl": "https://github.com/echovisionlab/skenion-studio/actions/runs/27974258954/job/82787904666"
+        "evidenceUrl": "https://github.com/skenion/skenion-studio/actions/runs/27974258954/job/82787904666"
       },
       "aarch64-unknown-linux-gnu": {
         "id": "studio-smoke-aarch64-unknown-linux-gnu",
@@ -754,14 +720,14 @@
         "target": "aarch64-unknown-linux-gnu",
         "desktopPackageArtifactId": "studio-desktop-aarch64-unknown-linux-gnu",
         "runtimeSidecarArtifactId": "studio-runtime-sidecar-aarch64-unknown-linux-gnu",
-        "evidenceUrl": "https://github.com/echovisionlab/skenion-studio/actions/runs/27974258954/job/82787904640"
+        "evidenceUrl": "https://github.com/skenion/skenion-studio/actions/runs/27974258954/job/82787904640"
       }
     },
     "examplesConformance": {
       "id": "examples-conformance",
       "status": "pending",
       "required": true,
-      "repository": "echovisionlab/Skenion-examples",
+      "repository": "skenion/skenion-examples",
       "ref": "skenion-examples-v0.43.0",
       "version": "0.43.0"
     },
@@ -771,7 +737,7 @@
       "required": true,
       "manualVersion": "0.43.0",
       "manualPath": "/manual/0.43/",
-      "pagesUrl": "https://echovisionlab.github.io/Skenion-docs/manual/0.43/"
+      "pagesUrl": "https://skenion.github.io/skenion-docs/manual/0.43/"
     }
   }
 }

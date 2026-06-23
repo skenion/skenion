@@ -99,4 +99,4 @@ run "studio: app build smoke" bash -lc \
   "cd '${STUDIO_DIR}' && pnpm install --frozen-lockfile && pnpm run build"
 
 echo
-echo "Skenion cross-repo compatibility smoke passed."
+echo "skenion cross-repo compatibility smoke passed."

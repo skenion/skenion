@@ -1,22 +1,25 @@
 # Codex Agent Context
 
-GitHub milestones and issues are the source of truth for sequencing Skenion
-work. Before committing, opening PRs, or writing close keywords, check the
-relevant repo milestone and issue state.
+GitHub milestones, issues, and the `skenion Product Release Train` org Project
+(`skenion/projects/1`) are the source of truth for sequencing skenion work.
+Before committing, opening PRs, or writing close keywords, check the relevant
+repo milestone, issue state, and org Project item when the work is part of a
+release train. Do not treat moving an org Project item as release completion;
+the release matrix and artifact gates remain authoritative.
 
-Skenion v0 uses lockstep product SemVer across releasable repositories and
+skenion v0 uses lockstep product SemVer across releasable repositories and
 artifacts. If the product train is `0.55`, every package, crate, app, Runtime
 sidecar asset, examples release marker, and Manual release marker in that train
 must use the same product version, using registry-compatible SemVer such as
 `0.55.0` where required.
-The hub repository `echovisionlab/skenion` owns product train conductor state,
+The hub repository `skenion/skenion` owns product train conductor state,
 release manifests, release ordering, and completion reporting. The
-`echovisionlab/skenion-ci` repository owns reusable workflow implementation.
+`skenion/skenion-ci` repository owns reusable workflow implementation.
 The first v0 train default is product version `0.43.0` with `trainId: "0.43"`.
 Train releases follow Contracts -> Runtime -> SDK -> Studio -> Examples ->
 Docs.
 
-Skenion v0 does not support legacy, deprecated, or import-only compatibility
+skenion v0 does not support legacy, deprecated, or import-only compatibility
 paths. Unsupported graph, project, node, operation, extension, package,
 manifest, Runtime HTTP, or protocol versions must be rejected with structured
 diagnostics. Do not add migration/import fallbacks, default-session aliases, or
@@ -28,9 +31,12 @@ label. Do not preserve the old v0.1 meaning as legacy compatibility.
 Release and publish workflows must run through Release Please and GitHub
 Actions only. During v0, Release Please PRs are conductor-dispatched with an
 explicit `release-as` matching the train version. Independent automatic
-per-repository Release Please authority is stale. Do not publish npm packages,
-crates, Runtime binaries, Studio packages, or Manual releases from a local
-machine.
+per-repository Release Please authority is stale. Publish registry packages
+only for importable libraries: `@skenion/contracts`, `skenion-contracts`, and
+`@skenion/sdk`. Runtime binaries, Studio builds, examples, Manual pages, and
+`skenion-ci` are release assets, tags, deployments, or workflow refs. Do not
+publish npm packages, crates, Runtime binaries, Studio packages, or Manual
+releases from a local machine.
 
 Runtime IO must remain node/object-level behavior. Do not add Runtime-global
 MIDI, Runtime-global clock source, or Runtime-owned semantic IO start/stop UI.
@@ -39,7 +45,7 @@ node/object parameter editors.
 
 ## Manager, Worker, And Review Gate Defaults
 
-Codex should operate as a manager/orchestrator on Skenion work. The manager owns
+Codex should operate as a manager/orchestrator on skenion work. The manager owns
 sequencing, milestone and issue hygiene, PR title/body/close-keyword control,
 worker assignment, integration, and final reporting. Except for trivial
 documentation, context, issue, or status edits, the manager should not directly

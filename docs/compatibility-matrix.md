@@ -4,7 +4,7 @@ This matrix records the current source-of-truth boundaries for graph, node, and
 runtime compatibility. It exists to keep `skenion-contracts`, `skenion-examples`,
 `skenion-studio`, and `skenion-runtime` on one lockstep product train.
 
-Skenion v0 has no legacy or deprecated compatibility mode. Each surface accepts
+skenion v0 has no legacy or deprecated compatibility mode. Each surface accepts
 only the current exact schema/protocol version listed here. Older graph,
 project, node, operation, extension, package, manifest, Runtime HTTP, or
 protocol versions must be rejected with structured diagnostics.
@@ -145,7 +145,7 @@ ready. Do not record mismatched local worktree versions here.
 | Artifact group | Required train state |
 | --- | --- |
 | Contracts npm/crate | Same product version as the train, published from Release Please/GitHub Actions |
-| Runtime crate/binaries | Same product version as the train, with multi-arch sidecar assets and checksums |
+| Runtime binaries | Same product version as the train, with multi-arch sidecar assets and checksums |
 | SDK npm | Same product version as the train |
 | Studio web/desktop | Same product version as the train, with Runtime sidecar compatibility verified |
 | Examples | Same product train tag/commit, current-version fixtures only |

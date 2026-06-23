@@ -6,7 +6,7 @@ Accepted.
 
 ## Context
 
-Skenion has separate implementation surfaces:
+skenion has separate implementation surfaces:
 
 - Rust native runtime
 - browser editor/controller/viewer
@@ -21,7 +21,8 @@ it would blur the most important boundary: contracts versus implementations.
 
 ## Decision
 
-Start Skenion as a public multi-repository project under EchoVisionLab.
+Start skenion as a public multi-repository project under the `skenion` GitHub
+organization.
 
 Initial repositories:
 
@@ -33,7 +34,7 @@ Initial repositories:
 - `skenion-examples`
 - `skenion-ci`
 
-Use `skenion-ci` for Skenion-specific reusable workflows instead of an org-level
+Use `skenion-ci` for skenion-specific reusable workflows instead of an org-level
 `.github` repository.
 
 Use Mantine as the default UI component system for `skenion-studio`.

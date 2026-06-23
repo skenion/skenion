@@ -6,13 +6,13 @@ Accepted
 
 ## Context
 
-Skenion Studio needs a node-link canvas with pan, zoom, selection, drag handles,
+skenion Studio needs a node-link canvas with pan, zoom, selection, drag handles,
 connection gestures, custom node rendering, and edge feedback. Building that
 interaction layer directly would delay the more important contract, runtime,
 and authoring work.
 
 The canvas library must not become the saved graph format or execution model.
-Skenion already has a graph document contract, node definition manifests, and a
+skenion already has a graph document contract, node definition manifests, and a
 runtime-owned execution model.
 
 ## Decision
@@ -20,15 +20,15 @@ runtime-owned execution model.
 Use `@xyflow/react` as the Studio canvas interaction layer.
 
 React Flow nodes and edges are derived view-model state. They are not persisted
-as Skenion project files, and they are not runtime IR.
+as skenion project files, and they are not runtime IR.
 
 Studio must keep explicit conversion boundaries:
 
-- `toReactFlowViewModel()` maps Skenion graph documents, patch definitions, and
+- `toReactFlowViewModel()` maps skenion graph documents, patch definitions, and
   node definitions into canvas nodes, handles, and edges.
 - Studio command builders map canvas gestures into Runtime operation envelopes,
   such as move, connect, edit params, and `pasteGraphFragment`.
-- edge validation calls Skenion compatibility logic before a connection is
+- edge validation calls skenion compatibility logic before a connection is
   committed.
 
 Mantine remains the default component system for node bodies, inspectors,
@@ -50,10 +50,10 @@ There is no `flow: "gpu"` value.
 ## Consequences
 
 React Flow gives the project a strong default interaction layer without
-capturing Skenion's storage or execution model.
+capturing skenion's storage or execution model.
 
 If performance or rendering limits appear later, Studio can replace the canvas
-implementation while preserving the Skenion graph and patch boundary.
+implementation while preserving the skenion graph and patch boundary.
 
 ELK.js remains a likely later dependency for auto-layout, but it is not an
 initial requirement.

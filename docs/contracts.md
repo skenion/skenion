@@ -1,6 +1,6 @@
 # Contracts
 
-Skenion separates persisted documents from live runtime communication.
+skenion separates persisted documents from live runtime communication.
 
 ## Live Control Plane
 

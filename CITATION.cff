@@ -1,11 +1,11 @@
 cff-version: 1.2.0
-message: "If Skenion helps your artwork, research, publication, installation, or tool, please cite it."
-title: "Skenion"
+message: "If skenion helps your artwork, research, publication, installation, or tool, please cite it."
+title: "skenion"
 type: software
 authors:
-  - name: "EchoVisionLab"
+  - name: "skenion contributors"
 date-released: 2026-06-15
-url: "https://github.com/echovisionlab/skenion"
-repository-code: "https://github.com/echovisionlab/skenion"
+url: "https://github.com/skenion/skenion"
+repository-code: "https://github.com/skenion/skenion"
 license: "Apache-2.0"
-abstract: "Skenion is an open-source interactive artwork platform with a browser editor and native Rust runtime."
+abstract: "skenion is an open-source interactive artwork platform with a browser editor and native Rust runtime."

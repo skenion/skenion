@@ -1,14 +1,14 @@
 # Release Train Manifests
 
 This directory contains product release train manifests owned by the
-`echovisionlab/skenion` hub conductor.
+`skenion/skenion` hub conductor.
 
 The hub is the source of truth for product state: train identity, component
 order, protocol baselines, artifact inventory, release gates, and release
 completion reporting. The manifest shape is owned by the flat
-`skenion.release-train` schema in `Skenion-contracts`; the hub must not invent a
+`skenion.release-train` schema in `skenion-contracts`; the hub must not invent a
 second manifest shape. Reusable workflow implementation belongs in
-`echovisionlab/skenion-ci`; it should not own product train state.
+`skenion/skenion-ci`; it should not own product train state.
 
 ## Lifecycle
 
@@ -56,7 +56,7 @@ A train is not complete when main branch CI is green. It is complete only when
 the manifest verifies all blocking gates:
 
 - Contracts npm package and Rust crate published at the train version.
-- Runtime crate and blocking-tier binary assets published at the train version.
+- Runtime blocking-tier binary assets published at the train version.
 - Runtime binary checksums recorded and verified.
 - SDK npm package published at the train version.
 - Studio web/desktop artifacts published at the train version and verified
@@ -70,3 +70,6 @@ their state must be visible in the manifest.
 Registry and release publishing must run only from GitHub Actions release
 workflows. Local machines may run dry-run checks, but must never upload npm
 packages, crates, Runtime binaries, Studio packages, or Manual releases.
+Registry packages are only for importable libraries; Runtime, Studio, Examples,
+Manual, and CI distribution surfaces are release assets, tags, deployments, or
+workflow refs.

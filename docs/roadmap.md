@@ -1,11 +1,11 @@
 # Roadmap
 
-This roadmap orders the first public Skenion repositories by contract risk.
+This roadmap orders the first public skenion repositories by contract risk.
 The goal is to stabilize the shared language before building a large Studio UI.
 
 ## Milestone Baseline
 
-The GitHub roadmap is tracked with repository milestones across the Skenion
+The GitHub roadmap is tracked with repository milestones across the skenion
 family. The current baseline is:
 
 | Milestone | Status | Scope |
@@ -15,7 +15,7 @@ family. The current baseline is:
 | M03 Audio Backend v0: Single Output CPAL | Closed | One default CPAL output and one output sample clock domain. |
 | M04 Audio Multi-Endpoint / Clock Domain Planning | Current | Endpoint descriptors, input/output clock domains, partition planning, explicit bridge/resample validation. |
 | M05 Runtime IO Substrate v0 | Current | Transport-neutral raw IO discovery and per-object binding contracts for MIDI, HID, Serial, and inline fixtures. |
-| M06 IO Codec Contract v0 | Current | Decoder/encoder contracts that interpret raw transport frames as Skenion messages/values and encode messages/values back to transport frames. |
+| M06 IO Codec Contract v0 | Current | Decoder/encoder contracts that interpret raw transport frames as skenion messages/values and encode messages/values back to transport frames. |
 | M06.5 Native Runtime Extension ABI v0 | Current | Native extension ABI, package manifests, capability registration, diagnostics, and SDK authoring substrate. |
 | M06.75 Graph 0.1 Subpatch / Live Help Foundation | Current | Patch libraries, `core.inlet`/`core.outlet`, live help as real patch graphs, `GraphFragmentV01`, and high-level paste semantics on the consolidated current `0.1` graph surface. |
 | M06.8 Desktop Multi-Window / Runtime Session Profiles v0 | Current | Tauri desktop shell, local-managed/local-shared/remote profiles, sidecar lifecycle, and same-session multi-view editing. |
@@ -119,7 +119,7 @@ are user-facing objects regardless of whether the text resolves today:
 - Display text prefers `objectText`, then a native alias, then the internal kind
   only as a fallback.
 
-M06 defines codecs. A decoder maps raw transport frames into Skenion
+M06 defines codecs. A decoder maps raw transport frames into skenion
 messages/values; an encoder maps messages/values back to transport frames.
 MIDI note/CC/clock parsing, serial line parsing, binary sensor packet parsing,
 and HID report interpretation are codec behavior, not Runtime IO discovery.

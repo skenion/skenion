@@ -1,6 +1,6 @@
 # Repository Map
 
-Skenion uses multiple public repositories because the runtime, editor, protocol,
+skenion uses multiple public repositories because the runtime, editor, protocol,
 SDK, examples, and CI rules have different ownership boundaries and stability
 requirements. During v0, released artifacts move together on one lockstep
 product train.
@@ -129,7 +129,7 @@ Examples must not depend on unpublished private packages.
 
 ### `skenion-ci`
 
-Skenion-specific reusable CI and release automation.
+skenion-specific reusable CI and release automation.
 
 Owns:
 

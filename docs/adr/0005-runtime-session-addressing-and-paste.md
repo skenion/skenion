@@ -6,7 +6,7 @@ Accepted
 
 ## Context
 
-Skenion Runtime currently exposes a singleton session surface such as
+skenion Runtime currently exposes a singleton session surface such as
 `/v0/session`, `/v0/session/mutate`, and `/v0/session/events/stream`. That was
 enough for a local bootstrap, but it is not enough for desktop multi-window
 editing, volatile help working copies, remote Runtime connections, or realtime

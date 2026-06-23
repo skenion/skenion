@@ -1,6 +1,6 @@
 # Local Demo
 
-This demo path is the current quickest way to learn Skenion locally.
+This demo path is the current quickest way to learn skenion locally.
 
 ## Start Runtime
 

@@ -1,6 +1,6 @@
 # Releases
 
-Skenion v0 uses lockstep product Semantic Versioning across releasable
+skenion v0 uses lockstep product Semantic Versioning across releasable
 repositories and artifacts.
 
 If the product train is `0.55`, every releasable package/application/artifact
@@ -35,19 +35,19 @@ record:
 
 - product train id, such as `0.55`
 - the lockstep `@skenion/contracts` npm version and `skenion-contracts` crate version
-- the lockstep `skenion-runtime` crate version
-- `skenion-runtime` binary release assets by OS/arch, with checksums
+- the lockstep `skenion-runtime` product binary release assets by OS/arch, with
+  checksums
 - the lockstep `@skenion/sdk` npm version
-- the lockstep Studio web/desktop release version
+- the lockstep Studio web/static deployment and desktop release version
 - Examples tag or commit used for conformance
 - Manual version and GitHub Pages deployment
 - exact graph, node, runtime-wire, extension, and manifest protocol baselines
 - `capabilitySet` covering protocol surfaces plus required Runtime, Studio,
   package/marketplace, and Manual capabilities
 
-`echovisionlab/skenion` is the conductor and product state owner. It owns train
+`skenion/skenion` is the conductor and product state owner. It owns train
 manifest instances, release order, cross-repository dispatch, release gate
-state, and completion reporting. `echovisionlab/skenion-ci` owns reusable
+state, and completion reporting. `skenion/skenion-ci` owns reusable
 workflow implementation and should expose pinned `workflow_call` entrypoints
 for conductor use.
 
@@ -58,9 +58,9 @@ release train gates.
 Recommended release order:
 
 1. Contracts npm/crate.
-2. Runtime crate and multi-arch binary assets.
+2. Runtime multi-arch binary assets.
 3. SDK npm.
-4. Studio web/desktop package.
+4. Studio web/static and desktop artifacts.
 5. Examples conformance against released artifacts.
 6. Docs Manual deployment.
 
@@ -70,12 +70,10 @@ release tags, GitHub Release assets, or a checked-in train manifest.
 
 ## Runtime And Desktop Artifacts
 
-`skenion-runtime` is both a Rust crate and a product binary.
-
-The crate is useful for Rust consumers and docs.rs. The binary is required for
-standalone Runtime installs and for Studio Desktop `local-managed` mode where
-Tauri bundles Runtime as a sidecar. Runtime release completion therefore
-requires GitHub Release assets in addition to crates.io publication.
+`skenion-runtime` is a product binary. The binary is required for standalone Runtime installs and for Studio Desktop
+`local-managed` mode where Tauri bundles Runtime as a sidecar. Runtime release
+completion is based on GitHub Release assets and checksums, not registry
+publishing.
 
 Design target matrix:
 
@@ -106,7 +104,7 @@ through the package marketplace flow.
 
 Every releasable repository should use Release Please for version files,
 changelogs, tags, and GitHub releases. During v0, Release Please PRs are
-conductor-dispatched from `echovisionlab/skenion` with an explicit
+conductor-dispatched from `skenion/skenion` with an explicit
 `release-as` matching the train version. Automatic independent per-repository
 release authority is stale for v0 product trains.
 
@@ -121,23 +119,25 @@ Release Please owns:
 Package publishing should be separate and should run only after Release Please
 reports that a release was created.
 
-Do not merge or publish a Release Please PR that bumps a package, crate, app, or
-Manual version away from the current product train version. A repository with no
-code changes still remains part of the lockstep train through its release tag,
-artifact metadata, deployment marker, or train manifest entry.
+Do not merge or publish a Release Please PR that bumps a package, app, artifact,
+or Manual version away from the current product train version. A repository with
+no code changes still remains part of the lockstep train through its release
+tag, artifact metadata, deployment marker, or train manifest entry.
 
-Release Please workflows should use this token order:
+Release train workflows should use this token order when dispatching
+cross-repository Release Please or verification jobs:
 
 ```yaml
 with:
-  token: ${{ secrets.SKENION_RELEASE_PLEASE_TOKEN || secrets.GITHUB_TOKEN }}
+  token: ${{ secrets.SKENION_RELEASE_TRAIN_TOKEN || secrets.GITHUB_TOKEN }}
 ```
 
-`SKENION_RELEASE_PLEASE_TOKEN` should be a repository or organization secret
-backed by a fine-grained personal access token that can create release PRs,
-tags, and releases. Without that secret, Release Please falls back to
-`GITHUB_TOKEN`; the release PR will still be created, but GitHub will not start
-normal PR CI from events created by that token.
+`SKENION_RELEASE_TRAIN_TOKEN` should be a repository or organization secret
+backed by a fine-grained personal access token that can dispatch workflows
+across `skenion/*`, create release PRs, tags, and releases, and read release
+artifacts. Without that secret, workflows may fall back to `GITHUB_TOKEN` only
+for same-repository dry runs; cross-repository publish orchestration is not
+release-complete until the train token is configured.
 
 This is expected GitHub Actions recursion protection, not a test failure. Do not
 treat an empty-job `action_required` release PR run as a code failure. Configure
@@ -221,7 +221,7 @@ Repository workflows should call pinned reusable workflows:
 ```yaml
 jobs:
   ci:
-    uses: EchoVisionLab/skenion-ci/.github/workflows/ts-ci.yml@v1
+    uses: skenion/skenion-ci/.github/workflows/ts-ci.yml@v1
 ```
 
 Publish workflows should use minimal permissions and GitHub environments for
