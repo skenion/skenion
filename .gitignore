@@ -1,15 +1,33 @@
+# OS and editor files
 .DS_Store
 .idea/
 .vscode/
-node_modules/
-target/
-dist/
-build/
+
+# Local environment
 .env
 .env.*
 !.env.example
 
-# Generated release-train validation output
+# Dependencies and package-manager state
+node_modules/
+.pnpm-store/
+
+# Build, coverage, and logs
+target/
+dist/
+build/
+coverage/
+test-results/
+playwright-report/
+junit.xml
+junit-*.xml
+*.log
+npm-debug.log*
+pnpm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Release-train validation scratch
 .skenion-train/
 .skenion-ci/
 .caller/
