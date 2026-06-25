@@ -59,6 +59,16 @@ create normal code PRs, or trigger approved `workflow_dispatch` jobs; the
 actual release mutation must run in CI with reviewed workflow code and
 auditable logs.
 
+Large Runtime/Studio release artifacts publish to the DSUB MinIO-backed release
+store through GitHub Actions. The S3 upload endpoint must be the public Caddy
+route `https://s3.dsub.io`, and it must validate on GitHub-hosted runner TLS
+stacks. If publish fails with `CERTIFICATE_VERIFY_FAILED`, inspect the public
+certificate chain with `openssl s_client -connect s3.dsub.io:443 -servername
+s3.dsub.io -verify_return_error -showcerts` before changing release workflow
+logic. Do not use AWS CLI `--no-verify-ssl`; fix the Caddy/ACME chain or the
+runner trust configuration. Caddy must not prefer the shortest Let's Encrypt
+chain for this endpoint when that chain is not trusted by GitHub runners.
+
 GitHub Actions workflows that need cross-repository or release automation
 credentials must use the organization Actions secret `GH_TOKEN`. Do not create
 separate Release Please credentials, release-train credentials, or default
