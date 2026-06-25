@@ -87,10 +87,18 @@ Codex should operate as a manager/orchestrator on skenion work. The manager owns
 sequencing, milestone and issue hygiene, PR title/body/close-keyword control,
 worker assignment, integration, and final reporting. Except for trivial
 documentation, context, issue, or status edits, the manager should not directly
-modify code. Implementation work and follow-up fixes should be delegated to
-focused worker agents, then integrated by the manager. Workers must receive a
-clear ownership scope, usually specific files, modules, or repository slices,
-and must be told that other agents may be editing nearby code.
+modify code. The manager may and should make genuinely trivial, non-behavioral
+mechanical corrections directly, such as a one-line lint rule rewrite, typo,
+format-only adjustment, PR body correction, Project field correction, or
+context wording update. For these trivial corrections, the manager may perform
+the review/check directly and must not create unnecessary worker or reviewer
+agents. Do not use that exception for changes that affect runtime behavior,
+public API/schema/protocol meaning, release artifact meaning, dependency
+resolution, UI behavior, or test expectations. Implementation work and
+follow-up fixes should be delegated to focused worker agents, then integrated by
+the manager. Workers must receive a clear ownership scope, usually specific
+files, modules, or repository slices, and must be told that other agents may be
+editing nearby code.
 
 Follow-up work is not an exception: if review, CI, or user feedback requires
 non-trivial code changes, the manager must assign that work to a worker and send
@@ -105,7 +113,16 @@ boundaries, readability, test coverage, CI risk, and milestone acceptance
 criteria. If the gate fails, the manager must send concrete fixes back to a
 worker, then run the gate again until the slice passes or a real blocker is
 recorded in the issue. The manager may only make trivial documentation,
-context, issue, or status corrections directly.
+context, issue, status, or non-behavioral mechanical corrections directly, and
+may self-review those trivial corrections with the smallest relevant check.
+Do not route trivial corrections through an avoidable reviewer gate.
+
+Agent lifecycle hygiene is mandatory. Once a worker, explorer, or reviewer has
+reported its final result and the manager has captured the useful output, the
+manager must close that agent immediately. Completed agents must not be left
+open as background clutter or treated as reusable context storage. If the same
+specialist is needed again later, spawn or resume deliberately for that new
+task instead of leaving reported agents open.
 
 Default code quality requirements:
 
